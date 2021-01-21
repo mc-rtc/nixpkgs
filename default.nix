@@ -15,4 +15,5 @@ self: super:
   eigen-qld = super.callPackage ./pkgs/eigen-qld {};
   eigen-quadprog = super.callPackage ./pkgs/eigen-quadprog {};
   sch-core = super.callPackage ./pkgs/sch-core {};
+  tasks = super.callPackage ./pkgs/tasks {};
 }
