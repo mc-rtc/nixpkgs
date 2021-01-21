@@ -18,4 +18,5 @@ self: super:
   tasks = super.callPackage ./pkgs/tasks {};
   mc-rtc-data = super.callPackage ./pkgs/mc-rtc-data {};
   state-observation = super.callPackage ./pkgs/state-observation {};
+  mc-rbdyn-urdf = super.callPackage ./pkgs/mc-rbdyn-urdf {};
 }
