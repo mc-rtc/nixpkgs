@@ -13,4 +13,5 @@ self: super:
   spacevecalg = super.callPackage ./pkgs/spacevecalg {};
   rbdyn = super.callPackage ./pkgs/rbdyn {};
   eigen-qld = super.callPackage ./pkgs/eigen-qld {};
+  eigen-quadprog = super.callPackage ./pkgs/eigen-quadprog {};
 }
