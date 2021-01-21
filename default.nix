@@ -17,4 +17,5 @@ self: super:
   sch-core = super.callPackage ./pkgs/sch-core {};
   tasks = super.callPackage ./pkgs/tasks {};
   mc-rtc-data = super.callPackage ./pkgs/mc-rtc-data {};
+  state-observation = super.callPackage ./pkgs/state-observation {};
 }
