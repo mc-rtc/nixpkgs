@@ -1,5 +1,5 @@
 { pkgs ? import <nixpkgs> { overlays = [ (import ./default.nix) ]; }
 }:
 pkgs.mkShell {
-  buildInputs = with pkgs; [ cmake mc-rtc ];
+  buildInputs = with pkgs; [ cmake mc-rtc tvm ];
 }

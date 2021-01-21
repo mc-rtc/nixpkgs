@@ -26,5 +26,6 @@ self: super:
   state-observation = super.callPackage ./pkgs/state-observation {};
   mc-rbdyn-urdf = super.callPackage ./pkgs/mc-rbdyn-urdf {};
   mc-rtc = super.callPackage ./pkgs/mc-rtc {};
+  tvm = super.callPackage ./pkgs/tvm {};
 }
 #          --replace 'include(@PACKAGE_CMAKE_INSTALL_PREFIX@/@PACKAGE_INSTALL_DESTINATION@/@PROJECT_NAME@-target.cmake)' 'include(\${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@-target.cmake)' \
