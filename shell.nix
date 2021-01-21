@@ -1,5 +1,5 @@
 { pkgs ? import <nixpkgs> { overlays = [ (import ./default.nix) ]; }
 }:
 pkgs.mkShell {
-  buildInputs = with pkgs; [ cmake hpp-spline tasks mc-rtc-data state-observation mc-rbdyn-urdf ];
+  buildInputs = with pkgs; [ cmake mc-rtc ];
 }
