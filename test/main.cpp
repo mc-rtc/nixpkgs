@@ -15,8 +15,9 @@ int main()
   mc_control::MCGlobalController gc;
 
   std::vector<double> initq;
-  initq.reserve(gc.robot().refJointOrder().size());
-  for(const auto & j : gc.robot().refJointOrder())
+  const auto & rjo = gc.robot().module().ref_joint_order();
+  initq.reserve(rjo.size());
+  for(const auto & j : rjo)
   {
     initq.push_back(gc.robot().mbc().q[gc.robot().jointIndexByName(j)][0]);
   }

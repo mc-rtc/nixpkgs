@@ -27,5 +27,6 @@ self: super:
   mc-rbdyn-urdf = super.callPackage ./pkgs/mc-rbdyn-urdf {};
   mc-rtc = super.callPackage ./pkgs/mc-rtc {};
   tvm = super.callPackage ./pkgs/tvm {};
+  mc-rtc-tvm = super.callPackage ./pkgs/mc-rtc { with-tvm = true; };
 }
 #          --replace 'include(@PACKAGE_CMAKE_INSTALL_PREFIX@/@PACKAGE_INSTALL_DESTINATION@/@PROJECT_NAME@-target.cmake)' 'include(\${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@-target.cmake)' \
