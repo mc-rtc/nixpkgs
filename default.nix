@@ -9,7 +9,8 @@ self: super:
       sha256 = "0raa8r2hsagk7gjlqjwax95ib8d47ba79n91r4aws2zg8y6ssv1d";
     };
   });
+  hpp-spline = super.callPackage ./pkgs/hpp-spline {};
   spacevecalg = super.callPackage ./pkgs/spacevecalg {};
   rbdyn = super.callPackage ./pkgs/rbdyn {};
-  hpp-spline = super.callPackage ./pkgs/hpp-spline {};
+  eigen-qld = super.callPackage ./pkgs/eigen-qld {};
 }
