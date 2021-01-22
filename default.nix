@@ -25,8 +25,7 @@ self: super:
   mc-rtc-data = super.callPackage ./pkgs/mc-rtc-data {};
   state-observation = super.callPackage ./pkgs/state-observation {};
   mc-rbdyn-urdf = super.callPackage ./pkgs/mc-rbdyn-urdf {};
-  mc-rtc = super.callPackage ./pkgs/mc-rtc {};
   tvm = super.callPackage ./pkgs/tvm {};
-  mc-rtc-tvm = super.callPackage ./pkgs/mc-rtc { with-tvm = true; };
+  mc-rtc = super.callPackage ./pkgs/mc-rtc {};
 }
 #          --replace 'include(@PACKAGE_CMAKE_INSTALL_PREFIX@/@PACKAGE_INSTALL_DESTINATION@/@PROJECT_NAME@-target.cmake)' 'include(\${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@-target.cmake)' \

@@ -2,8 +2,7 @@
   with-tvm ? false
 }:
 pkgs.mkShell rec {
-  mc-rtc = if with-tvm then pkgs.mc-rtc-tvm else pkgs.mc-rtc;
-  buildInputs = builtins.trace mc-rtc.with-tvm [ pkgs.cmake mc-rtc ];
+  buildInputs = with pkgs; [ cmake (mc-rtc.override { with-tvm = with-tvm; }) ];
   shellHook = ''
     export TMP=/tmp
     export TMPDIR=/tmp
