@@ -27,5 +27,11 @@ self: super:
   mc-rbdyn-urdf = super.callPackage ./pkgs/mc-rbdyn-urdf {};
   tvm = super.callPackage ./pkgs/tvm {};
   mc-rtc = super.callPackage ./pkgs/mc-rtc {};
+  omniorb-python = super.callPackage ./pkgs/omniorb-python {
+    buildPythonPackage = super.python2Packages.buildPythonPackage;
+  };
+  openrtm-aist = super.callPackage ./pkgs/openrtm-aist {};
+  openrtm-aist-python = super.callPackage ./pkgs/openrtm-aist-python {
+    buildPythonPackage = super.python2Packages.buildPythonPackage;
+  };
 }
-#          --replace 'include(@PACKAGE_CMAKE_INSTALL_PREFIX@/@PACKAGE_INSTALL_DESTINATION@/@PROJECT_NAME@-target.cmake)' 'include(\${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@-target.cmake)' \
