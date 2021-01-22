@@ -27,8 +27,15 @@ self: super:
   mc-rbdyn-urdf = super.callPackage ./pkgs/mc-rbdyn-urdf {};
   tvm = super.callPackage ./pkgs/tvm {};
   mc-rtc = super.callPackage ./pkgs/mc-rtc {};
-  omniorb-python = super.callPackage ./pkgs/omniorb-python {
-    buildPythonPackage = super.python2Packages.buildPythonPackage;
+  omniorb = super.symlinkJoin {
+    name = "omniorb";
+    paths = [
+      super.omniorb.out
+      (super.callPackage ./pkgs/omniorb-python {
+        omniorb = super.omniorb;
+        buildPythonPackage = super.python2Packages.buildPythonPackage;
+      }).out
+    ];
   };
   openrtm-aist = super.callPackage ./pkgs/openrtm-aist {};
   openrtm-aist-python = super.callPackage ./pkgs/openrtm-aist-python {

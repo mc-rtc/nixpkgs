@@ -11,8 +11,7 @@ buildPythonPackage rec {
     sha256 = "1di73mx9m639adsjzmf234zwdfzsswdc0svm5c039jcwamkxis6s";
   };
 
-  buildInputs = [ python2 ];
-  propagatedBuildInputs = [ omniorb ];
+  buildInputs = [ python2 omniorb ];
 
   format = "other";
 

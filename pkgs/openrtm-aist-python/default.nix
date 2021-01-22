@@ -1,4 +1,4 @@
-{ lib, fetchFromGitHub, python2, buildPythonPackage, openrtm-aist, omniorb-python }:
+{ lib, fetchFromGitHub, python2, buildPythonPackage, openrtm-aist, doxygen }:
 
 buildPythonPackage rec {
   pname = "openrtm-aist-python";
@@ -11,7 +11,8 @@ buildPythonPackage rec {
     sha256 = "0n4sjva3giw4fj1x70qksmmr421g1qbkf2w5fii9s5ykp208bjic";
   };
 
-  nativeBuildInputs = [ python2 openrtm-aist omniorb-python ];
+  nativeBuildInputs = [ python2 openrtm-aist doxygen ];
+  propagatedBuildInputs = [ openrtm-aist ];
 
   doCheck = false;
 
