@@ -42,4 +42,5 @@ self: super:
   openrtm-aist-python = super.callPackage ./pkgs/openrtm-aist-python {
     buildPythonPackage = super.python2Packages.buildPythonPackage;
   };
+  mc-state-observation = super.callPackage ./pkgs/mc-rtc/observers/mc-state-observation {};
 }
