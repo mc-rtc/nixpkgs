@@ -43,4 +43,5 @@ self: super:
     buildPythonPackage = super.python2Packages.buildPythonPackage;
   };
   mc-state-observation = super.callPackage ./pkgs/mc-rtc/observers/mc-state-observation {};
+  lipm-walking-controller = super.callPackage ./pkgs/mc-rtc/controllers/lipm-walking-controller {};
 }
