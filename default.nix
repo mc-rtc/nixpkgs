@@ -27,6 +27,7 @@ self: super:
   mc-rbdyn-urdf = super.callPackage ./pkgs/mc-rbdyn-urdf {};
   tvm = super.callPackage ./pkgs/tvm {};
   mc-rtc = super.callPackage ./pkgs/mc-rtc {};
+  copra = super.callPackage ./pkgs/copra {};
   omniorb = super.symlinkJoin {
     name = "omniorb";
     paths = [
