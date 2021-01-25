@@ -1,6 +1,6 @@
-{ stdenv, fetchgit, cmake, tasks, eigen-quadprog, libtool, geos, spdlog, fmt, hpp-spline, mc-rtc-data, state-observation, mc-rbdyn-urdf, nanomsg, with-tvm ? false, tvm ? null }:
+{ stdenv, fetchgit, cmake, tasks, eigen-quadprog, libtool, geos, spdlog, fmt, hpp-spline, mc-rtc-data, state-observation, mc-rbdyn-urdf, nanomsg, with-tvm ? false, tvm ? null, plugins ? [], symlinkJoin }:
 
-stdenv.mkDerivation {
+let default = stdenv.mkDerivation {
   pname = "mc-rtc";
   version = if with-tvm then "2.0.0" else "1.6.0";
 
@@ -33,10 +33,25 @@ stdenv.mkDerivation {
 
   with-tvm = with-tvm;
 
+  postInstall = ''
+    sed -i 's/''${PACKAGE_PREFIX_DIR}/''${CMAKE_INSTALL_PREFIX}/' $out/lib/cmake/mc_rtc/mc_rtcMacros.cmake
+    echo 'set(MC_STATES_DEFAULT_INSTALL_PREFIX "''${PACKAGE_PREFIX_DIR}/lib/mc_controller/fsm/states")' >> $out/lib/cmake/mc_rtc/mc_rtcMacros.cmake
+    echo 'set(MC_STATES_DEFAULT_RUNTIME_INSTALL_PREFIX "''${PACKAGE_PREFIX_DIR}/lib/mc_controller/fsm/states")' >> $out/lib/cmake/mc_rtc/mc_rtcMacros.cmake
+    echo 'set(MC_STATES_DEFAULT_LIBRARY_INSTALL_PREFIX "''${PACKAGE_PREFIX_DIR}/lib/mc_controller/fsm/states")' >> $out/lib/cmake/mc_rtc/mc_rtcMacros.cmake
+  '';
+
   meta = with stdenv.lib; {
     description = "An interface for simulated and real robotic systems suitable for real-time control";
     homepage    = "https://github.com/jrl-umi3218/mc_rtc";
     license     = licenses.bsd2;
     platforms   = platforms.all;
   };
+};
+
+in
+
+if plugins == [] then default
+else symlinkJoin {
+  name = (stdenv.lib.lists.foldl (a: b: a + "+" + b.name) default.name) plugins;
+  paths = [ default ] ++ map(p: p.override { mc-rtc = default; }) plugins;
 }
