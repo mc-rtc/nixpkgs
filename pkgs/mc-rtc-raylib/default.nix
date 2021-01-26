@@ -4,19 +4,15 @@ stdenv.mkDerivation {
   pname = "mc-rtc-raylib";
   version = "1.0.0";
 
-  # master branch as of 2021.01.25
+  # master branch as of 2021.01.26
   src = fetchgit {
       url = "https://github.com/gergondet/mc_rtc-raylib";
       rev = "refs/heads/master";
-      sha256 = "1gf1l2kk5sb87hwy83d5i9in713l3dv8q2s2h9hpms4kmva9zzpd";
+      sha256 = "0yqinyv7pkqyhdlv0haikmd4b2dhaqqq11wq2pv7dx46zmkqw85g";
     };
 
   nativeBuildInputs = [ cmake ];
   propagatedBuildInputs = [ mc-rtc assimp libGL libXrandr libXinerama libXcursor libX11 libXi libXext ];
-
-  postPatch = ''
-    echo "install(TARGETS main DESTINATION bin RENAME mc-rtc-raylib)" >> CMakeLists.txt
-  '';
 
   cmakeFlags = [
     "-DBUILD_TESTING=OFF"
