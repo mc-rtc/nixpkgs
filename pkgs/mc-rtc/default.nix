@@ -1,6 +1,17 @@
-{ stdenv, fetchgit, cmake, tasks, eigen-quadprog, libtool, geos, spdlog, fmt, hpp-spline, mc-rtc-data, state-observation, mc-rbdyn-urdf, nanomsg, with-tvm ? false, tvm ? null, plugins ? [], symlinkJoin }:
+{ stdenv, fetchgit, cmake,
+  tasks, eigen-quadprog, libtool, geos, spdlog, fmt, hpp-spline, mc-rtc-data,
+  state-observation, mc-rbdyn-urdf, nanomsg,
+  with-tvm ? false, tvm ? null,
+  with-ros ? true, roscpp, nav-msgs, sensor-msgs, tf2-ros, rosbag, mc-rtc-msgs,
+  plugins ? [], symlinkJoin }:
 
-let default = stdenv.mkDerivation {
+let
+
+mc-rtc-data' = mc-rtc-data.override {
+    with-ros = with-ros;
+};
+
+default = stdenv.mkDerivation {
   pname = "mc-rtc";
   version = if with-tvm then "2.0.0" else "1.6.0";
 
@@ -19,9 +30,18 @@ let default = stdenv.mkDerivation {
       sha256 = "02azyhdd3fryh50d7cv9s2b7nwxhq9mfhwzz9byik247p8sjw97z";
     };
 
+  postPatch = if with-ros then
+    ''
+    sed -i 's@set(''${PACKAGE_PATH_VAR} "''${''${PACKAGE}_INSTALL_PREFIX}@\0/share/''${PACKAGE}@' CMakeLists.txt
+    ''
+    else
+    ''
+    '';
+
   nativeBuildInputs = [ cmake ];
-  propagatedBuildInputs = [ tasks eigen-quadprog libtool geos spdlog fmt hpp-spline mc-rtc-data state-observation mc-rbdyn-urdf nanomsg ]
-  ++ stdenv.lib.optional with-tvm tvm;
+  propagatedBuildInputs = [ tasks eigen-quadprog libtool geos spdlog fmt hpp-spline mc-rtc-data' state-observation mc-rbdyn-urdf nanomsg ]
+  ++ stdenv.lib.optional with-tvm [ tvm ]
+  ++ stdenv.lib.optional with-ros [ roscpp nav-msgs sensor-msgs tf2-ros rosbag mc-rtc-msgs];
 
   cmakeFlags = [
     "-DBUILD_TESTING=OFF"
@@ -31,6 +51,7 @@ let default = stdenv.mkDerivation {
 
   doCheck = true;
 
+  with-ros = with-ros;
   with-tvm = with-tvm;
 
   postInstall = ''

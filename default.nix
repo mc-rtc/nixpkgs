@@ -3,6 +3,11 @@ self: super:
   inherit (super.rosPackages.noetic)
     buildRosPackage
     catkin
+    roscpp
+    nav-msgs
+    tf2-ros
+    sensor-msgs
+    rosbag
     message-generation
     message-runtime
     geometry-msgs;

@@ -5,14 +5,22 @@
 
 let
 
-mc-rtc-data = pkgs.mc-rtc-data.override { with-ros = with-ros; };
-mc-rtc = pkgs.mc-rtc.override { with-tvm = with-tvm; plugins = with pkgs; [ mc-state-observation lipm-walking-controller ]; };
+mc-rtc = pkgs.mc-rtc.override {
+  with-ros = with-ros;
+  with-tvm = with-tvm;
+  plugins = with pkgs;
+    [
+      mc-state-observation
+      lipm-walking-controller
+    ];
+};
+
 rosbash = pkgs.rosPackages.noetic.rosbash;
 
 in
 
 pkgs.mkShell rec {
-  buildInputs = [ mc-rtc-data rosbash ];
+  buildInputs = [ mc-rtc rosbash ];
   shellHook = ''
     export TMP=/tmp
     export TMPDIR=/tmp
@@ -36,8 +44,8 @@ pkgs.mkShell rec {
     export mc_rtc=${mc-rtc}
     cp $etc_dir/mc_rtc.yaml .
     substituteAllInPlace mc_rtc.yaml
-    #cmake $test_dir -DCMAKE_BUILD_TYPE=Release
-    #make
-    #./main mc_rtc.yaml
+    cmake $test_dir -DCMAKE_BUILD_TYPE=Release
+    make
+    ./main mc_rtc.yaml
   '';
 }

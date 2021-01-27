@@ -1,6 +1,6 @@
-{ stdenv, fetchurl, cmake, with-ros ? false, catkin }:
+{ stdenv, fetchurl, cmake, with-ros ? false, catkin, buildRosPackage }:
 
-stdenv.mkDerivation {
+(if with-ros then buildRosPackage else stdenv.mkDerivation) {
   pname = "mc-rtc-data";
   version = "1.0.4";
 
