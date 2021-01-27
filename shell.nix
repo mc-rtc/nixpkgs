@@ -18,6 +18,7 @@ pkgs.mkShell rec {
     export TMPDIR=/tmp
     export TEMP=/tmp
     export TEMPDIR=/tmp
+    etc_dir=$(cd etc && pwd);
     test_dir=$(cd test && pwd);
     tmp_dir=$(mktemp -d /tmp/mc-rtc-nix.XXXXXXXXXXXX)
     cleanup_build() {
@@ -33,7 +34,7 @@ pkgs.mkShell rec {
     trap cleanup_and_exit SIGINT
     cd $tmp_dir
     export mc_rtc=${mc-rtc}
-    cp $test_dir/mc_rtc.yaml .
+    cp $etc_dir/mc_rtc.yaml .
     substituteAllInPlace mc_rtc.yaml
     #cmake $test_dir -DCMAKE_BUILD_TYPE=Release
     #make
