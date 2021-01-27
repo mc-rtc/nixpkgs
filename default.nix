@@ -1,5 +1,12 @@
 self: super:
 {
+  inherit (super.rosPackages.noetic)
+    buildRosPackage
+    catkin
+    message-generation
+    message-runtime
+    geometry-msgs;
+
   nanomsg = super.nanomsg.overrideAttrs( old : rec {
     postPatch = ''
       substituteInPlace cmake/nanomsg-config.cmake.in \
@@ -45,4 +52,5 @@ self: super:
   mc-state-observation = super.callPackage ./pkgs/mc-rtc/observers/mc-state-observation {};
   lipm-walking-controller = super.callPackage ./pkgs/mc-rtc/controllers/lipm-walking-controller {};
   mc-rtc-raylib = super.callPackage ./pkgs/mc-rtc-raylib {};
+  mc-rtc-msgs = super.callPackage ./pkgs/mc-rtc-msgs {};
 }

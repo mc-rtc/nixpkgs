@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, cmake }:
+{ stdenv, fetchurl, cmake, with-ros ? false, catkin }:
 
 stdenv.mkDerivation {
   pname = "mc-rtc-data";
@@ -9,7 +9,7 @@ stdenv.mkDerivation {
     sha256 = "0gvznx4ivcv6ajp6d3j8p942n0spmnzza1lzgib6h1lpi3zhnb38";
   };
 
-  nativeBuildInputs = [ cmake ];
+  nativeBuildInputs = if with-ros then [ catkin ] else [ cmake ];
 
   cmakeFlags = [
     "-DBUILD_TESTING=OFF"

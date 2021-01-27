@@ -1,0 +1,3 @@
+[submodule "ros-overlay"]
+	path = ros-overlay
+	url = https://github.com/lopsided98/nix-ros-overlay
