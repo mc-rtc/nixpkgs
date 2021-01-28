@@ -62,4 +62,6 @@ self: super:
   mc-udp = super.callPackage ./pkgs/mc-udp {};
   hrp4-description = super.callPackage ./pkgs/hrp4-description {};
   mc-hrp4 = super.callPackage ./pkgs/mc-hrp4 {};
+  hrp2-description = super.callPackage ./pkgs/hrp2-description {};
+  mc-hrp2 = super.callPackage ./pkgs/mc-hrp2 {};
 }
