@@ -64,4 +64,6 @@ self: super:
   mc-hrp4 = super.callPackage ./pkgs/mc-hrp4 {};
   hrp2-description = super.callPackage ./pkgs/hrp2-description {};
   mc-hrp2 = super.callPackage ./pkgs/mc-hrp2 {};
+  hrp5-p-description = super.callPackage ./pkgs/hrp5-p-description {};
+  mc-hrp5-p = super.callPackage ./pkgs/mc-hrp5-p {};
 }
