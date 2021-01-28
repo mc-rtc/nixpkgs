@@ -1,5 +1,5 @@
 # DO NOT EDIT THESE OPTIONS
-# They are required to run correctly in nix-shell
+# They are filled in by nix-shell when you run the program
 
 ClearControllerModulePath: true
 ClearRobotModulePath: true
@@ -11,6 +11,5 @@ RobotModulePaths: [@mc_rtc@/lib/mc_robots]
 ObserverModulePaths: [@mc_rtc@/lib/mc_observers]
 GlobalPluginPaths: [@mc_rtc@/lib/mc_plugins]
 
-# You can set your options here
-MainRobot: JVRC1
-Enabled: LIPMWalking
+MainRobot: @main_robot@
+Enabled: @enabled@

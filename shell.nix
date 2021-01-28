@@ -1,30 +1,75 @@
 { pkgs ? import <nixpkgs> { overlays = [ (import ./ros-overlay/overlay.nix) (import ./default.nix) ]; },
   with-ros ? true,
-  with-tvm ? false
+  with-tvm ? false,
+  with-udp ? false
 }:
 
 let
 
+enabled = "CoM";
+main_robot = "JVRC1";
+
+# Here we define a local controller that will be built within the local environment
+my-controller = { cmake, mc-rtc }: pkgs.stdenv.mkDerivation {
+  pname = "my-controller";
+  version = "1.0.0";
+
+  # Shows how the source folder can be changed for mc_rtc 2.0.0 adaptation
+  src = if mc-rtc.with-tvm then
+      /home/gergondet/devel/src/my_controller
+    else
+      /home/gergondet/devel/src/my_controller;
+
+  nativeBuildInputs = [ cmake ];
+  buildInputs = [ mc-rtc ];
+
+  cmakeFlags = [
+    "-DBUILD_TESTING=OFF"
+    "-DPYTHON_BINDING=OFF"
+    "-DINSTALL_DOCUMENTATION=OFF"
+  ];
+
+  doCheck = false;
+};
+
 mc-rtc = pkgs.mc-rtc.override {
   with-ros = with-ros;
   with-tvm = with-tvm;
+  # These are the package that will be added to your mc_rtc base installation
+  # The default configuration (JVRC1 robot and CoM controller) requires no extras
   plugins = with pkgs;
     [
-      mc-state-observation
-      lipm-walking-controller
+      # Example: bring in HRP4
+      # mc-hrp4
+      # Example: lipm-walking-controller requires mc-state-observation
+      # mc-state-observation
+      # lipm-walking-controller
     ];
 };
 
-mc-udp = pkgs.mc-udp.override {
-  mc-rtc = mc-rtc;
-};
+mc-ticker = if with-udp then
+  pkgs.mc-udp.override {
+    mc-rtc = mc-rtc;
+  }
+  else
+  pkgs.callPackage ({ cmake, mc-rtc }: pkgs.stdenv.mkDerivation {
+    pname = "mc-rtc-nix-ticker";
+    version = "1.0.0";
 
-rosbash = pkgs.rosPackages.noetic.rosbash;
+    src = ./ticker;
+
+    nativeBuildInputs = [ cmake ];
+    buildInputs = [ mc-rtc ];
+  }) { mc-rtc = mc-rtc; };
+
+ticker-cmd = if with-udp then "MCUDPControl -f" else "mc-rtc-nix-ticker";
+
+rosbash = if with-ros then pkgs.rosPackages.noetic.rosbash else null;
 
 in
 
 pkgs.mkShell rec {
-  buildInputs = [ mc-udp rosbash ];
+  buildInputs = [ mc-ticker rosbash ];
   shellHook = ''
     export TMP=/tmp
     export TMPDIR=/tmp
@@ -46,8 +91,11 @@ pkgs.mkShell rec {
     trap cleanup_and_exit SIGINT
     cd $tmp_dir
     export mc_rtc=${mc-rtc}
+    export enabled=${enabled}
+    export main_robot=${main_robot}
     cp $etc_dir/mc_rtc.yaml .
     substituteAllInPlace mc_rtc.yaml
-    MCUDPControl -f mc_rtc.yaml
+    ${ticker-cmd} mc_rtc.yaml
+    exit
   '';
 }
