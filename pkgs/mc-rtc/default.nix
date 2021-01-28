@@ -75,4 +75,6 @@ if plugins == [] then default
 else symlinkJoin {
   name = (stdenv.lib.lists.foldl (a: b: a + "+" + b.name) default.name) plugins;
   paths = [ default ] ++ map(p: p.override { mc-rtc = default; }) plugins;
+  with-ros = default.with-ros;
+  with-tvm = default.with-tvm;
 }

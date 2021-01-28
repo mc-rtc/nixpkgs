@@ -15,12 +15,16 @@ mc-rtc = pkgs.mc-rtc.override {
     ];
 };
 
+mc-udp = pkgs.mc-udp.override {
+  mc-rtc = mc-rtc;
+};
+
 rosbash = pkgs.rosPackages.noetic.rosbash;
 
 in
 
 pkgs.mkShell rec {
-  buildInputs = [ mc-rtc rosbash ];
+  buildInputs = [ mc-udp rosbash ];
   shellHook = ''
     export TMP=/tmp
     export TMPDIR=/tmp
@@ -44,8 +48,6 @@ pkgs.mkShell rec {
     export mc_rtc=${mc-rtc}
     cp $etc_dir/mc_rtc.yaml .
     substituteAllInPlace mc_rtc.yaml
-    cmake $test_dir -DCMAKE_BUILD_TYPE=Release
-    make
-    ./main mc_rtc.yaml
+    MCUDPControl -f mc_rtc.yaml
   '';
 }

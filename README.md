@@ -32,6 +32,5 @@ nix-shell display.nix --pure
 Planned features
 --
 
-- [ ] Enable mc_udp in Nix
 - [ ] Enable mc_openrtm in Nix (requires Choreonoid to build in Nix first)
 - [ ] Better document how-to use this to test mc_rtc 2.0.0

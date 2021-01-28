@@ -58,4 +58,5 @@ self: super:
   lipm-walking-controller = super.callPackage ./pkgs/mc-rtc/controllers/lipm-walking-controller {};
   mc-rtc-raylib = super.callPackage ./pkgs/mc-rtc-raylib {};
   mc-rtc-msgs = super.callPackage ./pkgs/mc-rtc-msgs {};
+  mc-udp = super.callPackage ./pkgs/mc-udp {};
 }
