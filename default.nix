@@ -11,7 +11,17 @@ self: super:
     message-generation
     message-runtime
     geometry-msgs
-    xacro;
+    xacro
+    franka-description;
+
+  libfranka = super.rosPackages.noetic.libfranka.overrideAttrs ( old : rec {
+    src = super.fetchgit {
+      url = "https://github.com/frankaemika/libfranka";
+      rev = "f1f46fb008a37eb0d1dba00c971ff7e5a7bfbfd3";
+      sha256 = "1dliddjwaq30fjqc0zvy89c94vmkyxgmgk9k1kamnkhfip6ilmlv";
+    };
+    propagatedBuildInputs = old.propagatedBuildInputs ++ [ super.zlib super.pcre ];
+  });
 
   nanomsg = super.nanomsg.overrideAttrs( old : rec {
     postPatch = ''
@@ -66,4 +76,5 @@ self: super:
   mc-hrp2 = super.callPackage ./pkgs/mc-hrp2 {};
   hrp5-p-description = super.callPackage ./pkgs/hrp5-p-description {};
   mc-hrp5-p = super.callPackage ./pkgs/mc-hrp5-p {};
+  mc-panda = super.callPackage ./pkgs/mc-panda {};
 }
