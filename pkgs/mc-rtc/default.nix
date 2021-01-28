@@ -19,8 +19,8 @@ default = stdenv.mkDerivation {
     # topic/TVM branch as of 2021.01.28
     fetchgit {
       url = "https://github.com/gergondet/mc_rtc";
-      rev = "58e126028c7ef664b52061f1cea0f8ce3c131e56";
-      sha256 = "0q404nr6rn29wy2ian22zwyljrsdjim4pza91gqmgadiw0m1i4a2";
+      rev = "0dcdcd2d3defa6adfa4724c7b9bac8be8827301c";
+      sha256 = "16dp1p9jccmc85p39iqkkhfrs2x9vwhgn1z47rmgvrwbvgn787mz";
     }
   else
     # master branch as of 2021.01.21

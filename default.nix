@@ -10,7 +10,8 @@ self: super:
     rosbag
     message-generation
     message-runtime
-    geometry-msgs;
+    geometry-msgs
+    xacro;
 
   nanomsg = super.nanomsg.overrideAttrs( old : rec {
     postPatch = ''
@@ -59,4 +60,6 @@ self: super:
   mc-rtc-raylib = super.callPackage ./pkgs/mc-rtc-raylib {};
   mc-rtc-msgs = super.callPackage ./pkgs/mc-rtc-msgs {};
   mc-udp = super.callPackage ./pkgs/mc-udp {};
+  hrp4-description = super.callPackage ./pkgs/hrp4-description {};
+  mc-hrp4 = super.callPackage ./pkgs/mc-hrp4 {};
 }
