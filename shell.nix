@@ -39,9 +39,10 @@ mc-rtc = pkgs.mc-rtc.override {
   # The default configuration (JVRC1 robot and CoM controller) requires no extras
   plugins = with pkgs;
     [
-      # Example: bring in HRP4
-      # mc-hrp4
-      # Example: lipm-walking-controller requires mc-state-observation
+      # Example: bring in HRP2/HRP4/HRP5P/panda
+      #          (requires access rights and a correctly configured ssh key for HRP robots)
+      # mc-hrp2 mc-hrp4 mc-hrp5-p mc-panda
+      # Example: bring in lipm-walking-controller which requires mc-state-observation
       # mc-state-observation
       # lipm-walking-controller
     ];

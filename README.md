@@ -51,6 +51,11 @@ Run your own controller
 
 If you need extra dependencies you should add them as arguments to the derivation and in the `buildInputs` array.
 
+Migration from mc_rtc 1.x
+--
+
+A migration guide is provided on [mc_rtc wiki](https://github.com/jrl-umi3218/mc_rtc/wiki/Migration-from-mc_rtc-1.x-to-2.0.0)
+
 Visualize the controller output
 --
 
@@ -72,4 +77,3 @@ Planned features
 --
 
 - [ ] Enable mc_openrtm in Nix (requires Choreonoid to build in Nix first)
-- [ ] Better document how-to use this to test mc_rtc 2.0.0

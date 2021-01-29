@@ -16,11 +16,11 @@ default = stdenv.mkDerivation {
   version = if with-tvm then "2.0.0" else "1.6.0";
 
   src = if with-tvm then
-    # topic/TVM branch as of 2021.01.28
+    # topic/TVM branch as of 2021.01.29
     fetchgit {
       url = "https://github.com/gergondet/mc_rtc";
-      rev = "7e36c262495238ffc6b20c2c3a2e81ba53e90218";
-      sha256 = "1jjyrfq78kjdv188hq2jicd9ks16p16qip9nrmbis8m94ah07z4j";
+      rev = "01f20b995c1716ec27f961aeb5c471802a798d72";
+      sha256 = "1h8hh0azcba16ffs8nnnxkfjjrj1pal47dv5c62gr0ynr336i7b0";
     }
   else
     # master branch as of 2021.01.21
