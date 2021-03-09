@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, cmake, spacevecalg, libyamlcpp, tinyxml-2, boost }:
+{ stdenv, lib, fetchurl, cmake, spacevecalg, libyamlcpp, tinyxml-2, boost }:
 
 stdenv.mkDerivation {
   pname = "rbdyn";
@@ -20,7 +20,7 @@ stdenv.mkDerivation {
 
   doCheck = true;
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "Model the dynamics of rigid body systems";
     homepage    = "https://github.com/jrl-umi3218/RBDyn";
     license     = licenses.bsd2;

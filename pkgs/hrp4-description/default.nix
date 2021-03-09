@@ -1,4 +1,4 @@
-{ stdenv, fetchgit, cmake, with-ros ? false, catkin, buildRosPackage, xacro }:
+{ stdenv, lib, fetchgit, cmake, with-ros ? false, catkin, buildRosPackage, xacro }:
 
 (if with-ros then buildRosPackage else stdenv.mkDerivation) {
   pname = "hrp4-description";
@@ -20,7 +20,7 @@
 
   doCheck = false;
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "HRP4 urdf and data";
     homepage    = "https://gite.lirmm.fr/mc-hrp4/hrp4";
     license     = licenses.bsd2;

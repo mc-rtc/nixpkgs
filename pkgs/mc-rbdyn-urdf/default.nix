@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, cmake, rbdyn, boost }:
+{ stdenv, lib, fetchurl, cmake, rbdyn, boost }:
 
 stdenv.mkDerivation {
   pname = "mc-rbdyn-urdf";
@@ -20,7 +20,7 @@ stdenv.mkDerivation {
 
   doCheck = true;
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "mc-rbdyn-urdf allows one to parse an URDF file and create RBDyn structure from it";
     homepage    = "https://github.com/jrl-umi3218/mc_rbdyn_urdf";
     license     = licenses.bsd2;

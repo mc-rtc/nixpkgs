@@ -1,4 +1,4 @@
-{ stdenv, fetchgit, cmake, eigen-qld, eigen-quadprog, boost }:
+{ stdenv, lib, fetchgit, cmake, eigen-qld, eigen-quadprog, boost }:
 
 stdenv.mkDerivation {
   pname = "tvm";
@@ -25,7 +25,7 @@ stdenv.mkDerivation {
 
   doCheck = true;
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "Tasks with Variable Management";
     homepage    = "https://github.com/jrl-umi3218/tvm";
     license     = licenses.bsd2;

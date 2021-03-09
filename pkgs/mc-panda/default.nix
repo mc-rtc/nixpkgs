@@ -1,4 +1,4 @@
-{ stdenv, fetchgit, cmake, mc-rtc, libfranka, franka-description, xacro } :
+{ stdenv, lib, fetchgit, cmake, mc-rtc, libfranka, franka-description, xacro } :
 
 stdenv.mkDerivation {
   pname = "mc-panda";
@@ -22,7 +22,7 @@ stdenv.mkDerivation {
 
   doCheck = false;
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "Panda RobotModule for mc-rtc";
     homepage    = "https://github.com/jrl-umi3218/mc_panda";
     license     = licenses.bsd2;

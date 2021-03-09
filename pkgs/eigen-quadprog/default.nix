@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, cmake, gfortran, eigen }:
+{ stdenv, lib, fetchurl, cmake, gfortran, eigen }:
 
 stdenv.mkDerivation {
   pname = "eigen-quadprog";
@@ -20,7 +20,7 @@ stdenv.mkDerivation {
 
   doCheck = false;
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "eigen-quadprog allow to use the quadprog QP solver with the Eigen3 library";
     homepage    = "https://github.com/jrl-umi3218/eigen-quadprog";
     license     = licenses.bsd2;

@@ -1,4 +1,4 @@
-{ stdenv, fetchgit, cmake, mc-rtc }:
+{ stdenv, lib, fetchgit, cmake, mc-rtc }:
 
 stdenv.mkDerivation {
   pname = "mc-udp";
@@ -30,7 +30,7 @@ stdenv.mkDerivation {
 
   doCheck = false;
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "UDP interface for mc_rtc";
     homepage    = "https://github.com/jrl-umi3218/mc_udp";
     license     = licenses.bsd2;

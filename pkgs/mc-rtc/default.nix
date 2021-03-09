@@ -1,4 +1,4 @@
-{ stdenv, fetchgit, cmake,
+{ stdenv, lib, fetchgit, cmake,
   tasks, eigen-quadprog, libtool, geos, spdlog, fmt, hpp-spline, mc-rtc-data,
   state-observation, mc-rbdyn-urdf, nanomsg,
   with-tvm ? false, tvm ? null,
@@ -40,8 +40,8 @@ default = stdenv.mkDerivation {
 
   nativeBuildInputs = [ cmake ];
   propagatedBuildInputs = [ tasks eigen-quadprog libtool geos spdlog fmt hpp-spline mc-rtc-data' state-observation mc-rbdyn-urdf nanomsg ]
-  ++ stdenv.lib.optional with-tvm [ tvm ]
-  ++ stdenv.lib.optional with-ros [ roscpp nav-msgs sensor-msgs tf2-ros rosbag mc-rtc-msgs];
+  ++ lib.optional with-tvm [ tvm ]
+  ++ lib.optional with-ros [ roscpp nav-msgs sensor-msgs tf2-ros rosbag mc-rtc-msgs];
 
   cmakeFlags = [
     "-DBUILD_TESTING=OFF"
@@ -61,7 +61,7 @@ default = stdenv.mkDerivation {
     echo 'set(MC_STATES_DEFAULT_LIBRARY_INSTALL_PREFIX "''${PACKAGE_PREFIX_DIR}/lib/mc_controller/fsm/states")' >> $out/lib/cmake/mc_rtc/mc_rtcMacros.cmake
   '';
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "An interface for simulated and real robotic systems suitable for real-time control";
     homepage    = "https://github.com/jrl-umi3218/mc_rtc";
     license     = licenses.bsd2;
@@ -73,7 +73,7 @@ in
 
 if plugins == [] then default
 else symlinkJoin {
-  name = (stdenv.lib.lists.foldl (a: b: a + "+" + b.name) default.name) plugins;
+  name = (lib.lists.foldl (a: b: a + "+" + b.name) default.name) plugins;
   paths = [ default ] ++ map(p: p.override { mc-rtc = default; }) plugins;
   with-ros = default.with-ros;
   with-tvm = default.with-tvm;

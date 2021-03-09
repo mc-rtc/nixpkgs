@@ -1,4 +1,4 @@
-{ stdenv, fetchgit, cmake, boost, eigen }:
+{ stdenv, lib, fetchgit, cmake, boost, eigen }:
 
 stdenv.mkDerivation {
   pname = "state-observation";
@@ -23,7 +23,7 @@ stdenv.mkDerivation {
 
   doCheck = false;
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "Describes interfaces for state observers, and implements some observers (including linear and extended Kalman filters)";
     homepage    = "https://github.com/jrl-umi3218/state-observation";
     license     = licenses.bsd2;

@@ -1,4 +1,4 @@
-{ stdenv, fetchFromGitHub, libuuid, omniorb, which, autoconf, automake, autogen, libtool, python, ccache }:
+{ stdenv, lib, fetchFromGitHub, libuuid, omniorb, which, autoconf, automake, autogen, libtool, python, ccache }:
 
 stdenv.mkDerivation {
   pname = "openrtm-aist";
@@ -37,7 +37,7 @@ stdenv.mkDerivation {
     "--build=${stdenv.buildPlatform.system}"
   ];
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "OpenRTM-aist is a software platform developed on the basis of the RT middleware standard.";
     homepage    = "https://www.openrtm.org";
     license     = licenses.lgpl3;

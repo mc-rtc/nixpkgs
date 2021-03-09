@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, cmake, eigen }:
+{ stdenv, lib, fetchurl, cmake, eigen }:
 
 stdenv.mkDerivation {
   pname = "spacevecalg";
@@ -20,7 +20,7 @@ stdenv.mkDerivation {
 
   doCheck = true;
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "Spatial Vector Algebra with the Eigen library";
     homepage    = "https://github.com/jrl-umi3218/SpaceVecAlg";
     license     = licenses.bsd2;

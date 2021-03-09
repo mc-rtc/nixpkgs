@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, cmake, boost }:
+{ stdenv, lib, fetchurl, cmake, boost }:
 
 stdenv.mkDerivation {
   pname = "sch-core";
@@ -20,7 +20,7 @@ stdenv.mkDerivation {
 
   doCheck = false;
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "sch-core: Effective proximity queries";
     homepage    = "https://github.com/jrl-umi3218/sch-core";
     license     = licenses.bsd2;

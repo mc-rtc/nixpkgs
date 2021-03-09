@@ -1,4 +1,4 @@
-{ stdenv, fetchgit, cmake, with-ros ? false, catkin, buildRosPackage }:
+{ stdenv, lib, fetchgit, cmake, with-ros ? false, catkin, buildRosPackage }:
 
 (if with-ros then buildRosPackage else stdenv.mkDerivation) {
   pname = "hrp2-description";
@@ -19,7 +19,7 @@
 
   doCheck = false;
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "HRP2 urdf and data";
     homepage    = "https://gite.lirmm.fr/mc-hrp2/hrp2_drc";
     license     = licenses.bsd2;

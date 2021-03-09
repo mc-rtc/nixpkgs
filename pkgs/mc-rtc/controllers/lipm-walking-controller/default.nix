@@ -1,4 +1,4 @@
-{ stdenv, fetchgit, cmake, mc-rtc, copra }:
+{ stdenv, lib, fetchgit, cmake, mc-rtc, copra }:
 
 stdenv.mkDerivation {
   pname = "lipm-walking-controller";
@@ -29,7 +29,7 @@ stdenv.mkDerivation {
 
   doCheck = false;
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "Walking controller based on linear inverted pendulum tracking";
     homepage    = "https://github.com/jrl-umi3218/lipm_walking_controller";
     license     = licenses.bsd2;

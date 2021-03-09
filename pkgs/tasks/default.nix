@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, cmake, rbdyn, sch-core, eigen-qld }:
+{ stdenv, lib, fetchurl, cmake, rbdyn, sch-core, eigen-qld }:
 
 stdenv.mkDerivation {
   pname = "tasks";
@@ -20,7 +20,7 @@ stdenv.mkDerivation {
 
   doCheck = true;
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "Real-time control for kinematics tree and list of kinematics tree";
     homepage    = "https://github.com/jrl-umi3218/tasks";
     license     = licenses.bsd2;

@@ -1,4 +1,4 @@
-{ stdenv, fetchgit, cmake, mc-rtc }:
+{ stdenv, lib, fetchgit, cmake, mc-rtc }:
 
 stdenv.mkDerivation {
   pname = "mc-state-observation";
@@ -28,7 +28,7 @@ stdenv.mkDerivation {
 
   doCheck = false;
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "Extra mc_rtc observers";
     homepage    = "https://github.com/arntanguy/mc_state_observation";
     license     = licenses.bsd2;

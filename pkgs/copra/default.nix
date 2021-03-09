@@ -1,5 +1,5 @@
 
-{ stdenv, fetchurl, cmake, boost, eigen-qld, eigen-quadprog }:
+{ stdenv, lib, fetchurl, cmake, boost, eigen-qld, eigen-quadprog }:
 
 stdenv.mkDerivation {
   pname = "copra";
@@ -21,7 +21,7 @@ stdenv.mkDerivation {
 
   doCheck = true;
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "Copra (Control & preview algorithms) is a C++ library implementing linear model predictive control. It relies on quadratic programming (QP) solvers.";
     homepage    = "https://github.com/jrl-umi3218/copra";
     license     = licenses.bsd2;

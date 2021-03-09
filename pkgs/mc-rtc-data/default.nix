@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, cmake, with-ros ? false, catkin, buildRosPackage }:
+{ stdenv, lib, fetchurl, cmake, with-ros ? false, catkin, buildRosPackage }:
 
 (if with-ros then buildRosPackage else stdenv.mkDerivation) {
   pname = "mc-rtc-data";
@@ -19,7 +19,7 @@
 
   doCheck = true;
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "Data for mc_rtc";
     homepage    = "https://github.com/jrl-umi3218/mc_rtc_data";
     license     = licenses.bsd2;

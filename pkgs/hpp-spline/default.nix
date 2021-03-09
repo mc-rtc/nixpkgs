@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, cmake, eigen }:
+{ stdenv, lib, fetchurl, cmake, eigen }:
 
 stdenv.mkDerivation {
   pname = "hpp-spline";
@@ -20,7 +20,7 @@ stdenv.mkDerivation {
 
   doCheck = false;
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "A template-based library for creating curves of arbitrary order";
     homepage    = "https://github.com/humanoid-path-planner/hpp-spline";
     license     = licenses.bsd2;

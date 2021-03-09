@@ -1,4 +1,4 @@
-{ stdenv, fetchgit, cmake, mc-rtc, assimp, libGL, libXrandr, libXinerama, libXcursor, libX11, libXi, libXext }:
+{ stdenv, lib, fetchgit, cmake, mc-rtc, assimp, libGL, libXrandr, libXinerama, libXcursor, libX11, libXi, libXext }:
 
 stdenv.mkDerivation {
   pname = "mc-rtc-raylib";
@@ -22,7 +22,7 @@ stdenv.mkDerivation {
 
   doCheck = false;
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "raylib based interface for mc-rtc";
     homepage    = "https://github.com/gergondet/mc_rtc-raylib";
     license     = licenses.bsd2;

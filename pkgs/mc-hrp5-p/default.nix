@@ -1,4 +1,4 @@
-{ stdenv, fetchgit, cmake, mc-rtc, hrp5-p-description } :
+{ stdenv, lib, fetchgit, cmake, mc-rtc, hrp5-p-description } :
 
 let
 
@@ -28,7 +28,7 @@ stdenv.mkDerivation {
 
   doCheck = false;
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "HRP5-P RobotModule for mc-rtc";
     homepage    = "https://gite.lirmm.fr/mc-hrp5/mc-hrp5_p";
     license     = licenses.bsd2;
