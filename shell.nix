@@ -77,7 +77,6 @@ pkgs.mkShell rec {
     export TEMP=/tmp
     export TEMPDIR=/tmp
     etc_dir=$(cd etc && pwd);
-    test_dir=$(cd test && pwd);
     tmp_dir=$(mktemp -d /tmp/mc-rtc-nix.XXXXXXXXXXXX)
     cleanup_build() {
       cd $HOME
