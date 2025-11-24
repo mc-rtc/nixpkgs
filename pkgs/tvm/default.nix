@@ -1,15 +1,21 @@
-{ stdenv, lib, fetchgit, cmake, eigen-qld, eigen-quadprog, boost }:
+{ stdenv, lib, cmake, eigen-qld, eigen-quadprog, boost, fetchurl, fetchgit }:
 
 stdenv.mkDerivation {
   pname = "tvm";
-  version = "1.0.0";
+  version = "0.9.2";
 
   # master as of 2021.01.21
+  # src = fetchurl {
+  #   url = "https://github.com/jrl-umi3218/tvm/releases/download/v0.9.2/tvm-v0.9.2.tar.gz";
+  #   sha256 = "0s9sixkz1jns6yisrdzvsm6anz6b1f1h1xp0bbi81acb0r6ss9cv";
+  # };
+  # master as of 21/13/2025, Release 0.9.3
   src = fetchgit {
-    url = "https://github.com/jrl-umi3218/tvm/";
-    rev = "9b273feb05575a39e4b6fab45e17c4d090c2d292";
-    sha256 = "1n049b1vkwg2yff5pvq7vlvp73msqqb74f0v7k7mm8wyixdwg8y9";
+    url = "https://github.com/arntanguy/tvm";
+    rev = "67d09664e34db3dc8ce3d03ed77449eb552124ff";
+    sha256 = "mZ40sjGG56PNgeXcXpHzyNJqmX7yProgFQ09WC1sUSs=";
   };
+  
 
   nativeBuildInputs = [ cmake ];
   propagatedBuildInputs = [ eigen-qld eigen-quadprog boost ];

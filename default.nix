@@ -1,20 +1,27 @@
 self: super:
 {
-  inherit (super.rosPackages.noetic)
+  inherit (super.rosPackages.jazzy)
     buildRosPackage
-    catkin
-    roscpp
+    rclcpp
     nav-msgs
     tf2-ros
     sensor-msgs
-    rosbag
     message-generation
     message-runtime
     geometry-msgs
     xacro
     franka-description;
 
-  libfranka = super.rosPackages.noetic.libfranka.overrideAttrs ( old : rec {
+  # colcon-core = super.colcon-core.overrideAttrs (old: {
+  #   pyproject = true;
+  #   build-system = [ "setuptools" ];
+  # });
+  #
+  # ros-jazzy-ament-package = super.ros-jazzy-ament-package.overrideAttrs (attrs: {
+  #   __structuredAttrs = true;
+  # });
+  #
+  libfranka = super.rosPackages.jazzy.libfranka.overrideAttrs ( old : {
     src = super.fetchgit {
       url = "https://github.com/frankaemika/libfranka";
       rev = "f1f46fb008a37eb0d1dba00c971ff7e5a7bfbfd3";
@@ -29,16 +36,15 @@ self: super:
           --replace '@PACKAGE_CMAKE_INSTALL_PREFIX@/' ""
     '';
   });
-  tinyxml-2 = super.tinyxml-2.overrideAttrs( old : rec {
-    version = "8.0.0";
-    src = super.fetchFromGitHub {
-      repo = "tinyxml2";
-      owner = "leethomason";
-      rev = version;
-      sha256 = "0raa8r2hsagk7gjlqjwax95ib8d47ba79n91r4aws2zg8y6ssv1d";
-    };
-  });
-  hpp-spline = super.callPackage ./pkgs/hpp-spline {};
+  # tinyxml-2 = super.tinyxml-2.overrideAttrs( old : rec {
+  #   version = "11.0.0";
+  #   src = super.fetchFromGitHub {
+  #     repo = "tinyxml2";
+  #     owner = "leethomason";
+  #     rev = version;
+  #     sha256 = "0raa8r2hsagk7gjlqjwax95ib8d47ba79n91r4aws2zg8y6ssv1d";
+  #   };
+  # });
   spacevecalg = super.callPackage ./pkgs/spacevecalg {};
   rbdyn = super.callPackage ./pkgs/rbdyn {};
   eigen-qld = super.callPackage ./pkgs/eigen-qld {};

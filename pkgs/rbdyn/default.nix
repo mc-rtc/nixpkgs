@@ -1,22 +1,24 @@
-{ stdenv, lib, fetchurl, cmake, spacevecalg, libyamlcpp, tinyxml-2, boost }:
+{ stdenv, lib, cmake, spacevecalg, yaml-cpp, tinyxml-2, boost, fetchurl }:
 
-stdenv.mkDerivation {
-  pname = "rbdyn";
-  version = "1.4.0";
+stdenv.mkDerivation rec {
+  pname = "rbyn";
+  version = "1.9.2";
 
   src = fetchurl {
-    url = "https://github.com/jrl-umi3218/RBDyn/releases/download/v1.4.0/RBDyn-v1.4.0.tar.gz";
-    sha256 = "1msb2f03wzxqp0w2awijbcnhgfi2vrd3r9v6ib5hwvm9hrjl3a7x";
+    url = "https://github.com/jrl-umi3218/RBDyn/releases/download/v${version}/RBDyn-v${version}.tar.gz";
+    sha256 = "sha256-IFqX4z8r2JTwgNnPB35/vZKwgWoPO78ebnUvPdNOnjY=";
   };
 
   nativeBuildInputs = [ cmake ];
-  propagatedBuildInputs = [ spacevecalg libyamlcpp tinyxml-2 boost ];
+  propagatedBuildInputs = [ spacevecalg yaml-cpp tinyxml-2 boost ]; # Add other dependencies here
 
-  cmakeFlags = [
-    "-DBUILD_TESTING=OFF"
-    "-DPYTHON_BINDING=OFF"
-    "-DINSTALL_DOCUMENTATION=OFF"
-  ];
+  postPatch = ''
+    # Remove the include from the main CMakeLists.txt
+    sed -i '/include(cmake\/cython\/cython.cmake)/d' CMakeLists.txt
+
+    # Add the include to the top of the python binding CMakeLists.txt
+    sed -i '1i include(cmake/cython/cython.cmake)' binding/python/CMakeLists.txt
+  '';
 
   doCheck = true;
 

@@ -1,12 +1,12 @@
 { stdenv, lib, fetchurl, cmake, rbdyn, sch-core, eigen-qld }:
 
-stdenv.mkDerivation {
+stdenv.mkDerivation rec {
   pname = "tasks";
-  version = "1.3.1";
+  version = "v1.8.2";
 
-  src = fetchurl {
-    url = "https://github.com/jrl-umi3218/Tasks/releases/download/v1.3.1/Tasks-v1.3.1.tar.gz";
-    sha256 = "042qk1ijbmimwxivbnw0g2calxqgm5dm1r3vivhmw3r15nm1ij3v";
+  src = fetchTarball {
+    url = "https://github.com/jrl-umi3218/Tasks/releases/download/${version}/Tasks-${version}.tar.gz";
+    sha256 = "0if144c0jjpxk97fn2qszybdlx8b66qsa1kdkvwzfipvf8fh364q";
   };
 
   nativeBuildInputs = [ cmake ];
@@ -17,6 +17,14 @@ stdenv.mkDerivation {
     "-DPYTHON_BINDING=OFF"
     "-DINSTALL_DOCUMENTATION=OFF"
   ];
+
+  postPatch = ''
+    # Remove the include from the main CMakeLists.txt
+    sed -i '/include(cmake\/cython\/cython.cmake)/d' CMakeLists.txt
+
+    # Add the include to the top of the python binding CMakeLists.txt
+    sed -i '1i include(cmake/cython/cython.cmake)' binding/python/CMakeLists.txt
+  '';
 
   doCheck = true;
 

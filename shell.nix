@@ -1,6 +1,5 @@
 { pkgs ? import <nixpkgs> { overlays = [ (import ./ros-overlay/overlay.nix) (import ./default.nix) ]; },
-  with-ros ? true,
-  with-tvm ? false,
+  with-ros ? false,
   with-udp ? false
 }:
 
@@ -15,10 +14,7 @@ my-controller = { cmake, mc-rtc }: pkgs.stdenv.mkDerivation {
   version = "1.0.0";
 
   # Shows how the source folder can be changed for mc_rtc 2.0.0 adaptation
-  src = if mc-rtc.with-tvm then
-      /home/gergondet/devel/src/my_controller
-    else
-      /home/gergondet/devel/src/my_controller;
+  src = /home/gergondet/devel/src/my_controller;
 
   nativeBuildInputs = [ cmake ];
   buildInputs = [ mc-rtc ];
@@ -34,7 +30,6 @@ my-controller = { cmake, mc-rtc }: pkgs.stdenv.mkDerivation {
 
 mc-rtc = pkgs.mc-rtc.override {
   with-ros = with-ros;
-  with-tvm = with-tvm;
   # These are the package that will be added to your mc_rtc base installation
   # The default configuration (JVRC1 robot and CoM controller) requires no extras
   plugins = with pkgs;
@@ -65,12 +60,14 @@ mc-ticker = if with-udp then
 
 ticker-cmd = if with-udp then "MCUDPControl -f" else "mc-rtc-nix-ticker";
 
-rosbash = if with-ros then pkgs.rosPackages.noetic.rosbash else null;
+# rosbash = if with-ros then pkgs.rosPackages.jazzy.rosbash else null;
 
 in
 
 pkgs.mkShell rec {
-  buildInputs = [ mc-ticker rosbash ];
+  # buildInputs = [ mc-ticker rosbash ];
+  # buildInputs = [ rosbash ];
+  buildInputs = [ mc-ticker ];
   shellHook = ''
     export TMP=/tmp
     export TMPDIR=/tmp

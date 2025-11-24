@@ -1,4 +1,4 @@
-{ stdenv, lib, fetchgit, cmake, with-ros ? false, catkin, buildRosPackage, xacro }:
+{ stdenv, lib, fetchgit, cmake, with-ros ? false, colcon, buildRosPackage, xacro }:
 
 (if with-ros then buildRosPackage else stdenv.mkDerivation) {
   pname = "hrp4-description";
@@ -9,7 +9,7 @@
     rev = "fd0ae1789d4bce1575b6c618d77619e06c264b57";
   };
 
-  nativeBuildInputs = if with-ros then [ catkin ] else [ cmake ];
+  nativeBuildInputs = if with-ros then [ colcon ] else [ cmake ];
   propagatedBuildInputs = if with-ros then [ xacro ] else null;
 
   cmakeFlags = [

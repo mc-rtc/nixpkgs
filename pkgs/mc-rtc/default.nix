@@ -1,8 +1,8 @@
-{ stdenv, lib, fetchgit, cmake,
-  tasks, eigen-quadprog, libtool, geos, spdlog, fmt, hpp-spline, mc-rtc-data,
-  state-observation, mc-rbdyn-urdf, nanomsg,
-  with-tvm ? false, tvm ? null,
-  with-ros ? true, roscpp, nav-msgs, sensor-msgs, tf2-ros, rosbag, mc-rtc-msgs,
+{ stdenv, lib, fetchgit, cmake, pkg-config,
+  tasks, tvm, eigen-quadprog, libtool, geos, spdlog, fmt, ndcurves, mc-rtc-data,
+  state-observation, nanomsg, libnotify, rapidjson,
+  with-ros ? false,
+  rclcpp ? null, nav-msgs ? null, sensor-msgs ? null, tf2-ros ? null, rosbag ? null, mc-rtc-msgs ? null,
   plugins ? [], symlinkJoin }:
 
 let
@@ -13,22 +13,21 @@ mc-rtc-data' = mc-rtc-data.override {
 
 default = stdenv.mkDerivation {
   pname = "mc-rtc";
-  version = if with-tvm then "2.0.0" else "1.6.0";
+  version = "2.13.0"; # FIXME: use 2.14.0 but cmake submodule is empty in the release
 
-  src = if with-tvm then
-    # topic/TVM branch as of 2021.01.29
-    fetchgit {
-      url = "https://github.com/gergondet/mc_rtc";
-      rev = "01f20b995c1716ec27f961aeb5c471802a798d72";
-      sha256 = "1h8hh0azcba16ffs8nnnxkfjjrj1pal47dv5c62gr0ynr336i7b0";
-    }
-  else
-    # master branch as of 2021.01.21
-    fetchgit {
-      url = "https://github.com/jrl-umi3218/mc_rtc";
-      rev = "e383426418669292fcb9eea58b26de3e3a22c0fa";
-      sha256 = "02azyhdd3fryh50d7cv9s2b7nwxhq9mfhwzz9byik247p8sjw97z";
-    };
+  # src = fetchTarball {
+  #     url = "https://github.com/jrl-umi3218/mc_rtc/releases/download/v2.13.0/mc_rtc-v2.13.0.tar.gz";
+  #     sha256 = "0sh1wsqrk8zsqclv9nv61dzf3r6g5wfk23b6bi2i7hhf2963sw2f";
+  #   };
+
+  # branch topic/nix on @arntanguy remote
+  # mc_rtc 2.14 + fixes for fmt
+  src = fetchgit {
+    url = "https://github.com/arntanguy/mc_rtc";
+    rev = "40ebc0d1dd51c9968064d64bdd2fa7105fa69b33";
+    fetchSubmodules = true;
+    sha256 = "sha256-qa/eHK72uiBYq4KgT4mdrH5vbsrDiDzvXfAxb9nfwPU=";
+  };
 
   postPatch = if with-ros then
     ''
@@ -39,9 +38,13 @@ default = stdenv.mkDerivation {
     '';
 
   nativeBuildInputs = [ cmake ];
-  propagatedBuildInputs = [ tasks eigen-quadprog libtool geos spdlog fmt hpp-spline mc-rtc-data' state-observation mc-rbdyn-urdf nanomsg ]
-  ++ lib.optional with-tvm [ tvm ]
-  ++ lib.optional with-ros [ roscpp nav-msgs sensor-msgs tf2-ros rosbag mc-rtc-msgs];
+  propagatedBuildInputs = [ pkg-config tasks eigen-quadprog libtool geos spdlog fmt ndcurves mc-rtc-data state-observation nanomsg tvm libnotify rapidjson ]
+    ++ lib.optional (with-ros && rclcpp != null) rclcpp
+    ++ lib.optional (with-ros && nav-msgs != null) nav-msgs
+    ++ lib.optional (with-ros && sensor-msgs != null) sensor-msgs
+    ++ lib.optional (with-ros && tf2-ros != null) tf2-ros
+    ++ lib.optional (with-ros && rosbag != null) rosbag
+    ++ lib.optional (with-ros && mc-rtc-msgs != null) mc-rtc-msgs;
 
   cmakeFlags = [
     "-DBUILD_TESTING=OFF"
@@ -52,7 +55,6 @@ default = stdenv.mkDerivation {
   doCheck = true;
 
   with-ros = with-ros;
-  with-tvm = with-tvm;
 
   postInstall = ''
     sed -i 's/''${PACKAGE_PREFIX_DIR}/''${CMAKE_INSTALL_PREFIX}/' $out/lib/cmake/mc_rtc/mc_rtcMacros.cmake

@@ -1,12 +1,12 @@
 { stdenv, lib, fetchurl, cmake, gfortran, eigen }:
 
-stdenv.mkDerivation {
+stdenv.mkDerivation rec {
   pname = "eigen-qld";
-  version = "1.2.1";
+  version = "1.2.6";
 
   src = fetchurl {
-    url = "https://github.com/jrl-umi3218/eigen-qld/releases/download/v1.2.1/eigen-qld-v1.2.1.tar.gz";
-    sha256 = "1hlicwyzj477vhcvdkj09lgn9xf44irdv4wrcgx5r2254bq783k8";
+    url = "https://github.com/jrl-umi3218/eigen-qld/releases/download/v${version}/eigen-qld-v${version}.tar.gz";
+    sha256 = "835fca05e2274b7ae9dbe250db5f28b193e28318d55e10d354cf8d443c10fcaf";
   };
 
   nativeBuildInputs = [ cmake gfortran ];

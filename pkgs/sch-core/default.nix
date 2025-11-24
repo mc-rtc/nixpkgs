@@ -1,16 +1,24 @@
-{ stdenv, lib, fetchurl, cmake, boost }:
+{
+  lib,
+  stdenv,
+  cmake,
+  eigen,
+  doxygen,
+  boost,
+  fetchurl
+}:
 
-stdenv.mkDerivation {
+stdenv.mkDerivation rec {
   pname = "sch-core";
-  version = "1.1.0";
+  version = "1.4.3";
 
   src = fetchurl {
-    url = "https://github.com/jrl-umi3218/sch-core/releases/download/v1.1.0/sch-core-v1.1.0.tar.gz";
-    sha256 = "1p5552m3k4wbjcsrcpxdkcvifii7118vyhwf8j90q6hlg0310fk6";
+    url = "https://github.com/jrl-umi3218/${pname}/releases/download/v${version}/${pname}-v${version}.tar.gz";
+    sha256 = "aa10a427bafc3fbe4fc687d1785b079539a438597b7b6ba20ae230d5286074dd";
   };
 
-  nativeBuildInputs = [ cmake ];
-  propagatedBuildInputs = [ boost ];
+  nativeBuildInputs = [ cmake doxygen boost ];
+  propagatedBuildInputs = [ eigen ];
 
   cmakeFlags = [
     "-DBUILD_TESTING=OFF"

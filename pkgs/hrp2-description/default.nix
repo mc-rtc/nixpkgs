@@ -1,4 +1,4 @@
-{ stdenv, lib, fetchgit, cmake, with-ros ? false, catkin, buildRosPackage }:
+{ stdenv, lib, fetchgit, cmake, with-ros ? false, colcon, buildRosPackage }:
 
 (if with-ros then buildRosPackage else stdenv.mkDerivation) {
   pname = "hrp2-description";
@@ -9,7 +9,7 @@
     rev = "240abab83fd77aaeb3e95c18a396ffea37c677e3";
   };
 
-  nativeBuildInputs = if with-ros then [ catkin ] else [ cmake ];
+  nativeBuildInputs = if with-ros then [ colcon ] else [ cmake ];
 
   cmakeFlags = [
     "-DBUILD_TESTING=OFF"
