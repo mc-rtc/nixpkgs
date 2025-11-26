@@ -24,10 +24,16 @@ default = stdenv.mkDerivation {
   # mc_rtc 2.14 + fixes for fmt
   src = fetchgit {
     url = "https://github.com/arntanguy/mc_rtc";
-    rev = "40ebc0d1dd51c9968064d64bdd2fa7105fa69b33";
+    rev = "refs/heads/topic/nix";
     fetchSubmodules = true;
-    sha256 = "sha256-qa/eHK72uiBYq4KgT4mdrH5vbsrDiDzvXfAxb9nfwPU=";
+    # sha256 = "sha256-PVx24hjrsSajrJTv73wNhNj1qkyokYcSEuQwGiRVd9s=";
+    sha256 = "sha256-wTiQ4RcsTnFcZiB21NpOrjOysHVl0v0WeBhf9hBjzl4=";
   };
+
+  # src = builtins.path {
+  #   path = /home/arnaud/nix/mc-rtc/workspace/mc_rtc;
+  #   name = "mc_rtc-src";
+  # };
 
   postPatch = if with-ros then
     ''
@@ -56,6 +62,9 @@ default = stdenv.mkDerivation {
 
   with-ros = with-ros;
 
+  # Patch paths with their nix-store counterpart
+  # XXX: This should not have been required for paths included within
+  # the library (controller, observers, robots, etc)
   postInstall = ''
     sed -i 's/''${PACKAGE_PREFIX_DIR}/''${CMAKE_INSTALL_PREFIX}/' $out/lib/cmake/mc_rtc/mc_rtcMacros.cmake
     echo 'set(MC_STATES_DEFAULT_INSTALL_PREFIX "''${PACKAGE_PREFIX_DIR}/lib/mc_controller/fsm/states")' >> $out/lib/cmake/mc_rtc/mc_rtcMacros.cmake

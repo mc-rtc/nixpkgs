@@ -62,7 +62,8 @@
   };
   mc-state-observation = prev.callPackage ./pkgs/mc-rtc/observers/mc-state-observation {};
   lipm-walking-controller = prev.callPackage ./pkgs/mc-rtc/controllers/lipm-walking-controller {};
-  mc-rtc-raylib = prev.callPackage ./pkgs/mc-rtc-raylib {};
+  #mc-rtc-raylib = prev.callPackage ./pkgs/mc-rtc-raylib {};
+  mc-rtc-magnum = prev.callPackage ./pkgs/mc-rtc-magnum {};
   mc-rtc-msgs = prev.callPackage ./pkgs/mc-rtc-msgs {};
   mc-udp = prev.callPackage ./pkgs/mc-udp {};
   hrp4-description = prev.callPackage ./pkgs/hrp4-description {};

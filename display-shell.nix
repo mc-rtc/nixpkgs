@@ -1,8 +1,11 @@
 { pkgs }:
 
 pkgs.mkShell {
-  buildInputs = with pkgs; [ mc-rtc cmake ninja ]
-  ++ (with pkgs.xorg; [ mc-rtc assimp libGL libXrandr libXinerama libXcursor libX11 libXi libXext ]);
+  buildInputs = [
+    pkgs.cmake
+    pkgs.mc-rtc-magnum
+    pkgs.nixgl.nixGLIntel
+  ];
 
   shellHook = ''
     export MC_RTC_PATH=${pkgs.mc-rtc}
@@ -18,9 +21,10 @@ pkgs.mkShell {
     export TMPDIR=/tmp
     export TEMP=/tmp
     export TEMPDIR=/tmp
-
-    echo "mc-rtc interactive shell ready."
-    echo "The following convenience environment variables are set:"
-    env | grep '^MC_RTC_'
+    echo "Launching mc-rtc-magnum with nixGLNvidia..."
+    echo $LD_LIBRARY_PATH
+    cat $MC_RTC_PATH/include/mc_rtc/config.h
+    nixGLIntel mc-rtc-magnum
+    exit
   '';
 }

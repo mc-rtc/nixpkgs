@@ -5,15 +5,17 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     ros-overlay.url = "github:lopsided98/nix-ros-overlay";
+    nixgl.url = "github:nix-community/nixGL";
   };
 
-  outputs = { self, nixpkgs, flake-utils, ros-overlay }:
+  outputs = { self, nixpkgs, flake-utils, ros-overlay, nixgl }:
     flake-utils.lib.eachSystem [ "x86_64-linux" ] (system:
       let
         pkgs = import nixpkgs {
           system = system;
           overlays = [
             ros-overlay.overlays.default
+            nixgl.overlay
             (import ./overlay.nix) 
           ];
           rosVersion = "jazzy";
@@ -21,11 +23,14 @@
       in {
         packages = {
           mc-rtc = pkgs.mc-rtc;
+          mc-rtc-magnum = pkgs.mc-rtc-magnum;
         };
-        overlays = {
-          default = import ./overlay.nix;
-        };
-        devShells.default = import ./controller-shell.nix { pkgs = pkgs; };
+        # overlays = {
+        #   default = import ./overlay.nix;
+        # };
+        devShells.default = import ./shell.nix { pkgs = pkgs; };
+        devShells.controller = import ./controller-shell.nix { pkgs = pkgs; };
+        devShells.display = import ./display-shell.nix { pkgs = pkgs; };
       }
     );
 
