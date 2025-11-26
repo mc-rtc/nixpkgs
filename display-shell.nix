@@ -4,7 +4,7 @@ pkgs.mkShell {
   buildInputs = [
     pkgs.cmake
     pkgs.mc-rtc-magnum
-    pkgs.nixgl.nixGLIntel
+    pkgs.nixgl.auto.nixGLDefault # Tries to auto-detect and install Nvidia, if not, fallback to mesa. Recommended. Invoke with nixGL program.
   ];
 
   shellHook = ''
@@ -24,7 +24,7 @@ pkgs.mkShell {
     echo "Launching mc-rtc-magnum with nixGLNvidia..."
     echo $LD_LIBRARY_PATH
     cat $MC_RTC_PATH/include/mc_rtc/config.h
-    nixGLIntel mc-rtc-magnum
+    nixGL mc-rtc-magnum
     exit
   '';
 }
