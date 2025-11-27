@@ -65,6 +65,7 @@ in
   openrtm-aist-python = prev.callPackage ./pkgs/openrtm-aist-python {
     buildPythonPackage = prev.python2Packages.buildPythonPackage;
   };
+  # mc-state-observation = callWithLocal ./pkgs/mc-rtc/observers/mc-state-observation;
   mc-state-observation = prev.callPackage ./pkgs/mc-rtc/observers/mc-state-observation {};
   lipm-walking-controller = prev.callPackage ./pkgs/mc-rtc/controllers/lipm-walking-controller {};
   #mc-rtc-raylib = prev.callPackage ./pkgs/mc-rtc-raylib {};

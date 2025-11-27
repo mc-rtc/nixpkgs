@@ -1,15 +1,20 @@
-{ stdenv, lib, fetchgit, cmake, mc-rtc }:
+{ stdenv, lib, fetchurl, cmake, mc-rtc, useLocal ? false, localWorkspace ? null, with-ros ? false } :
 
-stdenv.mkDerivation {
+stdenv.mkDerivation rec {
   pname = "mc-state-observation";
-  version = "1.0.0";
+  version = "1.1.0";
 
-  # master branch as of 2021.01.25
-  src = fetchgit {
-    url = "https://github.com/arntanguy/mc_state_observation";
-    rev = "6cbb56f85cf041657a7f9c84c096d221cd6ebdb2";
-    sha256 = "1lmdy9zayr3s70pqmnqicnly2r5za5f1ing765idyp07009dd3pl";
-  };
+  src = if useLocal then
+    builtins.trace "Using local workspace for ${pname}: ${localWorkspace}/mc_state_obeservation"
+    (builtins.path {
+      path = "${localWorkspace}/mc_state_observation";
+      name = "mc_state_observation-src";
+    })
+  else
+    fetchurl {
+      url = "https://github.com/jrl-umi3218/mc_state_observation/releases/download/v${version}/mc_state_observation-v${version}.tar.gz";
+      sha256 = "sha256-F1LzhAK0MQM4mc5+dr0lK364J7f0nA1ZBe1RZlG3Pmo=";
+    };
 
   nativeBuildInputs = [ cmake ];
   propagatedBuildInputs = [ mc-rtc ];
@@ -24,13 +29,18 @@ stdenv.mkDerivation {
     "-DBUILD_TESTING=OFF"
     "-DPYTHON_BINDING=OFF"
     "-DINSTALL_DOCUMENTATION=OFF"
-  ];
+    # XXX: this installs mc-state-observation under its own install prefix because builds in nix are sandboxed
+    # so we cannot install to mc_rtc's install prefix directly.
+    # Nix will merge all install prefixes into a single one in the final store path for mc-rtc.
+    "-DMC_RTC_HONOR_INSTALL_PREFIX=ON"
+  ]
+  ++ [ (if with-ros then "-DWITH_ROS_OBSERVERS=ON" else "-DWITH_ROS_OBSERVERS=OFF") ];
 
   doCheck = false;
 
   meta = with lib; {
     description = "Extra mc_rtc observers";
-    homepage    = "https://github.com/arntanguy/mc_state_observation";
+    homepage    = "https://github.com/jrl-umi3218/mc_state_observation";
     license     = licenses.bsd2;
     platforms   = platforms.all;
   };

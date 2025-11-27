@@ -3,7 +3,7 @@
   state-observation, nanomsg, libnotify, rapidjson,
   with-ros ? false,
   rclcpp ? null, nav-msgs ? null, sensor-msgs ? null, tf2-ros ? null, rosbag ? null, mc-rtc-msgs ? null,
-  plugins ? [], symlinkJoin,
+  extensions ? [], symlinkJoin,
   useLocal ? false,
   localWorkspace ? null
   }:
@@ -85,10 +85,21 @@ default = stdenv.mkDerivation {
 
 in
 
-if plugins == [] then default
-else symlinkJoin {
-  name = (lib.lists.foldl (a: b: a + "+" + b.name) default.name) plugins;
-  paths = [ default ] ++ map(p: p.override { mc-rtc = default; }) plugins;
-  with-ros = default.with-ros;
-  with-tvm = default.with-tvm;
-}
+# NOTE:
+# If there are extensions, merge their install folders with mc-rtc's
+# This is done to ensure that mc-rtc will have access to the extensions at runtime without specific configuration
+# (e.g observers, controllers, robots, etc)
+if extensions == [] then default
+else
+  let name = (lib.lists.foldl (a: b: a + "+" + b.name) default.name) extensions; in
+builtins.trace ''
+
+${default.name} derivation declares the following extensions:
+${builtins.concatStringsSep "\n" (map (e: "- ${e.name}") extensions)}
+  Their output will be joined (symlinkJoin) with mc-rtc's in "${name}".
+''
+  (symlinkJoin {
+    name = name; 
+    paths = [ default ] ++ map(p: p.override { mc-rtc = default; }) extensions;
+    with-ros = default.with-ros;
+  })
