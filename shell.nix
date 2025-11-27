@@ -1,7 +1,8 @@
 { pkgs }:
 
 pkgs.mkShell {
-  buildInputs = with pkgs; [ mc-rtc cmake ninja ]
+  buildInputs = 
+  with pkgs; [ mc-rtc cmake ninja clang clang-tools ]
   ++ (with pkgs.xorg; [ mc-rtc assimp libGL libXrandr libXinerama libXcursor libX11 libXi libXext ]);
 
   shellHook = ''

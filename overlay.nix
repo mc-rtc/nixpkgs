@@ -5,7 +5,12 @@
 - **`prev`**: The package set before your overlay is applied (i.e., the "previous" state).
   Use this to access and override existing packages, or to call functions from the underlying package set.
 */
-(final: prev: {
+{ useLocal ? false, localWorkspace ? null, ... }:
+(final: prev:
+let
+callWithLocal = pkg: prev.callPackage pkg { inherit useLocal localWorkspace; };
+in
+{
   inherit (prev.rosPackages.jazzy)
     buildRosPackage
     rclcpp
@@ -44,7 +49,7 @@
   state-observation = prev.callPackage ./pkgs/state-observation {};
   mc-rbdyn-urdf = prev.callPackage ./pkgs/mc-rbdyn-urdf {};
   tvm = prev.callPackage ./pkgs/tvm {};
-  mc-rtc = prev.callPackage ./pkgs/mc-rtc {};
+  mc-rtc = callWithLocal ./pkgs/mc-rtc;
   copra = prev.callPackage ./pkgs/copra {};
   omniorb = prev.symlinkJoin {
     name = "omniorb";
@@ -63,7 +68,7 @@
   mc-state-observation = prev.callPackage ./pkgs/mc-rtc/observers/mc-state-observation {};
   lipm-walking-controller = prev.callPackage ./pkgs/mc-rtc/controllers/lipm-walking-controller {};
   #mc-rtc-raylib = prev.callPackage ./pkgs/mc-rtc-raylib {};
-  mc-rtc-magnum = prev.callPackage ./pkgs/mc-rtc-magnum {};
+  mc-rtc-magnum = callWithLocal ./pkgs/mc-rtc-magnum;
   mc-rtc-msgs = prev.callPackage ./pkgs/mc-rtc-msgs {};
   mc-udp = prev.callPackage ./pkgs/mc-udp {};
   hrp4-description = prev.callPackage ./pkgs/hrp4-description {};

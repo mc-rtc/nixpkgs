@@ -3,7 +3,10 @@
   state-observation, nanomsg, libnotify, rapidjson,
   with-ros ? false,
   rclcpp ? null, nav-msgs ? null, sensor-msgs ? null, tf2-ros ? null, rosbag ? null, mc-rtc-msgs ? null,
-  plugins ? [], symlinkJoin }:
+  plugins ? [], symlinkJoin,
+  useLocal ? false,
+  localWorkspace ? null
+  }:
 
 let
 
@@ -13,27 +16,27 @@ mc-rtc-data' = mc-rtc-data.override {
 
 default = stdenv.mkDerivation {
   pname = "mc-rtc";
-  version = "2.13.0"; # FIXME: use 2.14.0 but cmake submodule is empty in the release
+  version = "2.14.1"; # TODO: Release
 
   # src = fetchTarball {
   #     url = "https://github.com/jrl-umi3218/mc_rtc/releases/download/v2.13.0/mc_rtc-v2.13.0.tar.gz";
   #     sha256 = "0sh1wsqrk8zsqclv9nv61dzf3r6g5wfk23b6bi2i7hhf2963sw2f";
   #   };
 
-  # branch topic/nix on @arntanguy remote
-  # mc_rtc 2.14 + fixes for fmt
-  src = fetchgit {
-    url = "https://github.com/arntanguy/mc_rtc";
-    rev = "refs/heads/topic/nix";
-    fetchSubmodules = true;
-    # sha256 = "sha256-PVx24hjrsSajrJTv73wNhNj1qkyokYcSEuQwGiRVd9s=";
-    sha256 = "sha256-wTiQ4RcsTnFcZiB21NpOrjOysHVl0v0WeBhf9hBjzl4=";
-  };
-
-  # src = builtins.path {
-  #   path = /home/arnaud/nix/mc-rtc/workspace/mc_rtc;
-  #   name = "mc_rtc-src";
-  # };
+  src = if useLocal then
+    builtins.trace "Using local workspace for mc_rtc: ${localWorkspace}/mc_rtc"
+    (builtins.path {
+      path = "${localWorkspace}/mc_rtc";
+      name = "mc_rtc-src";
+    })
+  else
+    # future 2.14.1 release
+    fetchgit {
+      url = "https://github.com/arntanguy/mc_rtc";
+      rev = "refs/heads/topic/nix";
+      fetchSubmodules = true;
+      sha256 = "";
+    };
 
   postPatch = if with-ros then
     ''

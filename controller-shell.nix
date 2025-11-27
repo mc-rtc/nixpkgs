@@ -9,19 +9,10 @@ let
     plugins = with pkgs; [];
   };
 
-  mc-ticker = pkgs.callPackage ({ cmake, mc-rtc }: pkgs.stdenv.mkDerivation {
-    pname = "mc-rtc-nix-ticker";
-    version = "1.0.0";
-    src = ./ticker;
-    nativeBuildInputs = [ cmake ];
-    buildInputs = [ mc-rtc ];
-  }) { mc-rtc = mc-rtc; };
-
-  ticker-cmd = "mc-rtc-nix-ticker";
 in
 
 pkgs.mkShell {
-  buildInputs = [ mc-ticker ];
+  buildInputs = [ mc-rtc pkgs.clangd ];
   shellHook = ''
     export TMP=/tmp
     export TMPDIR=/tmp
@@ -46,7 +37,7 @@ pkgs.mkShell {
     export main_robot=${main_robot}
     cp $etc_dir/mc_rtc.yaml .
     substituteAllInPlace mc_rtc.yaml
-    ${ticker-cmd} mc_rtc.yaml
+    mc_rtc_ticker -f mc_rtc.yaml
     exit
   '';
 }
