@@ -8,8 +8,8 @@
     nixgl.url = "github:nix-community/nixGL";
   };
 
-  outputs = { self, nixpkgs, flake-utils, ros-overlay, nixgl }:
-    flake-utils.lib.eachSystem [ "x86_64-linux" ] (system:
+  outputs = { nixpkgs, ... } @ inputs:
+    inputs.flake-utils.lib.eachSystem [ "x86_64-linux" ] (system:
       let
         # USE MC_RTC_USE_LOCAL=1 env variable to use local workspace for mc-rtc-magnum
         # pass useLocal to packages that require it
@@ -19,8 +19,8 @@
         pkgs = import nixpkgs {
           system = system;
           overlays = [
-            ros-overlay.overlays.default
-            nixgl.overlay
+            inputs.ros-overlay.overlays.default
+            inputs.nixgl.overlay
             (import ./overlay.nix { inherit useLocal localWorkspace; })
           ];
           rosVersion = "jazzy";
@@ -30,8 +30,9 @@
           mc-rtc-magnum = pkgs.mc-rtc-magnum;
         };
       in {
-        packages = packages;
-        defaultPackage = packages.mc-rtc;
+        packages = packages // {
+          default = packages.mc-rtc;
+        };
         # overlays = {
         #   default = import ./overlay.nix;
         # };
