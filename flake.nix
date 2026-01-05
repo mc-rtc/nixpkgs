@@ -14,7 +14,7 @@
         # USE MC_RTC_USE_LOCAL=1 env variable to use local workspace for mc-rtc-magnum
         # pass useLocal to packages that require it
         useLocal = builtins.getEnv "MC_RTC_USE_LOCAL" == "1";
-        localWorkspace = "/home/arnaud/nix/mc-rtc/workspace";
+        localWorkspace = "/home/arnaud/devel/mc-rtc-nix/workspace";
 
         pkgs = import nixpkgs {
           system = system;
@@ -25,11 +25,13 @@
           ];
           rosVersion = "jazzy";
         };
-      in {
         packages = {
           mc-rtc = pkgs.mc-rtc;
           mc-rtc-magnum = pkgs.mc-rtc-magnum;
         };
+      in {
+        packages = packages;
+        defaultPackage = packages.mc-rtc;
         # overlays = {
         #   default = import ./overlay.nix;
         # };
