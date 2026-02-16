@@ -1,0 +1,92 @@
+# The main purpose of this derivation is to provide an mc_rtc environment
+# with runtime dependencies available, e.g robot modules, controllers, observers and plugins
+# 
+# This is achieved by:
+# - declaring the runtime dependencies in either robots, controllers, observers and plugins list
+# - this derivation generates and mc_rtc.yaml configuration with runtime path to these dependencies
+#   e.g in ControllerModulePaths, ObserverModulePaths, etc
+{ stdenv, lib, writeTextFile
+, mc-rtc
+, MainRobot ? "JVRC1" # default robot module name
+, Enabled ? "CoM" # default controller
+, Timestep ? 0.005 # default timestep
+, robots ? []
+, controllers ? []
+, observers ? []
+, plugins ? []
+}:
+
+let
+  # Helper to build YAML lists
+  toYamlList = paths: lib.concatMapStringsSep ", " (p: "\"${p}\"") paths;
+
+  configYaml = writeTextFile {
+    name = "mc_rtc.yaml";
+    destination = "/etc/mc_rtc.yaml";
+    text = ''
+      ---
+      ###################################
+      # Default configuration of mc_rtc #
+      ###################################
+      # This file contains the default configuration of mc_rtc
+      #
+      # You may overwrite any of these settings in
+      # - Linux/MacOS: $HOME/.config/mc_rtc/mc_rtc.yaml
+      # - Windows:     %APPDATA%/mc_rtc/mc_rtc.conf
+      #
+      # For further details, refer to https://jrl-umi3218.github.io/mc_rtc/tutorials/introduction/configuration.html
+
+      MainRobot: ${MainRobot}
+      Enabled: [${Enabled}]
+      Timestep: ${toString Timestep}
+      InitAttitudeFromSensor: false
+      InitAttitudeSensor: ""
+      Log: true
+      LogTemplate: mc-control
+      GUIServer:
+        Enable: true
+        Timestep: 0.05
+        IPC: {}
+        TCP:
+          Host: "*"
+          Ports: [4242, 4343]
+      VerboseLoader: false
+
+      # Dynamically generated module paths
+      ControllerModulePaths: [${toYamlList (map (p: "${p}/lib/mc_controller") ([mc-rtc] ++ controllers))}]
+      RobotModulePaths: [${toYamlList (map (p: "${p}/lib/mc_robots") ([mc-rtc] ++ robots))}]
+      ObserverModulePaths: [${toYamlList (map (p: "${p}/lib/mc_observers") ([mc-rtc] ++ observers))}]
+      GlobalPluginPaths: [${toYamlList (map (p: "${p}/lib/mc_global_plugin") ([mc-rtc] ++ plugins))}]
+      ClearControllerModulePath: true
+      ClearRobotModulePath: true
+      ClearObserverModulePath: true
+      ClearGlobalPluginPath: true
+    '';
+  };
+in
+
+stdenv.mkDerivation {
+  pname = "mc-rtc-meta";
+  version = mc-rtc.version;
+  src = null;
+  dontUnpack = true;
+
+  installPhase = ''
+    mkdir -p $out/etc
+    cp ${configYaml}/etc/mc_rtc.yaml $out/etc
+  '';
+
+  passthru = {
+    inherit mc-rtc robots controllers observers plugins configYaml;
+  };
+
+  meta = mc-rtc.meta // {
+    description = mc-rtc.meta.description + " (meta-package with robots, controllers, observers, plugins)";
+  };
+
+  # Set MC_RTC_CONTROLLER_CONFIG to point to the generated YAML
+  shellHook = ''
+    export MC_RTC_CONTROLLER_CONFIG="$out/etc/mc_rtc.yaml"
+    echo "MC_RTC_CONTROLLER_CONFIG set to $MC_RTC_CONTROLLER_CONFIG"
+  '';
+}

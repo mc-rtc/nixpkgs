@@ -6,41 +6,8 @@
     flake-utils.url = "github:numtide/flake-utils";
     ros-overlay.url = "github:lopsided98/nix-ros-overlay";
     nixgl.url = "github:nix-community/nixGL";
+    flake-parts.url = "github:hercules-ci/flake-parts";
   };
-
-  outputs = { nixpkgs, ... } @ inputs:
-    inputs.flake-utils.lib.eachSystem [ "x86_64-linux" ] (system:
-      let
-        # USE MC_RTC_USE_LOCAL=1 env variable to use local workspace for mc-rtc-magnum
-        # pass useLocal to packages that require it
-        useLocal = builtins.getEnv "MC_RTC_USE_LOCAL" == "1";
-        localWorkspace = "/home/arnaud/devel/mc-rtc-nix/workspace";
-
-        pkgs = import nixpkgs {
-          system = system;
-          overlays = [
-            inputs.ros-overlay.overlays.default
-            inputs.nixgl.overlay
-            (import ./overlay.nix { inherit useLocal localWorkspace; })
-          ];
-          rosVersion = "jazzy";
-        };
-        packages = {
-          mc-rtc = pkgs.mc-rtc;
-          mc-rtc-magnum = pkgs.mc-rtc-magnum;
-        };
-      in {
-        packages = packages // {
-          default = packages.mc-rtc;
-        };
-        # overlays = {
-        #   default = import ./overlay.nix;
-        # };
-        devShells.default = import ./shell.nix { pkgs = pkgs; };
-        devShells.controller = import ./controller-shell.nix { pkgs = pkgs; };
-        devShells.display = import ./display-shell.nix { pkgs = pkgs; };
-      }
-    );
 
   nixConfig = {
     extra-substituters = [
@@ -54,4 +21,35 @@
       "ros.cachix.org-1:dSyZxI8geDCJrwgvCOHDoAfOm5sV1wCPjBkKL+38Rvo="
     ];
   };
+
+  outputs = inputs@{ flake-parts, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      systems = [ "x86_64-linux" ];
+
+      perSystem = { system, pkgs, ... }:
+        let
+          useLocal = builtins.getEnv "MC_RTC_USE_LOCAL" == "1";
+          localWorkspace = "/home/arnaud/devel/mc-rtc-nix/workspace";
+          overlays = [
+            inputs.ros-overlay.overlays.default
+            inputs.nixgl.overlay
+            (import ./overlay.nix { inherit useLocal localWorkspace; })
+          ];
+          pkgs = import inputs.nixpkgs {
+            inherit system overlays;
+            rosVersion = "jazzy";
+          };
+          packages = {
+            mc-rtc-superbuild = pkgs.mc-rtc-superbuild;
+            mc-rtc-magnum = pkgs.mc-rtc-magnum;
+          };
+        in {
+          packages = packages // {
+            default = packages.mc-rtc-superbuild;
+          };
+          devShells.default = import ./shell.nix { inherit pkgs; };
+          devShells.controller = import ./controller-shell.nix { inherit pkgs; };
+          devShells.display = import ./display-shell.nix { inherit pkgs; };
+        };
+    };
 }

@@ -8,8 +8,11 @@
 { useLocal ? false, localWorkspace ? null, ... }:
 (final: prev:
 let
-callWithLocal = pkg: prev.callPackage pkg { inherit useLocal localWorkspace; };
-in
+  callWithLocal = pkg: { ... }@args:
+    prev.callPackage pkg ({
+      inherit useLocal localWorkspace;
+    } // args);
+in rec
 {
   inherit (prev.rosPackages.jazzy)
     buildRosPackage
@@ -49,7 +52,6 @@ in
   state-observation = prev.callPackage ./pkgs/state-observation {};
   mc-rbdyn-urdf = prev.callPackage ./pkgs/mc-rbdyn-urdf {};
   tvm = prev.callPackage ./pkgs/tvm {};
-  mc-rtc = callWithLocal ./pkgs/mc-rtc;
   copra = prev.callPackage ./pkgs/copra {};
   omniorb = prev.symlinkJoin {
     name = "omniorb";
@@ -75,8 +77,18 @@ in
   hrp4-description = prev.callPackage ./pkgs/hrp4-description {};
   mc-hrp4 = prev.callPackage ./pkgs/mc-hrp4 {};
   hrp2-description = prev.callPackage ./pkgs/hrp2-description {};
-  mc-hrp2 = prev.callPackage ./pkgs/mc-hrp2 {};
+  mc-hrp2 = prev.callPackage ./pkgs/mc-hrp2 { };
   hrp5-p-description = prev.callPackage ./pkgs/hrp5-p-description {};
   mc-hrp5-p = prev.callPackage ./pkgs/mc-hrp5-p {};
   mc-panda = prev.callPackage ./pkgs/mc-panda {};
+  mc-rtc = callWithLocal ./pkgs/mc-rtc/mc-rtc.nix {};
+  mc-rtc-superbuild = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild.nix { 
+    mc-rtc = final.mc-rtc;
+    robots = [ mc-hrp2 ];
+    MainRobot = "HRP2DRC";
+    controllers = [];
+    Enabled = "Posture";
+    observers = [];
+    plugins = [];
+  };
 })

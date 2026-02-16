@@ -12,9 +12,10 @@ stdenv.mkDerivation {
   pname = "mc-hrp2";
   version = "1.0.0";
 
+  # TODO: release mc-hrp2
   src = builtins.fetchGit {
-    url = "git@gite.lirmm.fr:mc-hrp2/mc-hrp2";
-    rev = "da1a1b3c0edbfb235bbc52cceb629a679cca999c";
+    url = "git@github.com:isri-aist/mc-hrp2";
+    rev = "3748d8290b06e390008c7a769e0e4ae47b322915";
   };
 
   nativeBuildInputs = [ cmake ];
@@ -24,6 +25,7 @@ stdenv.mkDerivation {
     "-DBUILD_TESTING=OFF"
     "-DPYTHON_BINDING=OFF"
     "-DINSTALL_DOCUMENTATION=OFF"
+    "-DMC_RTC_HONOR_INSTALL_PREFIX=ON"
   ];
 
   doCheck = false;

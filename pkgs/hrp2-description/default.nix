@@ -4,14 +4,22 @@
   pname = "hrp2-description";
   version = "1.0.0";
 
+  # TODO: release hrp2_drc_descriptioin
   src = builtins.fetchGit {
-    url = "git@gite.lirmm.fr:mc-hrp2/hrp2_drc";
-    rev = "240abab83fd77aaeb3e95c18a396ffea37c677e3";
+    url = "git@github.com:isri-aist/hrp2_drc_description.git";
+    rev = "8aed472ac981d5e2985f5404e0545cb33bcb6cec";
   };
 
   nativeBuildInputs = if with-ros then [ colcon ] else [ cmake ];
 
-  cmakeFlags = [
+  preConfigure = ''
+    export ROS_VERSION=2
+  '';
+
+  cmakeFlags = 
+  lib.optional (!with-ros) "-DDISABLE_ROS=ON"
+  ++
+  [
     "-DBUILD_TESTING=OFF"
     "-DPYTHON_BINDING=OFF"
     "-DINSTALL_DOCUMENTATION=OFF"
