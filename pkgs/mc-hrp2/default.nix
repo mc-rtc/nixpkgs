@@ -1,4 +1,4 @@
-{ stdenv, lib, fetchgit, cmake, mc-rtc, hrp2-description } :
+{ stdenv, lib, fetchgit, cmake, mc-rtc, hrp2-description, useLocal ? false, localWorkspace ? null } :
 
 let
 
@@ -13,10 +13,17 @@ stdenv.mkDerivation {
   version = "1.0.0";
 
   # TODO: release mc-hrp2
-  src = builtins.fetchGit {
-    url = "git@github.com:isri-aist/mc-hrp2";
-    rev = "3748d8290b06e390008c7a769e0e4ae47b322915";
-  };
+  src = if useLocal then
+    builtins.trace "Using local workspace for mc-hrp2: ${localWorkspace}/mc-hrp2"
+    (builtins.path {
+      path = "${localWorkspace}/mc-hrp2";
+      name = "mc-hrp2-src";
+    })
+  else
+    builtins.fetchGit {
+      url = "git@github.com:isri-aist/mc-hrp2";
+      rev = "3748d8290b06e390008c7a769e0e4ae47b322915";
+    };
 
   nativeBuildInputs = [ cmake ];
   propagatedBuildInputs = [ hrp2-description' mc-rtc ];

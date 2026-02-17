@@ -7,6 +7,7 @@
 #   e.g in ControllerModulePaths, ObserverModulePaths, etc
 { stdenv, lib, writeTextFile
 , mc-rtc
+, mc-rtc-magnum
 , MainRobot ? "JVRC1" # default robot module name
 , Enabled ? "CoM" # default controller
 , Timestep ? 0.005 # default timestep
@@ -14,6 +15,7 @@
 , controllers ? []
 , observers ? []
 , plugins ? []
+, apps ? []
 }:
 
 let
@@ -70,6 +72,8 @@ stdenv.mkDerivation {
   version = mc-rtc.version;
   src = null;
   dontUnpack = true;
+
+  propagatedBuildInputs = [ mc-rtc-magnum ];
 
   installPhase = ''
     mkdir -p $out/etc

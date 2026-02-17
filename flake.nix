@@ -7,6 +7,17 @@
     ros-overlay.url = "github:lopsided98/nix-ros-overlay";
     nixgl.url = "github:nix-community/nixGL";
     flake-parts.url = "github:hercules-ci/flake-parts";
+
+    
+    system-manager = {
+      url = "github:numtide/system-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    nix-system-graphics = {
+      url = "github:soupglasses/nix-system-graphics";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   nixConfig = {
@@ -22,11 +33,26 @@
     ];
   };
 
-  outputs = inputs@{ flake-parts, ... }:
+  outputs = inputs@{ flake-parts, nix-system-graphics, system-manager, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [ "x86_64-linux" ];
 
-      perSystem = { system, pkgs, ... }:
+      flake = {
+        systemConfigs.default = system-manager.lib.makeSystemConfig {
+          modules = [
+            nix-system-graphics.systemModules.default
+              ({
+               config = {
+               nixpkgs.hostPlatform = "x86_64-linux";
+               system-manager.allowAnyDistro = true;
+               system-graphics.enable = true;
+               };
+               })
+          ];
+        };
+      };
+
+      perSystem = { inputs', system, pkgs, ... }:
         let
           useLocal = builtins.getEnv "MC_RTC_USE_LOCAL" == "1";
           localWorkspace = "/home/arnaud/devel/mc-rtc-nix/workspace";
@@ -41,15 +67,16 @@
           };
           packages = {
             mc-rtc-superbuild = pkgs.mc-rtc-superbuild;
-            mc-rtc-magnum = pkgs.mc-rtc-magnum;
+            # mc-rtc-magnum = pkgs.mc-rtc-magnum;
+            system-manager = inputs'.system-manager.packages.default;
           };
         in {
           packages = packages // {
             default = packages.mc-rtc-superbuild;
           };
           devShells.default = import ./shell.nix { inherit pkgs; };
-          devShells.controller = import ./controller-shell.nix { inherit pkgs; };
-          devShells.display = import ./display-shell.nix { inherit pkgs; };
+          #devShells.controller = import ./controller-shell.nix { inherit pkgs; };
+          #devShells.display = import ./display-shell.nix { inherit pkgs; };
         };
     };
 }

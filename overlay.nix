@@ -71,24 +71,26 @@ in rec
   mc-state-observation = prev.callPackage ./pkgs/mc-rtc/observers/mc-state-observation {};
   lipm-walking-controller = prev.callPackage ./pkgs/mc-rtc/controllers/lipm-walking-controller {};
   #mc-rtc-raylib = prev.callPackage ./pkgs/mc-rtc-raylib {};
-  mc-rtc-magnum = callWithLocal ./pkgs/mc-rtc-magnum;
   mc-rtc-msgs = prev.callPackage ./pkgs/mc-rtc-msgs {};
   mc-udp = prev.callPackage ./pkgs/mc-udp {};
   hrp4-description = prev.callPackage ./pkgs/hrp4-description {};
   mc-hrp4 = prev.callPackage ./pkgs/mc-hrp4 {};
-  hrp2-description = prev.callPackage ./pkgs/hrp2-description {};
-  mc-hrp2 = prev.callPackage ./pkgs/mc-hrp2 { };
+  # hrp2-description = prev.callPackage ./pkgs/hrp2-description {};
+  hrp2-description = callWithLocal ./pkgs/hrp2-description {};
+  # mc-hrp2 = prev.callPackage ./pkgs/mc-hrp2 { };
+  mc-hrp2 = callWithLocal ./pkgs/mc-hrp2 { };
   hrp5-p-description = prev.callPackage ./pkgs/hrp5-p-description {};
   mc-hrp5-p = prev.callPackage ./pkgs/mc-hrp5-p {};
   mc-panda = prev.callPackage ./pkgs/mc-panda {};
   mc-rtc = callWithLocal ./pkgs/mc-rtc/mc-rtc.nix {};
+  mc-rtc-magnum = callWithLocal ./pkgs/mc-rtc-magnum {};
   mc-rtc-superbuild = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild.nix { 
-    mc-rtc = final.mc-rtc;
     robots = [ mc-hrp2 ];
     MainRobot = "HRP2DRC";
     controllers = [];
-    Enabled = "Posture";
+    Enabled = "CoM";
     observers = [];
     plugins = [];
+    apps = [ mc-rtc-magnum ];
   };
 })
