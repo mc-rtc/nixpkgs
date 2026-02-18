@@ -76,6 +76,8 @@ in rec
   #mc-panda = prev.callPackage ./pkgs/mc-panda {};
   mc-panda = callWithLocal ./pkgs/mc-panda {};
   mc-panda-lirmm = callWithLocal ./pkgs/mc-panda/mc-panda-lirmm.nix {};
+  #mc-franka = prev.callPackage ./pkgs/mc-panda/mc-franka.nix {};
+  mc-franka = callWithLocal ./pkgs/mc-panda/mc-franka.nix {};
   franka-description = prev.callPackage ./pkgs/mc-panda/franka-description.nix {};
   poco = prev.callPackage ./pkgs/mc-panda/libpoco.nix {};
   mc-rtc = callWithLocal ./pkgs/mc-rtc/mc-rtc.nix {};
@@ -87,6 +89,6 @@ in rec
     Enabled = "CoM";
     observers = [];
     plugins = [];
-    apps = [ mc-rtc-magnum ];
+    apps = [ mc-rtc-magnum mc-franka ];
   };
 })
