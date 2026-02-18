@@ -1,0 +1,41 @@
+From 4e4b8382760e1db9948b01b2433dc531a2f701ed Mon Sep 17 00:00:00 2001
+From: Arnaud TANGUY <arn.tanguy@gmail.com>
+Date: Fri, 6 Jun 2025 14:36:32 +0200
+Subject: [PATCH] chore: update min cmake version
+
+---
+ CMakeLists.txt                     | 2 +-
+ cmake/GoogleTest-CMakeLists.txt.in | 2 +-
+ examples/CMakeLists.txt            | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index c3b03ef5..27462b7e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 3.4)
++cmake_minimum_required(VERSION 3.10)
+ 
+ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+ 
+diff --git a/cmake/GoogleTest-CMakeLists.txt.in b/cmake/GoogleTest-CMakeLists.txt.in
+index f5e5dd05..2a853b32 100644
+--- a/cmake/GoogleTest-CMakeLists.txt.in
++++ b/cmake/GoogleTest-CMakeLists.txt.in
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 3.0)
++cmake_minimum_required(VERSION 3.10)
+ project(googletest-download VERSION "" LANGUAGES CXX)
+ 
+ include(ExternalProject)
+diff --git a/examples/CMakeLists.txt b/examples/CMakeLists.txt
+index 5e281f89..117f6264 100644
+--- a/examples/CMakeLists.txt
++++ b/examples/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 3.4)
++cmake_minimum_required(VERSION 3.10)
+ 
+ project(libfranka-examples CXX)
+ 

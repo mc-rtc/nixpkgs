@@ -73,7 +73,7 @@ stdenv.mkDerivation {
   src = null;
   dontUnpack = true;
 
-  propagatedBuildInputs = [ mc-rtc-magnum ];
+  propagatedBuildInputs = [ mc-rtc ] ++ apps ++ robots ++ plugins ++ controllers ++ observers;
 
   installPhase = ''
     mkdir -p $out/etc

@@ -2,12 +2,10 @@
   description = "mc-rtc Nix flake";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
-    ros-overlay.url = "github:lopsided98/nix-ros-overlay";
-    nixgl.url = "github:nix-community/nixGL";
+    gazebros2nix.url = "github:gepetto/gazebros2nix";
+    nixpkgs.follows = "gazebros2nix/nixpkgs";
+    nix-ros-overlay.follows = "gazebros2nix/nix-ros-overlay";
     flake-parts.url = "github:hercules-ci/flake-parts";
-
     
     system-manager = {
       url = "github:numtide/system-manager";
@@ -57,13 +55,17 @@
           useLocal = builtins.getEnv "MC_RTC_USE_LOCAL" == "1";
           localWorkspace = "/home/arnaud/devel/mc-rtc-nix/workspace";
           overlays = [
-            inputs.ros-overlay.overlays.default
-            inputs.nixgl.overlay
+            inputs.nix-ros-overlay.overlays.default
             (import ./overlay.nix { inherit useLocal localWorkspace; })
           ];
           pkgs = import inputs.nixpkgs {
             inherit system overlays;
             rosVersion = "jazzy";
+            config = {
+              permittedInsecurePackages = [
+                "openssl-1.1.1w" # for libfranka
+              ];
+            };
           };
           packages = {
             mc-rtc-superbuild = pkgs.mc-rtc-superbuild;

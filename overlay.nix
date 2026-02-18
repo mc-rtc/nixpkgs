@@ -16,6 +16,7 @@ in rec
 {
   inherit (prev.rosPackages.jazzy)
     buildRosPackage
+    ament-cmake
     rclcpp
     nav-msgs
     tf2-ros
@@ -23,17 +24,7 @@ in rec
     message-generation
     message-runtime
     geometry-msgs
-    xacro
-    franka-description;
-
-  libfranka = prev.rosPackages.jazzy.libfranka.overrideAttrs (old: {
-    src = prev.fetchgit {
-      url = "https://github.com/frankaemika/libfranka";
-      rev = "f1f46fb008a37eb0d1dba00c971ff7e5a7bfbfd3";
-      sha256 = "1dliddjwaq30fjqc0zvy89c94vmkyxgmgk9k1kamnkhfip6ilmlv";
-    };
-    propagatedBuildInputs = old.propagatedBuildInputs ++ [ prev.zlib prev.pcre ];
-  });
+    xacro;
 
   nanomsg = prev.nanomsg.overrideAttrs (old: rec {
     postPatch = ''
@@ -81,11 +72,16 @@ in rec
   mc-hrp2 = callWithLocal ./pkgs/mc-hrp2 { };
   hrp5-p-description = prev.callPackage ./pkgs/hrp5-p-description {};
   mc-hrp5-p = prev.callPackage ./pkgs/mc-hrp5-p {};
-  mc-panda = prev.callPackage ./pkgs/mc-panda {};
+  libfranka = prev.callPackage ./pkgs/mc-panda/libfranka.nix {};
+  #mc-panda = prev.callPackage ./pkgs/mc-panda {};
+  mc-panda = callWithLocal ./pkgs/mc-panda {};
+  mc-panda-lirmm = callWithLocal ./pkgs/mc-panda/mc-panda-lirmm.nix {};
+  franka-description = prev.callPackage ./pkgs/mc-panda/franka-description.nix {};
+  poco = prev.callPackage ./pkgs/mc-panda/libpoco.nix {};
   mc-rtc = callWithLocal ./pkgs/mc-rtc/mc-rtc.nix {};
   mc-rtc-magnum = callWithLocal ./pkgs/mc-rtc-magnum {};
   mc-rtc-superbuild = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild.nix { 
-    robots = [ mc-hrp2 ];
+    robots = [ mc-hrp2 mc-panda mc-panda-lirmm ];
     MainRobot = "HRP2DRC";
     controllers = [];
     Enabled = "CoM";
