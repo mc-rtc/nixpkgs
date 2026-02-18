@@ -60,7 +60,8 @@ in rec
   };
   # mc-state-observation = callWithLocal ./pkgs/mc-rtc/observers/mc-state-observation;
   mc-state-observation = prev.callPackage ./pkgs/mc-rtc/observers/mc-state-observation {};
-  lipm-walking-controller = prev.callPackage ./pkgs/mc-rtc/controllers/lipm-walking-controller {};
+  #lipm-walking-controller = prev.callPackage ./pkgs/mc-rtc/controllers/lipm-walking-controller {};
+  lipm-walking-controller = callWithLocal ./pkgs/mc-rtc/controllers/lipm-walking-controller {};
   #mc-rtc-raylib = prev.callPackage ./pkgs/mc-rtc-raylib {};
   mc-rtc-msgs = prev.callPackage ./pkgs/mc-rtc-msgs {};
   mc-udp = prev.callPackage ./pkgs/mc-udp {};
@@ -80,11 +81,15 @@ in rec
   mc-franka = callWithLocal ./pkgs/mc-panda/mc-franka.nix {};
   franka-description = prev.callPackage ./pkgs/mc-panda/franka-description.nix {};
   poco = prev.callPackage ./pkgs/mc-panda/libpoco.nix {};
-  mc-rtc = callWithLocal ./pkgs/mc-rtc/mc-rtc.nix {};
+  #mesh-sampling = prev.callPackage ./pkgs/mesh-sampling {};
+  mesh-sampling = callWithLocal ./pkgs/mesh-sampling {};
+  mc-rtc = callWithLocal ./pkgs/mc-rtc/mc-rtc.nix { };
   mc-rtc-magnum = callWithLocal ./pkgs/mc-rtc-magnum {};
   mc-rtc-superbuild = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild.nix { 
-    robots = [ mc-hrp2 mc-panda mc-panda-lirmm ];
-    MainRobot = "HRP2DRC";
+    #robots = [ mc-hrp2 mc-panda mc-panda-lirmm ];
+    robots = [ mc-panda mc-panda-lirmm ];
+    MainRobot = "JVRC1";
+    #controllers = [lipm-walking-controller];
     controllers = [];
     Enabled = "CoM";
     observers = [];

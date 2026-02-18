@@ -3,7 +3,7 @@
 
 { stdenv, lib, fetchgit, cmake, pkg-config,
   tasks, tvm, eigen-quadprog, libtool, geos, spdlog, fmt, ndcurves, mc-rtc-data,
-  state-observation, nanomsg, libnotify, rapidjson, boost,
+  state-observation, nanomsg, libnotify, rapidjson, boost, mesh-sampling,
   with-ros ? false,
   rclcpp ? null, nav-msgs ? null, sensor-msgs ? null, tf2-ros ? null, rosbag ? null, mc-rtc-msgs ? null,
   useLocal ? false, localWorkspace ? null
@@ -42,7 +42,7 @@ stdenv.mkDerivation {
     "";
 
   nativeBuildInputs = [ cmake ];
-  propagatedBuildInputs = [ pkg-config tasks eigen-quadprog libtool geos spdlog fmt ndcurves mc-rtc-data state-observation nanomsg tvm libnotify rapidjson boost ]
+  propagatedBuildInputs = [ pkg-config tasks eigen-quadprog libtool geos spdlog fmt ndcurves mc-rtc-data state-observation nanomsg tvm libnotify rapidjson boost mesh-sampling ]
     ++ lib.optional (with-ros && rclcpp != null) rclcpp
     ++ lib.optional (with-ros && nav-msgs != null) nav-msgs
     ++ lib.optional (with-ros && sensor-msgs != null) sensor-msgs
