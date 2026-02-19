@@ -85,13 +85,24 @@ in rec
   mesh-sampling = callWithLocal ./pkgs/mesh-sampling {};
   mc-rtc = callWithLocal ./pkgs/mc-rtc/mc-rtc.nix { };
   mc-rtc-magnum = callWithLocal ./pkgs/mc-rtc-magnum {};
+  #panda-prosthesis = prev.callPackage ./pkgs/mc-rtc/controllers/panda-prosthesis {};
+  panda-prosthesis = callWithLocal ./pkgs/mc-rtc/controllers/panda-prosthesis {};
+  # TODO:
+  # - as-is it is a bit hard to understand where all parts of mc-rtc are installed,
+  #   since they are all in their own store path. Could we figure out a way to inspect them?
   mc-rtc-superbuild = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild.nix { 
-    #robots = [ mc-hrp2 mc-panda mc-panda-lirmm ];
-    robots = [ mc-panda mc-panda-lirmm ];
-    MainRobot = "JVRC1";
-    #controllers = [lipm-walking-controller];
-    controllers = [];
-    Enabled = "CoM";
+    robots = [
+      mc-hrp2
+      mc-panda
+      mc-panda-lirmm
+      # note that panda-prosthesis is not strictly-speaking a robot, but it builds a robot module so we need it here as well to populate the robots runtime paths
+      panda-prosthesis
+    ];
+    # MainRobot = "HRP2DRC";
+    # Enabled = "CoM";
+    # controllers = [lipm-walking-controller];
+    controllers = [ panda-prosthesis ];
+    configs = [ "${panda-prosthesis}/lib/mc_controller/etc/mc_rtc.yaml" ]; # extra mc_rtc.yaml
     observers = [];
     plugins = [];
     apps = [ mc-rtc-magnum mc-franka ];

@@ -11,6 +11,7 @@
 , MainRobot ? "JVRC1" # default robot module name
 , Enabled ? "CoM" # default controller
 , Timestep ? 0.005 # default timestep
+, configs ? [] # extra paths to mc_rtc.yaml
 , robots ? []
 , controllers ? []
 , observers ? []
@@ -22,7 +23,7 @@ let
   # Helper to build YAML lists
   toYamlList = paths: lib.concatMapStringsSep ", " (p: "\"${p}\"") paths;
 
-  configYaml = writeTextFile {
+  default_mc_rtc_yaml = writeTextFile {
     name = "mc_rtc.yaml";
     destination = "/etc/mc_rtc.yaml";
     text = ''
@@ -77,11 +78,11 @@ stdenv.mkDerivation {
 
   installPhase = ''
     mkdir -p $out/etc
-    cp ${configYaml}/etc/mc_rtc.yaml $out/etc
+    cp ${default_mc_rtc_yaml}/etc/mc_rtc.yaml $out/etc
   '';
 
   passthru = {
-    inherit mc-rtc robots controllers observers plugins configYaml;
+    inherit mc-rtc robots controllers observers plugins configs;
   };
 
   meta = mc-rtc.meta // {

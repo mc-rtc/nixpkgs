@@ -1,5 +1,10 @@
 { pkgs }:
 
+let 
+  mcRtcConfigs =
+  pkgs.mc-rtc-superbuild.configs
+  ++ [ "${pkgs.mc-rtc-superbuild}/etc/mc_rtc.yaml" ];
+in
 pkgs.mkShell {
   buildInputs = 
   with pkgs; [ mc-rtc-superbuild cmake ninja clang clang-tools ]
@@ -10,7 +15,7 @@ pkgs.mkShell {
     export MC_RTC_LIB=${pkgs.mc-rtc}/lib
     export MC_RTC_BIN=${pkgs.mc-rtc}/bin
     export MC_RTC_PKGCONFIG=${pkgs.mc-rtc}/lib/pkgconfig
-    export MC_RTC_CONTROLLER_CONFIG=${pkgs.mc-rtc-superbuild}/etc/mc_rtc.yaml
+    export MC_RTC_CONTROLLER_CONFIG=${pkgs.lib.concatStringsSep ":" mcRtcConfigs}
 
     export PATH=$MC_RTC_BIN:$PATH
     export LD_LIBRARY_PATH=$MC_RTC_LIB:$LD_LIBRARY_PATH
@@ -24,5 +29,15 @@ pkgs.mkShell {
     echo "mc-rtc-superbuild interactive shell ready."
     echo "The following convenience environment variables are set:"
     env | grep '^MC_RTC_'
+
+    echo "Runtime dependencies:"
+    echo "Robot modules:"
+    for robot in ${pkgs.lib.concatStringsSep " " (map (r: "${r}") pkgs.mc-rtc-superbuild.robots)}; do
+      echo "  $robot"
+    done
+    echo "Plugins:"
+    for plugin in ${pkgs.lib.concatStringsSep " " (map (r: "${r}") pkgs.mc-rtc-superbuild.plugins)}; do
+      echo "  $plugin"
+    done
   '';
 }
