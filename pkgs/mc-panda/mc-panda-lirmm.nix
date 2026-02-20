@@ -21,9 +21,10 @@ stdenv.mkDerivation {
     else
       # TODO: release mc-panda-lirmm
       fetchgit {
-        url = "https://github.com/jrl-umi3218/mc_panda_lirmm";
-        rev = "72d0125c3caf422a2e29f35460d372e0a6d6cf73";
-        sha256 = "sha256-MUOWXXrEbVzDQt0hI2drjpiaE47P/rIEW6rTu11QDe4=";
+        url = "https://github.com/arntanguy/mc_panda_lirmm";
+        # topic/ConnectModules
+        rev = "0eaf597b1585012e48d93032ee2b0c3bde9dce79";
+        sha256 = "sha256-r40sNPZoRbjT62lXgdvUtDMlaTnJv97UgKMX5Tkt1Fw=";
       };
 
   nativeBuildInputs = [ cmake ];

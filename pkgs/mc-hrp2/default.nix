@@ -22,7 +22,7 @@ stdenv.mkDerivation {
   else
     builtins.fetchGit {
       url = "git@github.com:isri-aist/mc-hrp2";
-      rev = "3748d8290b06e390008c7a769e0e4ae47b322915";
+      rev = "58d64f62e6031571f9fff9b6211f6dcc2d93535b";
     };
 
   nativeBuildInputs = [ cmake ];

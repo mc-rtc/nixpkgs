@@ -17,8 +17,9 @@ stdenv.mkDerivation {
       # TODO: release mesh-sampling
       fetchgit {
         url = "https://github.com/jrl-umi3218/mesh_sampling";
-        rev = "4dc2f91e3a5625670bffdc6f59cadd16cad48c3d";
-        sha256 = "sha256-ZhVdLWOjkRYTeTPPfGO3It4VdQbKT0MPRbzBaNnzMHE=";
+        # master
+        rev = "466064a4e9b7718b0b90922122c6aedd4867724a";
+        sha256 = "sha256-2e1Ctq/2lj2BNyxPH3VD+owYlURyIUq82D74y4nKPeg=";
       };
 
   nativeBuildInputs = [ cmake cli11 ];

@@ -17,9 +17,10 @@ stdenv.mkDerivation {
     else
       # TODO: release mc-franka
       fetchgit {
-        url = "https://github.com/jrl-umi3218/mc_franka";
-        rev = "5e4215e4b17dd5f24c2587471d6741b96e93c648";
-        sha256 = "sha256-2eUYp7Zk4tcAKFASJvhGPNodjvDUwL2PGhtCpc7tpew=";
+        url = "https://github.com/arntanguy/mc_franka";
+        # topic/nix
+        rev = "f5fca4b2ac4bd1076a2b02243cac18eb71f87627";
+        sha256 = "sha256-kWmK06gXrFcUpQTPArlVxPlWSl/q/z4VgawV+NDjtyY=";
       };
 
   nativeBuildInputs = [ cmake sudo libcap ];

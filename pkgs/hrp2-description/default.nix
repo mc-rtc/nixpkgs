@@ -14,7 +14,7 @@
     else
       builtins.fetchGit {
         url = "git@github.com:isri-aist/hrp2_drc_description.git";
-        rev = "8aed472ac981d5e2985f5404e0545cb33bcb6cec";
+        rev = "c2b2e9886ed07cdf5ddb6018c2dc53aca0f5f098";
       };
 
   nativeBuildInputs = if with-ros then [ colcon ] else [ cmake ];

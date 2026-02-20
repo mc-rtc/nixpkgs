@@ -19,8 +19,9 @@ stdenv.mkDerivation {
       fetchgit {
         #url = "https://github.com/ROLKNEEMATICS/panda_prosthesis";
         url = "https://github.com/arntanguy/panda_prosthesis_rolkneematics";
-        rev = "24e3a3b35e1b3266e8bac6128d216c4665ef65b5";
-        sha256 = "sha256-XdRmfMZPMFMqdNCRc7VBjQQAh5t5g00GxI3T+pN5F4E=";
+        # topic/ConnectModules
+        rev = "edef20d6a4b05ba5868e399d63984f18da64bac4";
+        sha256 = "sha256-yzIjxDpD0ry6j9+a5n6y+PAgYmtrtwUeZDFC0/M7aR4=";
       };
 
   nativeBuildInputs = [ cmake ];

@@ -16,9 +16,10 @@ stdenv.mkDerivation {
     else
       # TODO: release mc-panda
       fetchgit {
-        url = "https://github.com/jrl-umi3218/mc_panda";
-        rev = "924a58282cd91e1b78726a7f6c90fb48c93699ad";
-        sha256 = "sha256-sUkDrFlWoibuuHIFF8R2cGUnp7Y8VuHiT0paPKW1wEY=";
+        url = "https://github.com/arntanguy/mc_panda";
+        # topic/nix
+        rev = "0718841a4c0dced881a191082cd79afdff248173";
+        sha256 = "sha256-Nx/5tsnfqIOGh3iW9bPcQs03PLWm8JXZFPXrjNY7DCA=";
       };
 
   nativeBuildInputs = [ cmake ];

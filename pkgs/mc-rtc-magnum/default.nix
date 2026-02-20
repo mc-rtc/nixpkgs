@@ -22,8 +22,9 @@ stdenv.mkDerivation {
   else
     fetchgit {
       url = "https://github.com/mc-rtc/mc_rtc-magnum.git";
-      rev = "refs/heads/main";
-      sha256 = "";
+      # topic/nix
+      rev = "6b9835904e4beb2c784214d8d96e1fc0eb596799";
+      sha256 = "sha256-xo8u7OEMNeNCevfH6Fj8t6dLSb7sDOftWhjqu8DwjyY=";
       fetchSubmodules = true;
     };
 

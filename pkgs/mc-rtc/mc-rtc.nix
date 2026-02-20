@@ -29,9 +29,10 @@ stdenv.mkDerivation {
     # TODO: future 2.14.1 release
     fetchgit {
       url = "https://github.com/arntanguy/mc_rtc";
-      rev = "refs/heads/topic/nix";
+      # topic/nix-ConnectModules
+      rev = "efab1b0816edca4cc78919c6bcb29e1e8cbd2fe0";
       fetchSubmodules = true;
-      sha256 = "";
+      sha256 = "sha256-IwutgLX7oBK6KsYyEGH03Gv4AHVwCA0j/JejNu8sEbk=";
     };
 
   postPatch = if with-ros then
