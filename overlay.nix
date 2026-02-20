@@ -84,12 +84,12 @@ in rec
   poco = prev.callPackage ./pkgs/mc-panda/libpoco.nix {};
   mesh-sampling = prev.callPackage ./pkgs/mesh-sampling {};
   # mesh-sampling = callWithLocal ./pkgs/mesh-sampling {};
-  # mc-rtc = callWithLocal ./pkgs/mc-rtc/mc-rtc.nix { };
-  mc-rtc = prev.callPackage ./pkgs/mc-rtc/mc-rtc.nix { };
+  mc-rtc = callWithLocal ./pkgs/mc-rtc/mc-rtc.nix { };
+  # mc-rtc = prev.callPackage ./pkgs/mc-rtc/mc-rtc.nix { };
   # mc-rtc-magnum = callWithLocal ./pkgs/mc-rtc-magnum {};
   mc-rtc-magnum = prev.callPackage ./pkgs/mc-rtc-magnum {};
-  #panda-prosthesis = prev.callPackage ./pkgs/mc-rtc/controllers/panda-prosthesis {};
-  panda-prosthesis = callWithLocal ./pkgs/mc-rtc/controllers/panda-prosthesis {};
+  panda-prosthesis = prev.callPackage ./pkgs/mc-rtc/controllers/panda-prosthesis {};
+  # panda-prosthesis = callWithLocal ./pkgs/mc-rtc/controllers/panda-prosthesis {};
   # TODO:
   # - as-is it is a bit hard to understand where all parts of mc-rtc are installed,
   #   since they are all in their own store path. Could we figure out a way to inspect them?
