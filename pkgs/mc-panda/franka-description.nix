@@ -1,3 +1,6 @@
+# FIXME: unused
+# See https://github.com/frankarobotics/franka_description to see how to generate the URDF models from xacro
+# We would need to compile, install them, then modify mc-panda to use them. wtf frankarobotics.
 { lib
 , buildRosPackage, ament-cmake
 , fetchFromGitHub, libfranka
@@ -24,9 +27,8 @@ buildRosPackage {
     };
 
   buildType = "ament_cmake";
-  buildInputs = [ ament-cmake ];
-  nativeBuildInputs = [ ament-cmake ];
-  propagatedBuildInputs = [ libfranka xacro ];
+  nativeBuildInputs = [ ament-cmake xacro ];
+  propagatedBuildInputs = [ libfranka ];
 
   meta = {
     description = "URDF, meshes, and other description files for Franka robots";

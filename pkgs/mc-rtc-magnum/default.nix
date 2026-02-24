@@ -39,6 +39,10 @@ stdenv.mkDerivation {
     xorg.libXi
   ];
 
+  preConfigure = ''
+    export ROS_VERSION=2
+  '';
+
   cmakeFlags = [
   ];
 

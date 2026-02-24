@@ -7,7 +7,6 @@
 #   e.g in ControllerModulePaths, ObserverModulePaths, etc
 { stdenv, lib, writeTextFile
 , mc-rtc
-, mc-rtc-magnum
 , MainRobot ? "JVRC1" # default robot module name
 , Enabled ? "CoM" # default controller
 , Timestep ? 0.005 # default timestep
@@ -58,8 +57,9 @@ let
       # Dynamically generated module paths
       ControllerModulePaths: [${toYamlList (map (p: "${p}/lib/mc_controller") ([mc-rtc] ++ controllers))}]
       RobotModulePaths: [${toYamlList (map (p: "${p}/lib/mc_robots") ([mc-rtc] ++ robots))}]
+      # RobotModulePaths: [${toYamlList (["/home/arnaud/devel/mc-rtc-nix/install/lib64/mc_robots"] ++ (map (p: "${p}/lib/mc_robots") ([mc-rtc] ++ robots)))}]
       ObserverModulePaths: [${toYamlList (map (p: "${p}/lib/mc_observers") ([mc-rtc] ++ observers))}]
-      GlobalPluginPaths: [${toYamlList (map (p: "${p}/lib/mc_global_plugin") ([mc-rtc] ++ plugins))}]
+      GlobalPluginPaths: [${toYamlList (map (p: "${p}/lib/mc_plugins") ([mc-rtc] ++ plugins))}]
       ClearControllerModulePath: true
       ClearRobotModulePath: true
       ClearObserverModulePath: true
@@ -73,6 +73,9 @@ stdenv.mkDerivation {
   version = mc-rtc.version;
   src = null;
   dontUnpack = true;
+  dontConfigure = true;
+  dontBuild = true;
+  dontWrapQtApps = true;
 
   propagatedBuildInputs = [ mc-rtc ] ++ apps ++ robots ++ plugins ++ controllers ++ observers;
 

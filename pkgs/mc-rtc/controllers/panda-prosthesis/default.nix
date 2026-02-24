@@ -1,4 +1,4 @@
-{ stdenv, lib, fetchgit, 
+{ stdenv, lib, fetchFromGitHub, fetchgit, 
 cmake, mc-rtc,
 mc-panda-lirmm,
 useLocal ? false, localWorkspace ? null
@@ -16,12 +16,18 @@ stdenv.mkDerivation {
       })
     else
       # TODO: release panda-prosthesis
-      fetchgit {
-        #url = "https://github.com/ROLKNEEMATICS/panda_prosthesis";
-        url = "https://github.com/arntanguy/panda_prosthesis_rolkneematics";
-        # topic/ConnectModules
-        rev = "edef20d6a4b05ba5868e399d63984f18da64bac4";
-        sha256 = "sha256-yzIjxDpD0ry6j9+a5n6y+PAgYmtrtwUeZDFC0/M7aR4=";
+      # fetchgit {
+      #   #url = "https://github.com/ROLKNEEMATICS/panda_prosthesis";
+      #   url = "https://github.com/arntanguy/panda_prosthesis_rolkneematics";
+      #   # topic/ConnectModules
+      #   rev = "edef20d6a4b05ba5868e399d63984f18da64bac4";
+      #   sha256 = "sha256-yzIjxDpD0ry6j9+a5n6y+PAgYmtrtwUeZDFC0/M7aR4=";
+      # };
+      fetchFromGitHub {
+        owner = "arntanguy";
+        repo = "panda_prosthesis_rolkneematics";
+        rev = "topic/ConnectModules";
+        hash = "sha256-VgaE9pYQ5J9F9DehK6y7EOGSzsZtgHdspUxKohmMw7E=";
       };
 
   nativeBuildInputs = [ cmake ];

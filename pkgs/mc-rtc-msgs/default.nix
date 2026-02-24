@@ -1,18 +1,32 @@
-{ lib, buildRosPackage, fetchurl, colcon, message-generation, message-runtime, geometry-msgs }:
+{ lib, buildRosPackage, fetchurl, colcon, rosidl-default-runtime, rosidl-default-generators, geometry-msgs }:
 
+let
+  version = "1.1.2";
+in
 buildRosPackage {
   pname = "ros-jazzy-mc-rtc-msgs";
-  version = "1.0.1";
+  version = "${version}";
 
   src = fetchurl {
-    url = "https://github.com/jrl-umi3218/mc_rtc_msgs/releases/download/v1.0.1/mc_rtc_msgs-v1.0.1.tar.gz";
-    sha256 = "1sfkqns5ncigp3z8zhiv86dwqyd5l6ijx8sbzq9ywipqxh5jnkwr";
+    url = "https://github.com/jrl-umi3218/mc_rtc_msgs/releases/download/v${version}/mc_rtc_msgs-v${version}.tar.gz";
+    sha256 = "sha256-NGRbolox21Ch6+LlN2aoyRd8aK2f3f2aOLQE/injxQc=";
   };
 
   buildType = "colcon";
-  buildInputs = [ message-generation ];
-  propagatedBuildInputs = [ geometry-msgs message-runtime ];
+
+  buildInputs = 
+  [
+    rosidl-default-generators
+  ];
+  propagatedBuildInputs = 
+  [ geometry-msgs
+    rosidl-default-runtime
+  ];
   nativeBuildInputs = [ colcon ];
+
+  preConfigure = ''
+    export ROS_VERSION=2
+  '';
 
   meta = {
     description = "Common messages used by mc_rtc ROS plugin";

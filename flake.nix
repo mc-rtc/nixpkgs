@@ -54,9 +54,11 @@
         let
           useLocal = builtins.getEnv "MC_RTC_USE_LOCAL" == "1";
           localWorkspace = "/home/arnaud/devel/mc-rtc-nix/workspace";
+          # with-ros = (if builtins.getEnv "MC_RTC_WITH_ROS" != null then builtins.getEnv "MC_RTC_WITH_ROS" else "") == "1";
+          with-ros = (let v = builtins.getEnv "MC_RTC_WITH_ROS"; in v == "" || v == "1");
           overlays = [
             inputs.nix-ros-overlay.overlays.default
-            (import ./overlay.nix { inherit useLocal localWorkspace; })
+            (import ./overlay.nix { inherit useLocal localWorkspace with-ros; })
           ];
           pkgs = import inputs.nixpkgs {
             inherit system overlays;
@@ -76,7 +78,7 @@
           packages = packages // {
             default = packages.mc-rtc-superbuild;
           };
-          devShells.default = import ./shell.nix { inherit pkgs; };
+          devShells.default = import ./shell.nix { inherit pkgs; with-ros = true; };
           #devShells.controller = import ./controller-shell.nix { inherit pkgs; };
           #devShells.display = import ./display-shell.nix { inherit pkgs; };
         };

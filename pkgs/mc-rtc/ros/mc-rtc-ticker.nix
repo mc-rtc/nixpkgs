@@ -1,0 +1,75 @@
+{ lib
+, buildRosPackage, ament-cmake
+, runtimeShell, writeTextFile
+, fetchFromGitHub
+, ros2cli
+, ros2launch
+, ros2run
+, useLocal ? false, localWorkspace ? null
+}:
+
+let
+  pname = "mc-rtc-ticker";
+  version = "1.6.1";
+  localSrc = "${localWorkspace}/mc_rtc_ros";
+  fetched = if useLocal then
+    builtins.trace "Using local workspace for mc-rtc-ticker: ${localSrc}"
+    (builtins.path {
+      path = "${localSrc}";
+      name = "${pname}-src";
+    })
+  else
+    # fetchFromGitHub {
+    #   owner = "jrl-umi3218";
+    #   repo = "mc_rtc_ros";
+    #   rev = "227917d348971b3ba39e7dcef0df4ca65c6bf511";
+    #   sha256 = "sha256-40gtvLRzFi7Rd9BwiX3P/OWqH2fUCuZoUO53zYJdwzc=";
+    # };
+    fetchFromGitHub {
+      owner = "arntanguy";
+      repo = "mc_rtc_ros";
+      rev = "topic/nix";
+      hash = "sha256-Gmxv/nYKGcK9G1r0i08kLzTc2Dj8qCAQA/S0bic1LKA=";
+    }
+  # convenience script to launch rviz with a simple command
+  mcRtcRvizScript = writeTextFile {
+    name = "mc-rtc-rviz";
+    executable = true;
+    text = ''
+      #!${runtimeShell}
+      exec rviz2 -d ${placeholder "out"}/share/mc_rtc_ticker/display.rviz "$@"
+    '';
+  };
+in
+buildRosPackage {
+  pname = "${pname}";
+  version = "${version}";
+
+  src = "${fetched}/mc_rtc_ticker";
+
+  buildType = "ament_cmake";
+  buildInputs = [ ament-cmake ];
+  nativeBuildInputs = [ ament-cmake ];
+  propagatedBuildInputs = [
+    ros2cli
+    ros2run
+    ros2launch
+  ];
+
+  preConfigure = ''
+    export ROS_VERSION=2
+  '';
+
+  postInstall = ''
+    mkdir -p $out/bin
+    cp ${mcRtcRvizScript} $out/bin/mc-rtc-rviz
+  '';
+
+  meta = {
+    description = "Ticker utility for mc_rtc, installs display.rviz";
+    homepage    = "https://github.com/jrl-umi3218/mc_rtc_ros";
+    license     = lib.licenses.bsd2;
+    platforms   = lib.platforms.linux;
+    maintainers = [];
+  };
+}

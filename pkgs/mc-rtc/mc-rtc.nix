@@ -1,19 +1,13 @@
 # Builds the base mc-rtc version, without any plugins (controllers, robots, etc)
 # See mc-rtc-superbuild.nix for a full derivation with optional plugins
 
-{ stdenv, lib, fetchgit, cmake, pkg-config,
+{ stdenv, lib, fetchFromGitHub, fetchgit, cmake, pkg-config,
   tasks, tvm, eigen-quadprog, libtool, geos, spdlog, fmt, ndcurves, mc-rtc-data,
   state-observation, nanomsg, libnotify, rapidjson, boost, mesh-sampling,
   with-ros ? false,
-  rclcpp ? null, nav-msgs ? null, sensor-msgs ? null, tf2-ros ? null, rosbag ? null, mc-rtc-msgs ? null,
+  rclcpp ? null, nav-msgs ? null, sensor-msgs ? null, tf2-ros ? null, rosbag2 ? null, mc-rtc-msgs ? null,
   useLocal ? false, localWorkspace ? null
 }:
-
-let
-  mc-rtc-data' = mc-rtc-data.override {
-    with-ros = with-ros;
-  };
-in
 
 stdenv.mkDerivation {
   pname = "mc-rtc";
@@ -30,9 +24,9 @@ stdenv.mkDerivation {
     fetchgit {
       url = "https://github.com/arntanguy/mc_rtc";
       # topic/nix-ConnectModules, fix runtime paths merging
-      rev = "dc750bb21228a6597db6722e344fa7b908d497a9";
+      rev = "6176587f0778d40c3206bba697090cc3d98c0d91";
       fetchSubmodules = true;
-      sha256 = "sha256-L/yeCSvVhdOAL7iwazv80Om7cQ7wNUZdv/wPfQje3lY=";
+      sha256 = "sha256-KYYoKoW4FOzRJKr/E6GpOHvci75zztDC1nj7yArOAPQ=";
     };
 
   postPatch = if with-ros then
@@ -48,8 +42,12 @@ stdenv.mkDerivation {
     ++ lib.optional (with-ros && nav-msgs != null) nav-msgs
     ++ lib.optional (with-ros && sensor-msgs != null) sensor-msgs
     ++ lib.optional (with-ros && tf2-ros != null) tf2-ros
-    ++ lib.optional (with-ros && rosbag != null) rosbag
+    ++ lib.optional (with-ros && rosbag2 != null) rosbag2
     ++ lib.optional (with-ros && mc-rtc-msgs != null) mc-rtc-msgs;
+
+  preConfigure = ''
+    export ROS_VERSION=2
+  '';
 
   cmakeFlags = [
     "-DBUILD_TESTING=OFF"

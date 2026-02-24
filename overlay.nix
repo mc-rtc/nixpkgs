@@ -5,24 +5,32 @@
 - **`prev`**: The package set before your overlay is applied (i.e., the "previous" state).
   Use this to access and override existing packages, or to call functions from the underlying package set.
 */
-{ useLocal ? false, localWorkspace ? null, ... }:
+{ useLocal ? false, localWorkspace ? null, with-ros ? false, ... }:
 (final: prev:
 let
   callWithLocal = pkg: { ... }@args:
     prev.callPackage pkg ({
       inherit useLocal localWorkspace;
     } // args);
+  callWithRos = pkg: args: prev.callPackage pkg (args // { inherit with-ros; });
+  callWithRosLocal = pkg: args: prev.callPackage pkg (args // { inherit with-ros useLocal localWorkspace; });
 in rec
 {
   inherit (prev.rosPackages.jazzy)
     buildRosPackage
     ament-cmake
     rclcpp
+    ros2cli
+    ros2run
+    ros2launch
+    rosbag2
+    rviz2
     nav-msgs
     tf2-ros
+    visualization-msgs
     sensor-msgs
-    message-generation
-    message-runtime
+    rosidl-default-generators
+    rosidl-default-runtime
     geometry-msgs
     xacro;
 
@@ -39,7 +47,11 @@ in rec
   eigen-quadprog = prev.callPackage ./pkgs/eigen-quadprog {};
   sch-core = prev.callPackage ./pkgs/sch-core {};
   tasks = prev.callPackage ./pkgs/tasks {};
-  mc-rtc-data = prev.callPackage ./pkgs/mc-rtc-data {};
+  mc-env-description = callWithRos ./pkgs/mc-rtc-data/mc-env-description.nix {};
+  mc-int-obj-description = callWithRos ./pkgs/mc-rtc-data/mc-int-obj-description.nix {};
+  jvrc-description = callWithRos ./pkgs/mc-rtc-data/jvrc-description.nix {};
+  # mc-rtc-data = prev.callPackage ./pkgs/mc-rtc-data { with-ros = false; };
+  mc-rtc-data = callWithRos ./pkgs/mc-rtc-data {};
   state-observation = prev.callPackage ./pkgs/state-observation {};
   mc-rbdyn-urdf = prev.callPackage ./pkgs/mc-rbdyn-urdf {};
   tvm = prev.callPackage ./pkgs/tvm {};
@@ -65,16 +77,17 @@ in rec
   #mc-rtc-raylib = prev.callPackage ./pkgs/mc-rtc-raylib {};
   mc-rtc-msgs = prev.callPackage ./pkgs/mc-rtc-msgs {};
   mc-udp = prev.callPackage ./pkgs/mc-udp {};
-  hrp4-description = prev.callPackage ./pkgs/hrp4-description {};
+  hrp4-description = callWithRos ./pkgs/hrp4-description {};
   mc-hrp4 = prev.callPackage ./pkgs/mc-hrp4 {};
-  hrp2-description = prev.callPackage ./pkgs/hrp2-description {};
+  hrp2-description = callWithRos ./pkgs/hrp2-description {};
   # hrp2-description = callWithLocal ./pkgs/hrp2-description {};
   mc-hrp2 = prev.callPackage ./pkgs/mc-hrp2 { };
   # mc-hrp2 = callWithLocal ./pkgs/mc-hrp2 { };
-  hrp5-p-description = prev.callPackage ./pkgs/hrp5-p-description {};
+  hrp5-p-description = callWithRos ./pkgs/hrp5-p-description {};
   mc-hrp5-p = prev.callPackage ./pkgs/mc-hrp5-p {};
   libfranka = prev.callPackage ./pkgs/mc-panda/libfranka.nix {};
-  mc-panda = prev.callPackage ./pkgs/mc-panda {};
+  # mc-panda = callWithRosLocal ./pkgs/mc-panda {};
+  mc-panda = callWithRos ./pkgs/mc-panda {};
   # mc-panda = callWithLocal ./pkgs/mc-panda {};
   mc-panda-lirmm = prev.callPackage ./pkgs/mc-panda/mc-panda-lirmm.nix {};
   # mc-panda-lirmm = callWithLocal ./pkgs/mc-panda/mc-panda-lirmm.nix {};
@@ -84,12 +97,19 @@ in rec
   poco = prev.callPackage ./pkgs/mc-panda/libpoco.nix {};
   mesh-sampling = prev.callPackage ./pkgs/mesh-sampling {};
   # mesh-sampling = callWithLocal ./pkgs/mesh-sampling {};
-  mc-rtc = callWithLocal ./pkgs/mc-rtc/mc-rtc.nix { };
+  # mc-rtc = callWithRosLocal ./pkgs/mc-rtc/mc-rtc.nix {};
+  mc-rtc = callWithRos ./pkgs/mc-rtc/mc-rtc.nix {};
+  # mc-rtc-rviz-panel = prev.libsForQt5.callPackage ./pkgs/mc-rtc/ros/mc-rtc-rviz-panel.nix { inherit useLocal; inherit localWorkspace; };
+  mc-rtc-rviz-panel = prev.libsForQt5.callPackage ./pkgs/mc-rtc/ros/mc-rtc-rviz-panel.nix {};
+  # mc-rtc-ticker = callWithLocal ./pkgs/mc-rtc/ros/mc-rtc-ticker.nix {};
+  mc-rtc-ticker = prev.callPackage ./pkgs/mc-rtc/ros/mc-rtc-ticker.nix {};
+  # mc-rtc = callWithLocal ./pkgs/mc-rtc/mc-rtc.nix { with-ros = true; };
   # mc-rtc = prev.callPackage ./pkgs/mc-rtc/mc-rtc.nix { };
-  # mc-rtc-magnum = callWithLocal ./pkgs/mc-rtc-magnum {};
+  #mc-rtc-magnum = callWithLocal ./pkgs/mc-rtc-magnum {};
   mc-rtc-magnum = prev.callPackage ./pkgs/mc-rtc-magnum {};
-  panda-prosthesis = prev.callPackage ./pkgs/mc-rtc/controllers/panda-prosthesis {};
+  # mc-rtc-magnum = prev.callPackage ./pkgs/mc-rtc-magnum {};
   # panda-prosthesis = callWithLocal ./pkgs/mc-rtc/controllers/panda-prosthesis {};
+  panda-prosthesis = prev.callPackage ./pkgs/mc-rtc/controllers/panda-prosthesis {};
   # TODO:
   # - as-is it is a bit hard to understand where all parts of mc-rtc are installed,
   #   since they are all in their own store path. Could we figure out a way to inspect them?
@@ -107,7 +127,9 @@ in rec
     controllers = [ panda-prosthesis ];
     configs = [ "${panda-prosthesis}/lib/mc_controller/etc/mc_rtc.yaml" ]; # extra mc_rtc.yaml
     observers = [];
-    plugins = [];
-    apps = [ mc-rtc-magnum mc-franka ];
+    plugins = [ mc-rtc ];
+    #apps = [ mc-rtc-magnum mc-franka mc-rtc-rviz-panel ];
+    apps = [ mc-rtc-magnum ];
+    # apps = [ mc-rtc-magnum ];
   };
 })

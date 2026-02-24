@@ -1,8 +1,9 @@
-{ stdenv, lib, fetchgit, cmake, with-ros ? false, colcon, buildRosPackage, useLocal ? false, localWorkspace ? null }:
+{ stdenv, lib, fetchgit, cmake, with-ros ? false, ament-cmake, buildRosPackage, useLocal ? false, localWorkspace ? null }:
 
 (if with-ros then buildRosPackage else stdenv.mkDerivation) {
   pname = "hrp2-description";
   version = "1.0.0";
+  separateDebugInfo = false;
 
   # TODO: release hrp2_drc_descriptioin
   src = if useLocal then
@@ -17,7 +18,8 @@
         rev = "c2b2e9886ed07cdf5ddb6018c2dc53aca0f5f098";
       };
 
-  nativeBuildInputs = if with-ros then [ colcon ] else [ cmake ];
+  buildType = "ament_cmake";
+  nativeBuildInputs = if with-ros then [ ament-cmake ] else [ cmake ];
 
   preConfigure = ''
     export ROS_VERSION=2

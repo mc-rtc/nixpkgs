@@ -1,5 +1,5 @@
-{ stdenv, lib, fetchgit, 
-cmake, mc-rtc, libfranka, franka-description, xacro, 
+{ stdenv, lib, fetchFromGitHub, fetchgit, 
+cmake, mc-rtc, libfranka, franka-description, xacro,
 useLocal ? false, localWorkspace ? null,
 with-ros ? false } :
 
@@ -18,14 +18,16 @@ stdenv.mkDerivation {
       fetchgit {
         url = "https://github.com/arntanguy/mc_panda";
         # topic/nix
-        rev = "0718841a4c0dced881a191082cd79afdff248173";
-        sha256 = "sha256-Nx/5tsnfqIOGh3iW9bPcQs03PLWm8JXZFPXrjNY7DCA=";
+        rev = "34933cdd9802493627f4a0470166b87580be43ae";
+        sha256 = "sha256-bj/wGDqYwmzMqJ5wziX1x/+gXamYsCXrhB2/anN0Gmk=";
       };
 
   nativeBuildInputs = [ cmake ];
   propagatedBuildInputs =
+    builtins.trace "panda with-ros: ${toString with-ros}"
+    (
     [ mc-rtc libfranka ]
-    ++ lib.optional (with-ros) [franka-description xacro];
+    ++ lib.optional (with-ros) [franka-description xacro]);
 
   cmakeFlags = [
     "-DBUILD_TESTING=OFF"

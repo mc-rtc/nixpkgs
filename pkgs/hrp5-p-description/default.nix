@@ -3,6 +3,7 @@
 (if with-ros then buildRosPackage else stdenv.mkDerivation) {
   pname = "hrp5-p-description";
   version = "1.0.0";
+  separateDebugInfo = false;
 
   src = builtins.fetchGit {
     url = "git@gite.lirmm.fr:mc-hrp5/hrp5_p_description";
