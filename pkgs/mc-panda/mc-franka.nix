@@ -19,8 +19,8 @@ stdenv.mkDerivation {
       fetchgit {
         url = "https://github.com/arntanguy/mc_franka";
         # topic/nix
-        rev = "f5fca4b2ac4bd1076a2b02243cac18eb71f87627";
-        sha256 = "sha256-kWmK06gXrFcUpQTPArlVxPlWSl/q/z4VgawV+NDjtyY=";
+        rev = "813c3dfc9294dc448fe6157e9a1483e14eaf6c7c";
+        sha256 = "sha256-SDePGlOb/zHKu3ejOYWJoIpj+2b9g9D36Kri3UlCBdk=";
       };
 
   nativeBuildInputs = [ cmake sudo libcap ];
