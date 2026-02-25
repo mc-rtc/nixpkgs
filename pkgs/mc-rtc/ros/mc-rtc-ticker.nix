@@ -30,7 +30,7 @@ let
       repo = "mc_rtc_ros";
       rev = "topic/nix";
       hash = "sha256-Gmxv/nYKGcK9G1r0i08kLzTc2Dj8qCAQA/S0bic1LKA=";
-    }
+    };
   # convenience script to launch rviz with a simple command
   mcRtcRvizScript = writeTextFile {
     name = "mc-rtc-rviz";
