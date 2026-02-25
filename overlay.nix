@@ -115,7 +115,7 @@ in rec
   #   since they are all in their own store path. Could we figure out a way to inspect them?
   mc-rtc-superbuild = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild.nix { 
     robots = [
-      mc-hrp2
+      # mc-hrp2
       mc-panda
       mc-panda-lirmm
       # note that panda-prosthesis is not strictly-speaking a robot, but it builds a robot module so we need it here as well to populate the robots runtime paths
@@ -128,8 +128,8 @@ in rec
     configs = [ "${panda-prosthesis}/lib/mc_controller/etc/mc_rtc.yaml" ]; # extra mc_rtc.yaml
     observers = [];
     plugins = [ mc-rtc ];
-    #apps = [ mc-rtc-magnum mc-franka mc-rtc-rviz-panel ];
-    apps = [ mc-rtc-magnum ];
+    apps = [ mc-rtc-magnum mc-franka mc-rtc-rviz-panel ];
+    # apps = [ mc-rtc-magnum ];
     # apps = [ mc-rtc-magnum ];
   };
 })

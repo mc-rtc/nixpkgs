@@ -28,18 +28,18 @@ let
       name = "${pname}-src";
     })
   else
-    # fetchFromGitHub {
-    #   owner = "jrl-umi3218";
-    #   repo = "mc_rtc_ros";
-    #   rev = "227917d348971b3ba39e7dcef0df4ca65c6bf511"; # TODO: release mc_rtc_ros
-    #   sha256 = "sha256-40gtvLRzFi7Rd9BwiX3P/OWqH2fUCuZoUO53zYJdwzc=";
-    # };
     fetchFromGitHub {
-      owner = "arntanguy";
+      owner = "jrl-umi3218";
       repo = "mc_rtc_ros";
-      rev = "topic/nix";
-      hash = "sha256-Gmxv/nYKGcK9G1r0i08kLzTc2Dj8qCAQA/S0bic1LKA=";
+      rev = "d769df946c38f8a5befc2fe790fdba9ac739d566"; # TODO: release mc_rtc_ros
+      sha256 = "sha256-Gmxv/nYKGcK9G1r0i08kLzTc2Dj8qCAQA/S0bic1LKA=";
     };
+    # fetchFromGitHub {
+    #   owner = "arntanguy";
+    #   repo = "mc_rtc_ros";
+    #   rev = "topic/nix";
+    #   hash = "sha256-Gmxv/nYKGcK9G1r0i08kLzTc2Dj8qCAQA/S0bic1LKA=";
+    # };
 in
 buildRosPackage {
   pname = "${pname}";
