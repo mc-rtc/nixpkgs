@@ -1,5 +1,6 @@
 { stdenv, lib, fetchFromGitHub, fetchgit, 
 cmake, mc-rtc,
+socat, picocom, screen, minicom,
 mc-panda-lirmm,
 useLocal ? false, localWorkspace ? null
 }:
@@ -32,7 +33,10 @@ stdenv.mkDerivation {
 
   nativeBuildInputs = [ cmake ];
   propagatedBuildInputs =
-    [ mc-rtc mc-panda-lirmm ];
+    [
+      mc-rtc mc-panda-lirmm
+      socat picocom screen minicom # make serial communication debugging tools available
+    ];
 
   cmakeFlags = [
     "-DBUILD_TESTING=OFF"
