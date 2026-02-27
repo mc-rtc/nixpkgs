@@ -1,5 +1,5 @@
 { stdenv, lib, fetchgit, 
-cmake, qhull, assimp, cli11, eigen,
+cmake, qhull, assimp, cli11, eigen, libz,
 useLocal ? false, localWorkspace ? null,
 } :
 
@@ -23,7 +23,8 @@ stdenv.mkDerivation {
       };
 
   nativeBuildInputs = [ cmake cli11 ];
-  propagatedBuildInputs = [ qhull assimp eigen ];
+  # XXX why is libz dependency manually required here? Either qhull or assimp should bring it
+  propagatedBuildInputs = [ qhull assimp eigen libz ];
 
   cmakeFlags = [
     "-DINSTALL_DOCUMENTATION=OFF"
