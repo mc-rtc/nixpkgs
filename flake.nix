@@ -16,6 +16,11 @@
       url = "github:soupglasses/nix-system-graphics";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nvim-nix = {
+      url = "github:arntanguy/nvim-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   nixConfig = {
@@ -78,7 +83,12 @@
           packages = packages // {
             default = packages.mc-rtc-superbuild;
           };
-          devShells.default = import ./shell.nix { inherit pkgs; with-ros = true; };
+          devShells.default = import ./shell.nix
+          { 
+            inherit pkgs;
+            with-ros = true;
+            extraBuildInputs = [ inputs.nvim-nix.packages.${system}.nixCats ];
+          };
           #devShells.controller = import ./controller-shell.nix { inherit pkgs; };
           #devShells.display = import ./display-shell.nix { inherit pkgs; };
         };

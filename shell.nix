@@ -1,4 +1,4 @@
-{ pkgs, with-ros ? false }:
+{ pkgs, extraBuildInputs, with-ros ? false }:
 
 let 
   mcRtcConfigs =
@@ -11,11 +11,9 @@ pkgs.mkShell {
       mc-rtc-superbuild
       cmake
       ninja
-      clang
-      clang-tools
+      gdb
     ]
     ++ (with pkgs.xorg; [
-      mc-rtc-superbuild
       assimp
       libGL
       libXrandr
@@ -24,7 +22,8 @@ pkgs.mkShell {
       libX11
       libXi
       libXext
-    ]);
+    ])
+    ++ extraBuildInputs;
     # ++ (if with-ros then [
     #   colcon
     #   # rosPackages.jazzy.ros-core
