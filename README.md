@@ -17,27 +17,58 @@ Usage
 3. Enable the ROS cache: `cachix use ros`
 4. Clone this repository
 5. Navigate to the cloned folder
-6. Run `nix-shell --pure --arg with-tvm true`
+6. Run `nix develop`
 
 ### Options
-
-- `with-tvm`
-  - `false` (default) gets you the master version of mc_rtc
-  - `true` gets you the experimental/preview version of mc_rtc + TVM
 
 - `with-ros`
   - `true` (default) build mc_rtc with ROS support
   - `false` build mc_rtc without ROS support
 
-- `with-udp`
-  - `false` (default) runs a simple ticker (similar to `mc_rtc_ticker`)
-  - `true` runs `MCUDPControl`
+### Override the shell's environment for local development
 
-Each argument must be specified with `--arg`, for example:
+To override the default shell environment to use your own local version of a controller, you can do
 
-```bash
-# Run MCUDPControl with vanilla mc_rtc and no ROS support
-nix-shell --pure --arg with-tvm false --arg with-udp true --arg with-ros false
+```sh
+mkdir -p nix-workspace/install nix-workspace/devel
+```
+
+now create a `.direnv` file with the following content
+
+```sh
+use flake https://github.com/mc-rtc/nixpkgs
+# or 
+# export MC_RTC_WITH_ROS=1
+# export MC_RTC_USE_LOCAL=1
+# use flake nixpkgs --impure # if you cloned it locally
+export LD_LIBRARY_PATH=$PWD/install/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$PWD/install/lib64:$LD_LIBRARY_PATH
+export PATH=$PWD/install/bin:$PATH
+alias cmake_local="cmake -DCMAKE_PREFIX_PATH=$PWD/install -DMC_RTC_HONOR_INSTALL_PREFIX=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -G Ninja"
+```
+
+Then run `direnv allow`. Upon entering the nix-workspace folder, this will setup the environment for you.
+
+Now if you wish to install a custom controller/...
+
+```sh
+cd nix-workspace/devel
+git clone <your_controller>
+cd <your_controller>
+```
+
+Create a `.envrc` file here
+```sh
+source_up
+export MC_RTC_CONTROLLER_CONFIG="$PWD/../install/lib64/mc_controller/etc/mc_rtc.yaml:MC_RTC_CONTROLLER_CONFIG"
+```
+
+Then run `direnv allow` again. This will add your controller to the `MC_RTC_CONTROLLER_CONFIG` variable. To build:
+
+```sh
+mkdir build
+cd build
+cmake_local ..
 ```
 
 Run your own controller
