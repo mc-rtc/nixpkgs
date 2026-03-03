@@ -57,9 +57,10 @@
 
       perSystem = { inputs', system, pkgs, ... }:
         let
+          # disable useLocal by default
           useLocal = builtins.getEnv "MC_RTC_USE_LOCAL" == "1";
           localWorkspace = "/home/arnaud/devel/mc-rtc-nix/workspace";
-          # with-ros = (if builtins.getEnv "MC_RTC_WITH_ROS" != null then builtins.getEnv "MC_RTC_WITH_ROS" else "") == "1";
+          # enable ros by default
           with-ros = (let v = builtins.getEnv "MC_RTC_WITH_ROS"; in v == "" || v == "1");
           overlays = [
             inputs.nix-ros-overlay.overlays.default

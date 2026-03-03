@@ -23,10 +23,10 @@ stdenv.mkDerivation {
     # TODO: future 2.14.1 release
     fetchgit {
       url = "https://github.com/arntanguy/mc_rtc";
-      # topic/nix-ConnectModules, fix runtime paths merging
-      rev = "6176587f0778d40c3206bba697090cc3d98c0d91";
+      # topic/nix-ConnectModules
+      rev = "2d323fe7712764fd1867be6dfb05c8e4770b3cd8";
       fetchSubmodules = true;
-      sha256 = "sha256-KYYoKoW4FOzRJKr/E6GpOHvci75zztDC1nj7yArOAPQ=";
+      sha256 = "sha256-piqbmlBaqwxIWBXGMwTS8AHMPFMu/WmV6wKF0RiNZfk=";
     };
 
   postPatch = if with-ros then

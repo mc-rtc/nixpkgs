@@ -17,8 +17,8 @@ stdenv.mkDerivation rec {
     sha256 = "aa10a427bafc3fbe4fc687d1785b079539a438597b7b6ba20ae230d5286074dd";
   };
 
-  nativeBuildInputs = [ cmake doxygen boost ];
-  propagatedBuildInputs = [ eigen ];
+  nativeBuildInputs = [ cmake doxygen ];
+  propagatedBuildInputs = [ eigen boost ];
 
   cmakeFlags = [
     "-DBUILD_TESTING=OFF"

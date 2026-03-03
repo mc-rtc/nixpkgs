@@ -46,6 +46,8 @@ in rec
   eigen-qld = prev.callPackage ./pkgs/eigen-qld {};
   eigen-quadprog = prev.callPackage ./pkgs/eigen-quadprog {};
   sch-core = prev.callPackage ./pkgs/sch-core {};
+  #sch-visualization = prev.callPackage ./pkgs/sch-visualization {};
+  sch-visualization = callWithLocal ./pkgs/sch-visualization {};
   tasks = prev.callPackage ./pkgs/tasks {};
   mc-env-description = callWithRos ./pkgs/mc-rtc-data/mc-env-description.nix {};
   mc-int-obj-description = callWithRos ./pkgs/mc-rtc-data/mc-int-obj-description.nix {};
