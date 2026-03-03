@@ -23,8 +23,8 @@ stdenv.mkDerivation {
       fetchgit {
         url = "https://github.com/arntanguy/mc_panda_lirmm";
         # topic/ConnectModules
-        rev = "0eaf597b1585012e48d93032ee2b0c3bde9dce79";
-        sha256 = "sha256-r40sNPZoRbjT62lXgdvUtDMlaTnJv97UgKMX5Tkt1Fw=";
+        rev = "45be18e5eaffad2536bc46840d8c9b72770bb87e";
+        sha256 = "sha256-+oepqf7i4rtAQZTXNDUo+QF1uw8Z2tEMdAy3Q94HJ1w=";
       };
 
   nativeBuildInputs = [ cmake ];
