@@ -24,9 +24,9 @@ stdenv.mkDerivation {
     fetchgit {
       url = "https://github.com/arntanguy/mc_rtc";
       # topic/nix-ConnectModules
-      rev = "2d323fe7712764fd1867be6dfb05c8e4770b3cd8";
+      rev = "31eee70f448a8ebbc07923e5dedf03ca0ad45063";
       fetchSubmodules = true;
-      sha256 = "sha256-piqbmlBaqwxIWBXGMwTS8AHMPFMu/WmV6wKF0RiNZfk=";
+      sha256 = "sha256-IrmfzL071TBiyQtxw+q7oZW7LTGnTzWIVhTUhMbc9GU=";
     };
 
   postPatch = if with-ros then

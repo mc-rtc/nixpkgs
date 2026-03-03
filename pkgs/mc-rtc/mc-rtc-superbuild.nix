@@ -55,15 +55,15 @@ let
       VerboseLoader: false
 
       # Dynamically generated module paths
-      ControllerModulePaths: [${toYamlList (map (p: "${p}/lib/mc_controller") ([mc-rtc] ++ controllers))}]
-      RobotModulePaths: [${toYamlList (map (p: "${p}/lib/mc_robots") ([mc-rtc] ++ robots))}]
-      # RobotModulePaths: [${toYamlList (["/home/arnaud/devel/mc-rtc-nix/install/lib64/mc_robots"] ++ (map (p: "${p}/lib/mc_robots") ([mc-rtc] ++ robots)))}]
-      ObserverModulePaths: [${toYamlList (map (p: "${p}/lib/mc_observers") ([mc-rtc] ++ observers))}]
-      GlobalPluginPaths: [${toYamlList (map (p: "${p}/lib/mc_plugins") ([mc-rtc] ++ plugins))}]
-      ClearControllerModulePath: true
-      ClearRobotModulePath: true
-      ClearObserverModulePath: true
-      ClearGlobalPluginPath: true
+      ControllerModulePaths: [${toYamlList (map (p: "${p}/lib/mc_controller") (controllers))}]
+      RobotModulePaths: [${toYamlList (map (p: "${p}/lib/mc_robots") (robots))}]
+      # RobotModulePaths: [${toYamlList (["/home/arnaud/devel/mc-rtc-nix/install/lib64/mc_robots"] ++ (map (p: "${p}/lib/mc_robots") (robots)))}]
+      ObserverModulePaths: [${toYamlList (map (p: "${p}/lib/mc_observers") (observers))}]
+      GlobalPluginPaths: [${toYamlList (map (p: "${p}/lib/mc_plugins") (plugins))}]
+      ClearControllerModulePath: false
+      ClearRobotModulePath: false
+      ClearObserverModulePath: false
+      ClearGlobalPluginPath: false
     '';
   };
 in

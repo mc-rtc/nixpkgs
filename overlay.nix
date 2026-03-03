@@ -91,16 +91,16 @@ in rec
   # mc-panda = callWithRosLocal ./pkgs/mc-panda {};
   mc-panda = callWithRos ./pkgs/mc-panda {};
   # mc-panda = callWithLocal ./pkgs/mc-panda {};
-  mc-panda-lirmm = prev.callPackage ./pkgs/mc-panda/mc-panda-lirmm.nix {};
-  # mc-panda-lirmm = callWithLocal ./pkgs/mc-panda/mc-panda-lirmm.nix {};
+  # mc-panda-lirmm = prev.callPackage ./pkgs/mc-panda/mc-panda-lirmm.nix {};
+  mc-panda-lirmm = callWithLocal ./pkgs/mc-panda/mc-panda-lirmm.nix {};
   mc-franka = prev.callPackage ./pkgs/mc-panda/mc-franka.nix {};
   # mc-franka = callWithLocal ./pkgs/mc-panda/mc-franka.nix {};
   franka-description = prev.callPackage ./pkgs/mc-panda/franka-description.nix {};
   poco = prev.callPackage ./pkgs/mc-panda/libpoco.nix {};
   mesh-sampling = prev.callPackage ./pkgs/mesh-sampling {};
   # mesh-sampling = callWithLocal ./pkgs/mesh-sampling {};
-  # mc-rtc = callWithRosLocal ./pkgs/mc-rtc/mc-rtc.nix {};
-  mc-rtc = callWithRos ./pkgs/mc-rtc/mc-rtc.nix {};
+  mc-rtc = callWithRosLocal ./pkgs/mc-rtc/mc-rtc.nix {};
+  # mc-rtc = callWithRos ./pkgs/mc-rtc/mc-rtc.nix {};
   # mc-rtc-rviz-panel = prev.libsForQt5.callPackage ./pkgs/mc-rtc/ros/mc-rtc-rviz-panel.nix { inherit useLocal; inherit localWorkspace; };
   mc-rtc-rviz-panel = prev.libsForQt5.callPackage ./pkgs/mc-rtc/ros/mc-rtc-rviz-panel.nix {};
   # mc-rtc-ticker = callWithLocal ./pkgs/mc-rtc/ros/mc-rtc-ticker.nix {};
@@ -110,8 +110,8 @@ in rec
   #mc-rtc-magnum = callWithLocal ./pkgs/mc-rtc-magnum {};
   mc-rtc-magnum = prev.callPackage ./pkgs/mc-rtc-magnum {};
   # mc-rtc-magnum = prev.callPackage ./pkgs/mc-rtc-magnum {};
-  # panda-prosthesis = callWithLocal ./pkgs/mc-rtc/controllers/panda-prosthesis {};
-  panda-prosthesis = prev.callPackage ./pkgs/mc-rtc/controllers/panda-prosthesis {};
+  panda-prosthesis = callWithLocal ./pkgs/mc-rtc/controllers/panda-prosthesis {};
+  # panda-prosthesis = prev.callPackage ./pkgs/mc-rtc/controllers/panda-prosthesis {};
   # TODO:
   # - as-is it is a bit hard to understand where all parts of mc-rtc are installed,
   #   since they are all in their own store path. Could we figure out a way to inspect them?
@@ -129,9 +129,9 @@ in rec
     controllers = [ panda-prosthesis ];
     configs = [ "${panda-prosthesis}/lib/mc_controller/etc/mc_rtc.yaml" ]; # extra mc_rtc.yaml
     observers = [];
-    plugins = [ mc-rtc ];
-    apps = [ mc-rtc-magnum mc-franka mc-rtc-rviz-panel ];
-    # apps = [ mc-rtc-magnum ];
+    plugins = [ panda-prosthesis ];
+    apps = [ mc-rtc-magnum mc-franka mc-rtc-rviz-panel sch-visualization ];
+    # apps = [ mc-rtc-magnum mc-franka sch-visualization ];
     # apps = [ mc-rtc-magnum ];
   };
 })

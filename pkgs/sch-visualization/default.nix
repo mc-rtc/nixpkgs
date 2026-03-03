@@ -29,8 +29,8 @@ stdenv.mkDerivation rec {
   else
     fetchgit {
       url = "https://github.com/jrl-umi3218/sch-visualization";
-      rev = "a4fd156f57c3a9676db97adc9773112244d24569";
-      hash = "sha256-wMzbsnS/wWMPYjdmKbRLV3H2NjKSsfT7Ljqi49t9J+0=";
+      rev = "a9883a9c2470c0d430306aea2f73284c255c705e";
+      hash = "sha256-hHQqPE+ijvXpHdHuHETBPI6O/Q5une+X7YwKdFAzdmg=";
       fetchSubmodules = true;
     };
 
