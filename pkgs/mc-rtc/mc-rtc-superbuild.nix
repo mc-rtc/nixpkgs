@@ -85,7 +85,7 @@ stdenv.mkDerivation {
   '';
 
   passthru = {
-    inherit mc-rtc robots controllers observers plugins configs;
+    inherit mc-rtc robots controllers observers plugins apps configs;
   };
 
   meta = mc-rtc.meta // {

@@ -68,5 +68,9 @@ pkgs.mkShell {
     for plugin in ${pkgs.lib.concatStringsSep " " (map (r: "${r}") pkgs.mc-rtc-superbuild.plugins)}; do
       echo "  $plugin"
     done
+    echo "Apps:"
+    for app in ${pkgs.lib.concatStringsSep " " (map (r: "${r}") pkgs.mc-rtc-superbuild.apps)}; do
+      echo "  $app"
+    done
   '';
 }
