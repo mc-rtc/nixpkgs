@@ -27,8 +27,8 @@ stdenv.mkDerivation {
       fetchFromGitHub {
         owner = "arntanguy";
         repo = "panda_prosthesis_rolkneematics";
-        rev = "topic/ConnectModules";
-        hash = "sha256-VgaE9pYQ5J9F9DehK6y7EOGSzsZtgHdspUxKohmMw7E=";
+        rev = "0caaf2a5772d8c73336b9b356c95cc6aed152da9";
+        hash = "sha256-xfuWKfKIl4iI+dYVR8szg5cj0v6HjED1Ol123enzDNE=";
       };
 
   nativeBuildInputs = [ cmake ];
