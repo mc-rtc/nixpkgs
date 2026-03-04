@@ -31,15 +31,6 @@ let
       rev = "topic/nix";
       hash = "sha256-Gmxv/nYKGcK9G1r0i08kLzTc2Dj8qCAQA/S0bic1LKA=";
     };
-  # convenience script to launch rviz with a simple command
-  mcRtcRvizScript = writeTextFile {
-    name = "mc-rtc-rviz";
-    executable = true;
-    text = ''
-      #!${runtimeShell}
-      exec rviz2 -d ${placeholder "out"}/share/mc_rtc_ticker/display.rviz "$@"
-    '';
-  };
 in
 buildRosPackage {
   pname = "${pname}";
@@ -60,9 +51,19 @@ buildRosPackage {
     export ROS_VERSION=2
   '';
 
+  # postInstall = ''
+  #   mkdir -p $out/bin
+  #   cp ${mcRtcRvizScript} $out/bin/mc-rtc-rviz
+  # '';
+
+  # convenience script to launch rviz with a simple command
   postInstall = ''
     mkdir -p $out/bin
-    cp ${mcRtcRvizScript} $out/bin/mc-rtc-rviz
+    cat > $out/bin/mc-rtc-rviz <<EOF
+    #!${runtimeShell}
+    exec rviz2 -d $out/share/mc_rtc_ticker/launch/display.rviz "\$@"
+    EOF
+    chmod +x $out/bin/mc-rtc-rviz
   '';
 
   meta = {
