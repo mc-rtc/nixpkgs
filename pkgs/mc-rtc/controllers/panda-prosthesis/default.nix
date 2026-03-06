@@ -27,8 +27,8 @@ stdenv.mkDerivation {
       fetchFromGitHub {
         owner = "arntanguy";
         repo = "panda_prosthesis_rolkneematics";
-        rev = "c8879608d73fa35547d0a0fa67266ee9a62687da";
-        hash = "sha256-mPO2I8TJUuIDs1B+QDnE9n0PDng5ZjN/gUYwb5I1ksk=";
+        rev = "734a0a3496042a33ba1ec74cb771c6fa17415e6e";
+        hash = "sha256-w3o5mYrwPic1/9ZkNPpwCtQ958L1e8vNoOBPx34+CxI=";
       };
 
   nativeBuildInputs = [ cmake ];
