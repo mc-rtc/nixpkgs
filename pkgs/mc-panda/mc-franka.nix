@@ -17,7 +17,7 @@ stdenv.mkDerivation {
     else
       # TODO: release mc-franka
       fetchgit {
-        url = "https://github.com/arntanguy/mc_franka";
+        url = "https://github.com/jrl-umi3218/mc_franka";
         # topic/nix
         rev = "a1ee4100b489d50f1c9cbe7e5913183939678ef3";
         sha256 = "sha256-CXh2wCVIC3FxZ+bBmHXNGXYGqiqFStITFj9NRgGT5EU=";
