@@ -1,33 +1,22 @@
 # Builds the base mc-rtc version, without any plugins (controllers, robots, etc)
 # See mc-rtc-superbuild.nix for a full derivation with optional plugins
 
-{ stdenv, lib, fetchFromGitHub, fetchgit, cmake, pkg-config,
+{ stdenv, lib, buildRosPackage, fetchgit, cmake, pkg-config,
   tasks, tvm, eigen-quadprog, libtool, geos, spdlog, fmt, ndcurves, mc-rtc-data,
   state-observation, nanomsg, libnotify, rapidjson, boost, mesh-sampling,
+  python313Packages, qt5, # for mc_log_ui and other python tools. TODO separate python packages
   with-ros ? false,
   rclcpp ? null, nav-msgs ? null, sensor-msgs ? null, tf2-ros ? null, rosbag2 ? null, mc-rtc-msgs ? null,
   useLocal ? false, localWorkspace ? null
 }:
 
-stdenv.mkDerivation {
-  pname = "mc-rtc";
-  version = "2.14.1"; # TODO: Release
+let
+  common = import ./mc-rtc-common.nix { inherit useLocal localWorkspace fetchgit; };
+in
 
-  src = if useLocal then
-    builtins.trace "Using local workspace for mc_rtc: ${localWorkspace}/mc_rtc"
-    (builtins.path {
-      path = "${localWorkspace}/mc_rtc";
-      name = "mc_rtc-src";
-    })
-  else
-    # TODO: future 2.14.1 release
-    fetchgit {
-      url = "https://github.com/arntanguy/mc_rtc";
-      # topic/nix-ConnectModules
-      rev = "dc24e730b4bbdff96e92dfa9fa6df195c665ffb2";
-      fetchSubmodules = true;
-      sha256 = "sha256-LMWNJQGaZOUvpm1RSq6LWqqgTNgFoOeE6ScKWQFJ+O4=";
-    };
+(if with-ros then buildRosPackage else stdenv.mkDerivation) {
+  pname = "mc-rtc";
+  inherit (common) version src;
 
   postPatch = if with-ros then
     ''
@@ -36,8 +25,9 @@ stdenv.mkDerivation {
     else
     "";
 
-  nativeBuildInputs = [ cmake ];
+  nativeBuildInputs = [ cmake qt5.wrapQtAppsHook ];
   propagatedBuildInputs = [ pkg-config tasks eigen-quadprog libtool geos spdlog fmt ndcurves mc-rtc-data state-observation nanomsg tvm libnotify rapidjson boost mesh-sampling ]
+  ++ [ python313Packages.gitpython python313Packages.pyqt5 python313Packages.matplotlib]
     ++ lib.optional (with-ros && rclcpp != null) rclcpp
     ++ lib.optional (with-ros && nav-msgs != null) nav-msgs
     ++ lib.optional (with-ros && sensor-msgs != null) sensor-msgs
@@ -49,7 +39,9 @@ stdenv.mkDerivation {
     export ROS_VERSION=2
   '';
 
+
   cmakeFlags = [
+    "-DBUILD_MC_RTC_PYTHON_UTILS=ON"
     "-DBUILD_TESTING=OFF"
     "-DPYTHON_BINDING=OFF"
     "-DINSTALL_DOCUMENTATION=OFF"
@@ -64,6 +56,7 @@ stdenv.mkDerivation {
     echo 'set(MC_STATES_DEFAULT_INSTALL_PREFIX "''${PACKAGE_PREFIX_DIR}/lib/mc_controller/fsm/states")' >> $out/lib/cmake/mc_rtc/mc_rtcMacros.cmake
     echo 'set(MC_STATES_DEFAULT_RUNTIME_INSTALL_PREFIX "''${PACKAGE_PREFIX_DIR}/lib/mc_controller/fsm/states")' >> $out/lib/cmake/mc_rtc/mc_rtcMacros.cmake
     echo 'set(MC_STATES_DEFAULT_LIBRARY_INSTALL_PREFIX "''${PACKAGE_PREFIX_DIR}/lib/mc_controller/fsm/states")' >> $out/lib/cmake/mc_rtc/mc_rtcMacros.cmake
+    wrapQtApp $out/bin/mc_log_ui
   '';
 
   meta = with lib; {

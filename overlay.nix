@@ -31,6 +31,8 @@ in rec
     sensor-msgs
     rosidl-default-generators
     rosidl-default-runtime
+    rosidl-typesupport-c
+    rosidl-typesupport-cpp
     geometry-msgs
     xacro;
 
@@ -99,8 +101,9 @@ in rec
   poco = prev.callPackage ./pkgs/mc-panda/libpoco.nix {};
   mesh-sampling = prev.callPackage ./pkgs/mesh-sampling {};
   # mesh-sampling = callWithLocal ./pkgs/mesh-sampling {};
-  # mc-rtc = callWithRosLocal ./pkgs/mc-rtc/mc-rtc.nix {};
-  mc-rtc = callWithRos ./pkgs/mc-rtc/mc-rtc.nix {};
+  mc-rtc = callWithRosLocal ./pkgs/mc-rtc/mc-rtc.nix {};
+  mc-rtc-python-utils = callWithLocal ./pkgs/mc-rtc/mc-rtc-python-utils.nix {};
+  #mc-rtc = callWithRos ./pkgs/mc-rtc/mc-rtc.nix {};
   # mc-rtc-rviz-panel = prev.libsForQt5.callPackage ./pkgs/mc-rtc/ros/mc-rtc-rviz-panel.nix { inherit useLocal; inherit localWorkspace; };
   mc-rtc-rviz-panel = prev.libsForQt5.callPackage ./pkgs/mc-rtc/ros/mc-rtc-rviz-panel.nix {};
   # mc-rtc-ticker = callWithLocal ./pkgs/mc-rtc/ros/mc-rtc-ticker.nix {};
@@ -134,4 +137,25 @@ in rec
     # apps = [ mc-rtc-magnum mc-franka sch-visualization ];
     # apps = [ mc-rtc-magnum ];
   };
+  # mc-rtc-superbuild = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild.nix { 
+  #   robots = [
+  #     # mc-hrp2
+  #     mc-panda
+  #     mc-panda-lirmm
+  #     # note that panda-prosthesis is not strictly-speaking a robot, but it builds a robot module so we need it here as well to populate the robots runtime paths
+  #     panda-prosthesis
+  #   ];
+  #   # MainRobot = "HRP2DRC";
+  #   # Enabled = "CoM";
+  #   # controllers = [lipm-walking-controller];
+  #   controllers = [];
+  #   configs = []; # extra mc_rtc.yaml
+  #   observers = [];
+  #   plugins = [];
+  #   # apps = [ mc-rtc-python-utils ];
+  #   # apps = [];
+  #   apps = [ mc-rtc-magnum mc-franka mc-rtc-rviz-panel sch-visualization ];
+  #   # apps = [ mc-rtc-magnum mc-franka sch-visualization ];
+  #   # apps = [ mc-rtc-magnum ];
+  # };
 })

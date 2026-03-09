@@ -1,4 +1,6 @@
-{ lib, buildRosPackage, fetchurl, colcon, rosidl-default-runtime, rosidl-default-generators, geometry-msgs }:
+{ lib, buildRosPackage, fetchurl, colcon, rosidl-default-runtime, rosidl-default-generators,
+rosidl-typesupport-c, rosidl-typesupport-cpp, ament-cmake,
+geometry-msgs }:
 
 let
   version = "1.1.2";
@@ -16,11 +18,15 @@ buildRosPackage {
 
   buildInputs = 
   [
-    rosidl-default-generators
   ];
   propagatedBuildInputs = 
-  [ geometry-msgs
+  [
+    rosidl-default-generators
+    geometry-msgs
     rosidl-default-runtime
+    rosidl-typesupport-c
+    rosidl-typesupport-cpp
+    ament-cmake
   ];
   nativeBuildInputs = [ colcon ];
 
