@@ -1,15 +1,10 @@
 # The main purpose of this derivation is to provide an mc_rtc environment
 # with runtime dependencies available, e.g robot modules, controllers, observers and plugins
-# 
-# This is achieved by:
-# - declaring the runtime dependencies in either robots, controllers, observers and plugins list
-# - this derivation generates and mc_rtc.yaml configuration with runtime path to these dependencies
-#   e.g in ControllerModulePaths, ObserverModulePaths, etc
 { stdenv, lib, writeTextFile
 , symlinkJoin
 , rsync
 , mc-rtc
-, MainRobot ? "JVRC1Toto"
+, MainRobot ? "JVRC1"
 , Enabled ? "CoM"
 , Timestep ? 0.005
 , configs ? []
@@ -38,28 +33,31 @@ stdenv.mkDerivation {
 
   installPhase = ''
     mkdir $out
-    #cp -r ${merged}/* $out/
+    # exclude mc_rtc.yaml from the symlinkJoin, as we want to override it
     rsync -a --exclude=etc/mc_rtc.yaml ${merged}/ $out/
+    # allow to write a modified mc_rtc.yaml
     chmod u+w $out/etc
-    cp ${merged}/etc/mc_rtc.yaml $out/etc/mc_rtc.yaml
 
     # Override mc_rtc's default mc_rtc.yaml configuration to provide:
     # - the runtime paths to the merged derivation (controllers, plugins, etc)
     # - the controller to run, the timestep
     # - which main robot to use
-    sed -i \
-      -e "s|^Timestep:.*|Timestep: ${toString Timestep}|" \
-      -e "s|^MainRobot:.*|MainRobot: ${MainRobot}|" \
-      -e "s|^Enabled:.*|Enabled: [${Enabled}]|" \
-      -e "s|^# ClearControllerModulePath:.*|ClearControllerModulePath: true|" \
-      -e "s|^# ClearRobotModulePath:.*|ClearRobotModulePath: true|" \
-      -e "s|^# ClearObserverModulePath:.*|ClearObserverModulePath: true|" \
-      -e "s|^# ClearGlobalPluginPath:.*|ClearGlobalPluginPath: true|" \
-      -e "s|^# ControllerModulePaths:.*|ControllerModulePaths: [\"$out/lib/mc_controller\"]|" \
-      -e "s|^# RobotModulePaths:.*|RobotModulePaths: [\"$out/lib/mc_robots\"]|" \
-      -e "s|^# ObserverModulePaths:.*|ObserverModulePaths: [\"$out/lib/mc_observers\"]|" \
-      -e "s|^# GlobalPluginPaths:.*|GlobalPluginPaths: [\"$out/lib/mc_plugins\"]|" \
-      $out/etc/mc_rtc.yaml
+    #
+    # Note that mc_rtc will load its own default configuration from the mc-rtc derivation
+    # This mc_rtc.yaml in the merged path will be loaded as an extra configuration provided by MC_RTC_CONTROLLER_CONFIG environment variable, and merged by mc_rtc using its configuration merging rules.
+    cat > $out/etc/mc_rtc.yaml <<EOF
+    Timestep: ${toString Timestep}
+    MainRobot: ${MainRobot}
+    Enabled: [${Enabled}]
+    ClearControllerModulePath: true
+    ClearRobotModulePath: true
+    ClearObserverModulePath: true
+    ClearGlobalPluginPath: true
+    ControllerModulePaths: ["$out/lib/mc_controller"]
+    RobotModulePaths: ["$out/lib/mc_robots"]
+    ObserverModulePaths: ["$out/lib/mc_observers"]
+    GlobalPluginPaths: ["$out/lib/mc_plugins"]
+    EOF
   '';
 
   shellHook = ''

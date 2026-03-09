@@ -115,9 +115,27 @@ in rec
   # mc-rtc-magnum = prev.callPackage ./pkgs/mc-rtc-magnum {};
   panda-prosthesis = callWithLocal ./pkgs/mc-rtc/controllers/panda-prosthesis {};
   # panda-prosthesis = prev.callPackage ./pkgs/mc-rtc/controllers/panda-prosthesis {};
-  # TODO:
-  # - as-is it is a bit hard to understand where all parts of mc-rtc are installed,
-  #   since they are all in their own store path. Could we figure out a way to inspect them?
+
+  #####################
+  # mc-rtc-superbuild #
+  #####################
+  # This derivation provides a mechanism to bring configurations of the whole framework together,
+  # that is:
+  # - mc-rtc itself
+  # - all runtime dependencies controllers/robots/observers/plugins required by the user
+  # - a default mc-rtc configuration, e.g which controller/timestep/main robot to use, or if the controllers
+  #   provide a suitable mc_rtc.yaml file, it can be referenced here as well
+  #
+  # This is handled as follows:
+  # - all runtime dependencies (including mc-rtc) are built independently, and their output is merged together (symlinkJoin) into a single runtimepath
+  # - the default mc_rtc.yaml runtime paths are overridden with corresponding paths in the merged output such that all runtime dependencies are available at the same place (this avoids confusion as to where each runtime dependency is located in the store and makes for a more user-friendly approach). In practice mc_rtc loads this mc_rtc.yaml override through the MC_RTC_CONTROLLER_CONFIG environment variable
+  #
+  # Note that local out-of-nix overrides from local source folders of controller/robot/plugin/observers can be achieved by:
+  # - prefixing LD_LIBRARY_PATH with the local intalled lib path
+  # - providing a custom mc_rtc.yaml with ControllerModulePaths, ObserverModulePaths, etc pointing to their corresponding installed folder
+  # This is not per-say recomended, but it can drastically reduce build time for these components, and also allow for seamless LSP integration in your editor.
+  #
+  # TODO: investigate use of ccacheStdenv
   mc-rtc-superbuild = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild.nix { 
     robots = [
       # mc-hrp2
@@ -130,32 +148,12 @@ in rec
     # Enabled = "CoM";
     # controllers = [lipm-walking-controller];
     controllers = [ panda-prosthesis ];
-    configs = [ "${panda-prosthesis}/lib/mc_controller/etc/mc_rtc.yaml" ]; # extra mc_rtc.yaml
+    # extra mc_rtc.yaml
+    configs = [ "${panda-prosthesis}/lib/mc_controller/etc/mc_rtc.yaml" ];
     observers = [];
     plugins = [ panda-prosthesis ];
     apps = [ mc-rtc-magnum mc-franka mc-rtc-rviz-panel sch-visualization ];
     # apps = [ mc-rtc-magnum mc-franka sch-visualization ];
     # apps = [ mc-rtc-magnum ];
   };
-  # mc-rtc-superbuild = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild.nix { 
-  #   robots = [
-  #     # mc-hrp2
-  #     mc-panda
-  #     mc-panda-lirmm
-  #     # note that panda-prosthesis is not strictly-speaking a robot, but it builds a robot module so we need it here as well to populate the robots runtime paths
-  #     panda-prosthesis
-  #   ];
-  #   # MainRobot = "HRP2DRC";
-  #   # Enabled = "CoM";
-  #   # controllers = [lipm-walking-controller];
-  #   controllers = [];
-  #   configs = []; # extra mc_rtc.yaml
-  #   observers = [];
-  #   plugins = [];
-  #   # apps = [ mc-rtc-python-utils ];
-  #   # apps = [];
-  #   apps = [ mc-rtc-magnum mc-franka mc-rtc-rviz-panel sch-visualization ];
-  #   # apps = [ mc-rtc-magnum mc-franka sch-visualization ];
-  #   # apps = [ mc-rtc-magnum ];
-  # };
 })
