@@ -37,10 +37,10 @@ pkgs.mkShell {
     # ] else []);
 
   shellHook = ''
-    export MC_RTC_PATH=${pkgs.mc-rtc}
-    export MC_RTC_LIB=${pkgs.mc-rtc}/lib
-    export MC_RTC_BIN=${pkgs.mc-rtc}/bin
-    export MC_RTC_PKGCONFIG=${pkgs.mc-rtc}/lib/pkgconfig
+    export MC_RTC_PATH=${pkgs.mc-rtc-superbuild}
+    export MC_RTC_LIB=${pkgs.mc-rtc-superbuild}/lib
+    export MC_RTC_BIN=${pkgs.mc-rtc-superbuild}/bin
+    export MC_RTC_PKGCONFIG=${pkgs.mc-rtc-superbuild}/lib/pkgconfig
     export MC_RTC_CONTROLLER_CONFIG=${pkgs.lib.concatStringsSep ":" mcRtcConfigs}
 
     export PATH=$MC_RTC_BIN:$PATH
@@ -55,11 +55,16 @@ pkgs.mkShell {
     # FIXME this flag gets too huge and gcc fails
     export NIX_CFLAGS_COMPILE=""
 
-    echo "mc-rtc-superbuild interactive shell ready."
+    echo "======================================="
+    echo "  mc-rtc-superbuild interactive shell  "
+    echo "======================================="
+
+    echo ""
     echo "The following convenience environment variables are set:"
     env | grep '^MC_RTC_'
+    echo ""
 
-    echo "Runtime dependencies:"
+    echo "Runtime dependencies (for information):"
     echo "Robot modules:"
     for robot in ${pkgs.lib.concatStringsSep " " (map (r: "${r}") pkgs.mc-rtc-superbuild.robots)}; do
       echo "  $robot"
@@ -68,9 +73,15 @@ pkgs.mkShell {
     for plugin in ${pkgs.lib.concatStringsSep " " (map (r: "${r}") pkgs.mc-rtc-superbuild.plugins)}; do
       echo "  $plugin"
     done
+    echo "Observers:"
+    for observer in ${pkgs.lib.concatStringsSep " " (map (r: "${r}") pkgs.mc-rtc-superbuild.observers)}; do
+      echo "  $plugin"
+    done
     echo "Apps:"
     for app in ${pkgs.lib.concatStringsSep " " (map (r: "${r}") pkgs.mc-rtc-superbuild.apps)}; do
       echo "  $app"
     done
+    echo ""
+    echo "All runtime components are symlinked in MC_RTC_PATH=${pkgs.mc-rtc-superbuild}"
   '';
 }
