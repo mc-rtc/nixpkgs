@@ -2,7 +2,7 @@
 mc-panda,
 cmake,
 useLocal ? false, localWorkspace ? null
-} :
+}:
 
 let
   version = "1.0.0";
