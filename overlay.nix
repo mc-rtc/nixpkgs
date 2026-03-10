@@ -23,6 +23,7 @@ in rec
     ros2cli
     ros2run
     ros2launch
+    ros2topic
     rosbag2
     rviz2
     nav-msgs
@@ -153,7 +154,7 @@ in rec
     configs = [ "${panda-prosthesis}/lib/mc_controller/etc/mc_rtc.yaml" ];
     observers = [];
     plugins = [ panda-prosthesis ];
-    apps = [ mc-rtc-magnum mc-franka mc-rtc-rviz-panel sch-visualization ];
+    apps = [ mc-rtc-magnum mc-franka mc-rtc-ticker sch-visualization ];
     # apps = [ mc-rtc-magnum mc-franka sch-visualization ];
     # apps = [ mc-rtc-magnum ];
   };

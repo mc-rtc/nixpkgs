@@ -2,9 +2,12 @@
 , buildRosPackage, ament-cmake
 , runtimeShell, writeTextFile
 , fetchFromGitHub
+, mc-rtc-rviz-panel
 , ros2cli
 , ros2launch
 , ros2run
+, ros2topic
+, rviz2
 , useLocal ? false, localWorkspace ? null
 }:
 
@@ -42,19 +45,16 @@ buildRosPackage {
   buildInputs = [ ament-cmake ];
   nativeBuildInputs = [ ament-cmake ];
   propagatedBuildInputs = [
+    mc-rtc-rviz-panel
     ros2cli
     ros2run
+    ros2topic
     ros2launch
   ];
 
   preConfigure = ''
     export ROS_VERSION=2
   '';
-
-  # postInstall = ''
-  #   mkdir -p $out/bin
-  #   cp ${mcRtcRvizScript} $out/bin/mc-rtc-rviz
-  # '';
 
   # convenience script to launch rviz with a simple command
   postInstall = ''

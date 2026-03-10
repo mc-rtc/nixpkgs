@@ -2,7 +2,6 @@
 , buildRosPackage, ament-cmake
 , fetchFromGitHub
 , mc-rtc
-, mc-rtc-ticker
 , qt5
 , qwt
 , libGL
@@ -52,7 +51,6 @@ buildRosPackage {
   nativeBuildInputs = [ ament-cmake ];
   propagatedBuildInputs = [
     mc-rtc
-    mc-rtc-ticker
     rclcpp
     rviz2
     visualization-msgs
