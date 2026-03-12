@@ -37,10 +37,17 @@ pkgs.mkShell {
     # ] else []);
 
   shellHook = ''
-    export MC_RTC_PATH=${pkgs.mc-rtc-superbuild}
-    export MC_RTC_LIB=${pkgs.mc-rtc-superbuild}/lib
-    export MC_RTC_BIN=${pkgs.mc-rtc-superbuild}/bin
-    export MC_RTC_PKGCONFIG=${pkgs.mc-rtc-superbuild}/lib/pkgconfig
+    export MC_RTC_PATH=${pkgs.mc-rtc}
+    export MC_RTC_JEKYLL_PLUGINS=${pkgs.mc-rtc}/share/doc/mc-rtc/jekyll/plugins
+    export MC_RTC_LIB=${pkgs.mc-rtc}/lib
+    export MC_RTC_BIN=${pkgs.mc-rtc}/bin
+    export MC_RTC_PKGCONFIG=${pkgs.mc-rtc}/lib/pkgconfig
+    # For mc-rtc-superbuild-symlinkjoin
+    # export MC_RTC_PATH=${pkgs.mc-rtc-superbuild}
+    # export MC_RTC_JEKYLL_PLUGINS=${pkgs.mc-rtc-superbuild}/share/doc/_plugins
+    # export MC_RTC_LIB=${pkgs.mc-rtc-superbuild}/lib
+    # export MC_RTC_BIN=${pkgs.mc-rtc-superbuild}/bin
+    # export MC_RTC_PKGCONFIG=${pkgs.mc-rtc-superbuild}/lib/pkgconfig
     export MC_RTC_CONTROLLER_CONFIG=${pkgs.lib.concatStringsSep ":" mcRtcConfigs}
 
     export PATH=$MC_RTC_BIN:$PATH

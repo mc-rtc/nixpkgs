@@ -1,13 +1,14 @@
 # Builds the base mc-rtc version, without any plugins (controllers, robots, etc)
 # See mc-rtc-superbuild.nix for a full derivation with optional plugins
 
-{ stdenv, lib, buildRosPackage, fetchgit, cmake, pkg-config,
-  tasks, tvm, eigen-quadprog, libtool, geos, spdlog, fmt, ndcurves, mc-rtc-data,
-  state-observation, nanomsg, libnotify, rapidjson, boost, mesh-sampling,
-  python313Packages, qt5, # for mc_log_ui and other python tools. TODO separate python packages
-  with-ros ? false,
-  rclcpp ? null, nav-msgs ? null, sensor-msgs ? null, tf2-ros ? null, rosbag2 ? null, mc-rtc-msgs ? null,
-  useLocal ? false, localWorkspace ? null
+{ lib, buildRosPackage, stdenv, fetchgit, cmake, pkg-config,
+tasks, tvm, eigen-quadprog, libtool, geos, spdlog, fmt, ndcurves, mc-rtc-data,
+state-observation, nanomsg, libnotify, rapidjson, boost, mesh-sampling,
+python313Packages, qt5,
+doxygen, bundler,# Ruby for bundle dependencies
+with-ros ? false,
+rclcpp ? null, nav-msgs ? null, sensor-msgs ? null, tf2-ros ? null, rosbag2 ? null, mc-rtc-msgs ? null,
+useLocal ? false, localWorkspace ? null
 }:
 
 let
@@ -25,9 +26,10 @@ in
     else
     "";
 
-  nativeBuildInputs = [ cmake qt5.wrapQtAppsHook ];
+    nativeBuildInputs = [ cmake qt5.wrapQtAppsHook ];
   propagatedBuildInputs = [ pkg-config tasks eigen-quadprog libtool geos spdlog fmt ndcurves mc-rtc-data state-observation nanomsg tvm libnotify rapidjson boost mesh-sampling ]
   ++ [ python313Packages.gitpython python313Packages.pyqt5 python313Packages.matplotlib]
+  ++ [ doxygen bundler ] # for documentation
     ++ lib.optional (with-ros && rclcpp != null) rclcpp
     ++ lib.optional (with-ros && nav-msgs != null) nav-msgs
     ++ lib.optional (with-ros && sensor-msgs != null) sensor-msgs
@@ -35,16 +37,15 @@ in
     ++ lib.optional (with-ros && rosbag2 != null) rosbag2
     ++ lib.optional (with-ros && mc-rtc-msgs != null) mc-rtc-msgs;
 
-  preConfigure = ''
-    export ROS_VERSION=2
-  '';
-
+    preConfigure = ''
+      export ROS_VERSION=2
+    '';
 
   cmakeFlags = [
     "-DBUILD_MC_RTC_PYTHON_UTILS=ON"
     "-DBUILD_TESTING=OFF"
     "-DPYTHON_BINDING=OFF"
-    "-DINSTALL_DOCUMENTATION=OFF"
+    "-DINSTALL_DOCUMENTATION=ON"
   ];
 
   doCheck = true;
