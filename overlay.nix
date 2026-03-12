@@ -117,6 +117,11 @@ in rec
   panda-prosthesis = callWithLocal ./pkgs/mc-rtc/controllers/panda-prosthesis {};
   # panda-prosthesis = prev.callPackage ./pkgs/mc-rtc/controllers/panda-prosthesis {};
 
+  ###########
+  # PLUGINS #
+  ###########
+  mc-force-shoe-plugin = callWithLocal ./pkgs/mc-rtc/plugins/mc-force-shoe-plugin.nix {};
+
   #####################
   # mc-rtc-superbuild #
   #####################
@@ -153,7 +158,7 @@ in rec
     # extra mc_rtc.yaml
     configs = [ "${panda-prosthesis}/lib/mc_controller/etc/mc_rtc.yaml" ];
     observers = [];
-    plugins = [ panda-prosthesis ];
+    plugins = [ panda-prosthesis mc-force-shoe-plugin ];
     apps = [ mc-rtc-magnum mc-franka mc-rtc-ticker sch-visualization ];
     # apps = [ mc-rtc-magnum mc-franka sch-visualization ];
     # apps = [ mc-rtc-magnum ];
