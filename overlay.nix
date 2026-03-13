@@ -122,6 +122,11 @@ in rec
   ###########
   mc-force-shoe-plugin = callWithLocal ./pkgs/mc-rtc/plugins/mc-force-shoe-plugin.nix {};
 
+  #############
+  # 3rd-party #
+  #############
+  eigen-fmt = prev.callPackage ./pkgs/3rd-party/eigen-fmt {};
+
   #####################
   # mc-rtc-superbuild #
   #####################

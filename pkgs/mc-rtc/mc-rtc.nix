@@ -5,6 +5,7 @@
 tasks, tvm, eigen-quadprog, libtool, geos, spdlog, fmt, ndcurves, mc-rtc-data,
 state-observation, nanomsg, libnotify, rapidjson, boost, mesh-sampling,
 python313Packages, qt5,
+eigen-fmt,
 doxygen, bundler,# Ruby for bundle dependencies
 with-ros ? false,
 rclcpp ? null, nav-msgs ? null, sensor-msgs ? null, tf2-ros ? null, rosbag2 ? null, mc-rtc-msgs ? null,
@@ -27,7 +28,7 @@ in
     "";
 
     nativeBuildInputs = [ cmake qt5.wrapQtAppsHook ];
-  propagatedBuildInputs = [ pkg-config tasks eigen-quadprog libtool geos spdlog fmt ndcurves mc-rtc-data state-observation nanomsg tvm libnotify rapidjson boost mesh-sampling ]
+  propagatedBuildInputs = [ pkg-config tasks eigen-quadprog libtool geos spdlog fmt ndcurves mc-rtc-data state-observation nanomsg tvm libnotify rapidjson boost mesh-sampling eigen-fmt ]
   ++ [ python313Packages.gitpython python313Packages.pyqt5 python313Packages.matplotlib]
   ++ [ doxygen bundler ] # for documentation
     ++ lib.optional (with-ros && rclcpp != null) rclcpp
