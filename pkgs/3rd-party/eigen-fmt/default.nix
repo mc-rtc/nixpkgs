@@ -37,7 +37,7 @@ stdenv.mkDerivation (finalAttrs:{
   meta = with lib; {
     description = "Provides custom formatters for eigen types to be used with the {fmt} library";
     homepage    = "https://gite.lirmm.fr/rpc/utils/eigen-fmt";
-    license     = licenses.cecill-2_1;
+    license     = licenses.cecill21;
     platforms   = platforms.all;
   };
 })
