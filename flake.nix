@@ -21,6 +21,13 @@
       url = "github:arntanguy/nvim-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    jrl-cmakemodulesv2 = {
+      url = "github:ahoarau/jrl-cmakemodules?ref=jrl-next";
+    };
+    jrl-cmakemodulesv2-test = {
+      url = "git+file:///home/arnaud/devel/mc-rtc-nix/workspace/jrl-cmakemodules";
+    };
   };
 
   nixConfig = {
@@ -65,6 +72,10 @@
           overlays = [
             inputs.nix-ros-overlay.overlays.default
             (import ./overlay.nix { inherit useLocal localWorkspace with-ros; })
+            (final: prev: {
+              jrl-cmakemodulesv2 = inputs.jrl-cmakemodulesv2.packages.${prev.system}.default;
+              jrl-cmakemodulesv2-test = inputs.jrl-cmakemodulesv2-test.packages.${prev.system}.default;
+            })
           ];
           pkgs = import inputs.nixpkgs {
             inherit system overlays;
@@ -77,17 +88,19 @@
           };
           packages = {
             mc-rtc-superbuild = pkgs.mc-rtc-superbuild;
+            mc-rtc-superbuild-hugo = pkgs.mc-rtc-superbuild-hugo;
             # mc-rtc-magnum = pkgs.mc-rtc-magnum;
             system-manager = inputs'.system-manager.packages.default;
           };
         in {
           packages = packages // {
-            default = packages.mc-rtc-superbuild;
+            default = packages.mc-rtc-superbuild-hugo;
           };
           devShells.default = import ./shell.nix
           { 
             inherit pkgs;
             with-ros = true;
+            mc-rtc-superbuild = packages.mc-rtc-superbuild-hugo;
             extraBuildInputs = [ inputs.nvim-nix.packages.${system}.nixCats ];
           };
           #devShells.controller = import ./controller-shell.nix { inherit pkgs; };

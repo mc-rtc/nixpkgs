@@ -114,6 +114,47 @@ in rec
   #mc-rtc-magnum = callWithLocal ./pkgs/mc-rtc-magnum {};
   mc-rtc-magnum = prev.callPackage ./pkgs/mc-rtc-magnum {};
   # mc-rtc-magnum = prev.callPackage ./pkgs/mc-rtc-magnum {};
+  gram-savitzky-golay = prev.callPackage ./pkgs/gram-savitzky-golay {};
+
+  ######################
+  # Overrides for hugo #
+  # polytopeController #
+  ######################
+  mc-rtc-hugo = final.mc-rtc.overrideAttrs (old: {
+    tvm = final.tvm-hugo;
+    src = final.fetchgit {
+      url = "https://github.com/arntanguy/mc_rtc.git";
+      rev = "73b10e8d7db6671e901d16f6ec9cde299c07ba4d";
+      sha256 = "sha256-MJrulDf6Qm8esLLJxIZoLerG3p/ug5M9WnMYoonHtrw=";
+    };
+    pname = "mc-rtc-hugo";
+  });
+
+  tvm-hugo = final.tvm.overrideAttrs (old: {
+    src = final.fetchgit {
+      # tvm pr 53
+      url = "https://github.com/Hugo-L3174/tvm.git";
+      rev = "0c66fac37db38f2e5bc4f3df2b418f3ae50cea68";
+      sha256 = "sha256-wLalEmtXO4Id8PFtVoJD9KzCU4QKeAv/xp5mCjDvpnA=";
+    };
+  });
+  mc-force-shoe-plugin-hugo = final.mc-force-shoe-plugin.overrideAttrs (old: {
+    mc-rtc = final.mc-rtc-hugo;
+  });
+  polytopeController = callWithLocal ./pkgs/mc-rtc/controllers/polytopeController {};
+  #mc-dynamic-polytopes = prev.callPackage ./pkgs/mc-rtc/controllers/polytopeController/mc-dynamic-polytopes.nix {};
+  mc-dynamic-polytopes = callWithLocal ./pkgs/mc-rtc/controllers/polytopeController/mc-dynamic-polytopes.nix {
+    jrl-cmakemodules = final.jrl-cmakemodulesv2;
+    mc-rtc = final.mc-rtc-hugo;
+  };
+  dcm-vrptask = callWithLocal ./pkgs/mc-rtc/controllers/polytopeController/dcm-vrptask.nix {
+    mc-rtc = final.mc-rtc-hugo;
+    jrl-cmakemodules = final.jrl-cmakemodulesv2-test;
+  };
+
+  ###############
+  # CONTROLLERS #
+  ###############
   panda-prosthesis = callWithLocal ./pkgs/mc-rtc/controllers/panda-prosthesis {};
   # panda-prosthesis = prev.callPackage ./pkgs/mc-rtc/controllers/panda-prosthesis {};
 
@@ -121,11 +162,15 @@ in rec
   # PLUGINS #
   ###########
   mc-force-shoe-plugin = callWithLocal ./pkgs/mc-rtc/plugins/mc-force-shoe-plugin.nix {};
+  mc-robot-model-update = callWithLocal ./pkgs/mc-rtc/plugins/mc-robot-model-update.nix {};
 
   #############
   # 3rd-party #
   #############
   eigen-fmt = prev.callPackage ./pkgs/3rd-party/eigen-fmt {};
+  politopix = prev.callPackage ./pkgs/3rd-party/politopix.nix {
+    fetchurl = final.stdenv.fetchurlBoot;
+  };
 
   #####################
   # mc-rtc-superbuild #
@@ -149,23 +194,35 @@ in rec
   # TODO: investigate use of ccacheStdenv
   # mc-rtc-superbuild = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-symlinkjoin.nix.nix { 
   mc-rtc-superbuild = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix { 
-    robots = [
-      # mc-hrp2
-      mc-panda
-      mc-panda-lirmm
-      # note that panda-prosthesis is not strictly-speaking a robot, but it builds a robot module so we need it here as well to populate the robots runtime paths
-      panda-prosthesis
-    ];
+    # robots = [
+    #   # mc-hrp2
+    #   mc-panda
+    #   mc-panda-lirmm
+    #   # note that panda-prosthesis is not strictly-speaking a robot, but it builds a robot module so we need it here as well to populate the robots runtime paths
+    #   panda-prosthesis
+    # ];
     # MainRobot = "HRP2DRC";
     # Enabled = "CoM";
     # controllers = [lipm-walking-controller];
-    controllers = [ panda-prosthesis ];
+    # controllers = [ panda-prosthesis ];
     # extra mc_rtc.yaml
-    configs = [ "${panda-prosthesis}/lib/mc_controller/etc/mc_rtc.yaml" ];
+    # configs = [ "${panda-prosthesis}/lib/mc_controller/etc/mc_rtc.yaml" ];
     observers = [];
-    plugins = [ panda-prosthesis mc-force-shoe-plugin ];
-    apps = [ mc-rtc-magnum mc-franka mc-rtc-ticker sch-visualization ];
+    controllers = [polytopeController];
+    plugins = [ politopix mc-force-shoe-plugin ]; # mc-robot-model-update ];
+    # plugins = [ panda-prosthesis mc-force-shoe-plugin ];
+    # apps = [ mc-rtc-magnum mc-franka mc-rtc-ticker sch-visualization ];
     # apps = [ mc-rtc-magnum mc-franka sch-visualization ];
     # apps = [ mc-rtc-magnum ];
+  };
+
+  mc-rtc-superbuild-hugo = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix { 
+    # robots = [ mc-rhps1 ]; # FIXME: missing mc-rhps1
+    # observers = [mc-state-observation]; # FIXME missing Attitude observer from mc_state_observation
+    controllers = [polytopeController];
+    # configs = [ "${polytopeController}/lib/mc_controller/etc/mc_rtc.yaml" ];
+    Enabled = "PolytopeController";
+    MainRobot = "JVRC1";
+    plugins = [ mc-force-shoe-plugin-hugo ];
   };
 })

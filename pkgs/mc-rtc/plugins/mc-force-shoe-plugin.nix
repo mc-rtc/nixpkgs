@@ -15,6 +15,7 @@ stdenv.mkDerivation (finalAttrs: {
         name = "mc-force-shoe-plugin-src";
       })
     else
+      # TODO: ask Hugo to transfer it to jrl-umi3218
       fetchFromGitHub {
         owner = "Hugo-L3174";
         repo = "mc_force_shoe_plugin";
@@ -36,8 +37,8 @@ stdenv.mkDerivation (finalAttrs: {
   doCheck = false;
 
   meta = with lib; {
-    description = "Panda RobotModule for mc-rtc";
-    homepage    = "https://github.com/jrl-umi3218/mc_panda";
+    description = "Plugin to read XSens Force Shoe sensors";
+    homepage    = "https://github.com/Hugo-L3174/mc_force_shoe_plugin";
     license     = licenses.bsd2;
     platforms   = platforms.all;
   };
