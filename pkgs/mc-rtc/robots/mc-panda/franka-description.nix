@@ -10,7 +10,7 @@
 
 buildRosPackage {
   pname = "franka_description";
-  version = "2.4.0";
+  version = "2.6.0";
 
   src = if useLocal then
     builtins.trace "Using local workspace for franka_description: ${localWorkspace}/franka_description"
@@ -22,8 +22,8 @@ buildRosPackage {
     fetchFromGitHub {
       owner = "frankarobotics";
       repo = "franka_description";
-      rev = "2.4.0"; # tag name
-      sha256 = "sha256-a0Qqt4DXQa8imGMHXwDHFxO1uyooZ4SHuuXI+A+lqMg=";
+      rev = "2.6.0"; # tag name
+      sha256 = "sha256-+5IqH80KWvUb7aoHh9n0CIod5zh3q3pRQaWi62Ed8aY=";
     };
 
   buildType = "ament_cmake";
