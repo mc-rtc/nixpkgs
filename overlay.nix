@@ -147,6 +147,16 @@ in rec
   dcm-vrptask = callWithLocal ./pkgs/mc-rtc/controllers/polytopeController/dcm-vrptask.nix {
     mc-rtc = final.mc-rtc-hugo;
     jrl-cmakemodules = final.jrl-cmakemodulesv2-test;
+
+  ##########
+  #  Apps  #
+  ##########
+  mujoco = prev.mujoco.overrideAttrs (old: {
+    propagatedBuildInputs = (old.propagatedBuildInputs or []) ++ [ final.libGL ];
+  });
+  #mc-mujoco = prev.callPackage ./pkgs/mc-rtc/mc-mujoco.nix {};
+  mc-mujoco = callWithLocal ./pkgs/mc-rtc/mc-mujoco.nix {
+    jrl-cmakemodules = final.jrl-cmakemodulesv2;
   };
 
   ###############
