@@ -88,6 +88,7 @@
           };
           packages = {
             mc-rtc-superbuild = pkgs.mc-rtc-superbuild;
+            mc-rtc-superbuild-rolkneematics = pkgs.mc-rtc-superbuild-rolkneematics;
             mc-rtc-superbuild-hugo = pkgs.mc-rtc-superbuild-hugo;
             # mc-rtc-magnum = pkgs.mc-rtc-magnum;
             system-manager = inputs'.system-manager.packages.default;
@@ -97,7 +98,14 @@
             { 
               inherit pkgs;
               with-ros = true;
-              mc-rtc-superbuild = packages.mc-rtc-superbuild-hugo;
+              mc-rtc-superbuild = packages.mc-rtc-superbuild;
+              extraBuildInputs = [ inputs.nvim-nix.packages.${system}.nixCats ];
+            };
+            mc-rtc-superbuild-rolkneematics = import ./shell.nix
+            { 
+              inherit pkgs;
+              with-ros = true;
+              mc-rtc-superbuild = packages.mc-rtc-superbuild-rolkneematics;
               extraBuildInputs = [ inputs.nvim-nix.packages.${system}.nixCats ];
             };
             mc-rtc-superbuild-hugo = import ./shell.nix
@@ -105,6 +113,13 @@
               inherit pkgs;
               with-ros = true;
               mc-rtc-superbuild = packages.mc-rtc-superbuild-hugo;
+              extraBuildInputs = [ inputs.nvim-nix.packages.${system}.nixCats ];
+            };
+            mc-rtc-superbuild-standalone-magnum = import ./shell.nix
+            { 
+              inherit pkgs;
+              with-ros = true;
+              mc-rtc-superbuild = pkgs.mc-rtc-superbuild-standalone-magnum;
               extraBuildInputs = [ inputs.nvim-nix.packages.${system}.nixCats ];
             };
             # Creates a custom devShell with all dependencies required to build mc_mujoco as defined in its derivation,
@@ -124,13 +139,11 @@
           };
         in {
           packages = packages // {
-            default = packages.mc-rtc-superbuild-hugo;
+            default = packages.mc-rtc-superbuild;
           };
-          #devShells.default = devShells.mc-rtc-magnum;
-          #devShells.default = devShells.mc-rtc-superbuild-hugo;
-          devShells.default = devShells.mc-rtc-superbuild;
-          #devShells.controller = import ./controller-shell.nix { inherit pkgs; };
-          #devShells.display = import ./display-shell.nix { inherit pkgs; };
+          devShells = devShells // {
+            default = devShells.mc-rtc-superbuild;
+          };
         };
     };
 }

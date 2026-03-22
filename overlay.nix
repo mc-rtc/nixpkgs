@@ -90,13 +90,13 @@ in rec
   mc-hrp5-p = prev.callPackage ./pkgs/mc-rtc/robots/mc-hrp5-p {};
   mc-rhps1 = prev.callPackage ./pkgs/mc-rtc/robots/mc-rhps1 {};
   rhps1-description = callWithRosLocal ./pkgs/mc-rtc/robots/rhps1-description {};
-  libfranka = prev.callPackage ./pkgs/mc-panda/libfranka.nix {};
+  libfranka = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/libfranka.nix {};
   mc-panda = callWithRos ./pkgs/mc-rtc/robots/mc-panda {};
-  mc-panda-lirmm = callWithLocal ./pkgs/mc-panda/mc-panda-lirmm.nix {};
+  mc-panda-lirmm = callWithLocal ./pkgs/mc-rtc/robots/mc-panda/mc-panda-lirmm.nix {};
   # mc-franka = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/mc-franka.nix {};
   mc-franka = callWithLocal ./pkgs/mc-rtc/robots/mc-panda/mc-franka.nix {};
   franka-description = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/franka-description.nix {};
-  poco = prev.callPackage ./pkgs/mc-panda/libpoco.nix {};
+  poco = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/libpoco.nix {};
   mesh-sampling = prev.callPackage ./pkgs/mesh-sampling {};
   # mesh-sampling = callWithLocal ./pkgs/mesh-sampling {};
   mc-rtc = callWithRosLocal ./pkgs/mc-rtc/mc-rtc.nix {};
@@ -108,8 +108,8 @@ in rec
   mc-rtc-ticker = prev.callPackage ./pkgs/mc-rtc/ros/mc-rtc-ticker.nix {};
   # mc-rtc = callWithLocal ./pkgs/mc-rtc/mc-rtc.nix { with-ros = true; };
   # mc-rtc = prev.callPackage ./pkgs/mc-rtc/mc-rtc.nix { };
-  mc-rtc-magnum = callWithLocal ./pkgs/mc-rtc-magnum {};
-  #mc-rtc-magnum = prev.callPackage ./pkgs/mc-rtc-magnum {};
+  # mc-rtc-magnum = callWithLocal ./pkgs/mc-rtc-magnum {};
+  mc-rtc-magnum = prev.callPackage ./pkgs/mc-rtc-magnum {};
   # mc-rtc-magnum = prev.callPackage ./pkgs/mc-rtc-magnum {};
   gram-savitzky-golay = prev.callPackage ./pkgs/gram-savitzky-golay {};
 
@@ -202,6 +202,10 @@ in rec
   mc-rtc-imgui = callWithLocal ./pkgs/mc-rtc-imgui {
     jrl-cmakemodules = final.jrl-cmakemodulesv2;
   };
+  # standlone version of mc-rtc-magnum, with independent packaging for magnum and its plugins
+  # and a standalone mc-rtc-imgui version
+  # This should ultimately replace mc-rtc-magnum when all issues have been resolved
+  mc-rtc-magnum-standalone = callWithLocal ./pkgs/mc-rtc-magnum/standalone.nix {};
 
   #####################
   # mc-rtc-superbuild #
@@ -224,34 +228,36 @@ in rec
   #
   # TODO: investigate use of ccacheStdenv
   # mc-rtc-superbuild = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-symlinkjoin.nix.nix { 
+
+  # default superbuild environment
   mc-rtc-superbuild = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix { 
-    # robots = [
-    #   # mc-hrp2
-    #   mc-panda
-    #   mc-panda-lirmm
-    #   # note that panda-prosthesis is not strictly-speaking a robot, but it builds a robot module so we need it here as well to populate the robots runtime paths
-    #   panda-prosthesis
-    # ];
-    # MainRobot = "HRP2DRC";
-    # Enabled = "CoM";
-    # controllers = [lipm-walking-controller];
-    # controllers = [ panda-prosthesis ];
+    apps = [ mc-rtc-magnum mc-rtc-ticker ];
+  };
+
+  mc-rtc-superbuild-standalone-magnum = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix { 
+    apps = [ mc-rtc-magnum-standalone ];
+  };
+
+  mc-rtc-superbuild-rolkneematics = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix { 
+    robots = [
+      mc-panda
+      mc-panda-lirmm
+      # note that panda-prosthesis is not strictly-speaking a robot, but it builds a robot module so we need it here as well to populate the robots runtime paths
+      panda-prosthesis
+    ];
+    controllers = [ panda-prosthesis ];
     # extra mc_rtc.yaml
-    # configs = [ "${panda-prosthesis}/lib/mc_controller/etc/mc_rtc.yaml" ];
+    configs = [ "${panda-prosthesis}/lib/mc_controller/etc/mc_rtc.yaml" ];
     observers = [];
-    controllers = [polytopeController];
-    plugins = [ politopix mc-force-shoe-plugin ]; # mc-robot-model-update ];
-    # plugins = [ panda-prosthesis mc-force-shoe-plugin ];
-    # apps = [ mc-rtc-magnum mc-franka mc-rtc-ticker sch-visualization ];
-    # apps = [ mc-rtc-magnum mc-franka sch-visualization ];
-    # apps = [ mc-rtc-magnum ];
+    plugins = [ panda-prosthesis mc-force-shoe-plugin ];
+    apps = [ mc-rtc-magnum mc-franka mc-rtc-ticker sch-visualization ];
   };
 
   mc-rtc-superbuild-hugo = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix { 
-    # robots = [ mc-rhps1 ]; # FIXME: missing mc-rhps1
+    robots = [ mc-rhps1 ];
     # observers = [mc-state-observation]; # FIXME missing Attitude observer from mc_state_observation
-    # controllers = [polytopeController];
-    # configs = [ "${polytopeController}/lib/mc_controller/etc/mc_rtc.yaml" ];
+    controllers = [polytopeController];
+    configs = [ "${polytopeController}/lib/mc_controller/etc/mc_rtc.yaml" ];
     Enabled = "CoM";
     MainRobot = "JVRC1";
     # plugins = [ mc-force-shoe-plugin-hugo ];
@@ -261,4 +267,5 @@ in rec
     apps = [ mc-rtc-magnum-hugo ];
     # apps = [ mc-mujoco-hugo ];
   };
+
 })

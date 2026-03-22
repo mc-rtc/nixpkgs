@@ -93,8 +93,8 @@ stdenv.mkDerivation {
   };
 
   # Set MC_RTC_CONTROLLER_CONFIG to point to the generated YAML
-  shellHook = ''
-    export MC_RTC_CONTROLLER_CONFIG="$out/etc/mc_rtc.yaml"
-    echo "MC_RTC_CONTROLLER_CONFIG set to $MC_RTC_CONTROLLER_CONFIG"
-  '';
+  # shellHook = ''
+  #   export MC_RTC_CONTROLLER_CONFIG="$out/etc/mc_rtc.yaml"
+  #   echo "MC_RTC_CONTROLLER_CONFIG set to $MC_RTC_CONTROLLER_CONFIG"
+  # '';
 }
