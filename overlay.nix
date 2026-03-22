@@ -108,8 +108,8 @@ in rec
   mc-rtc-ticker = prev.callPackage ./pkgs/mc-rtc/ros/mc-rtc-ticker.nix {};
   # mc-rtc = callWithLocal ./pkgs/mc-rtc/mc-rtc.nix { with-ros = true; };
   # mc-rtc = prev.callPackage ./pkgs/mc-rtc/mc-rtc.nix { };
-  #mc-rtc-magnum = callWithLocal ./pkgs/mc-rtc-magnum {};
-  mc-rtc-magnum = prev.callPackage ./pkgs/mc-rtc-magnum {};
+  mc-rtc-magnum = callWithLocal ./pkgs/mc-rtc-magnum {};
+  #mc-rtc-magnum = prev.callPackage ./pkgs/mc-rtc-magnum {};
   # mc-rtc-magnum = prev.callPackage ./pkgs/mc-rtc-magnum {};
   gram-savitzky-golay = prev.callPackage ./pkgs/gram-savitzky-golay {};
 
@@ -135,6 +135,12 @@ in rec
       sha256 = "sha256-wLalEmtXO4Id8PFtVoJD9KzCU4QKeAv/xp5mCjDvpnA=";
     };
   });
+  mc-rtc-magnum-hugo = final.mc-rtc-magnum.overrideAttrs (old: {
+    mc-rtc = final.mc-rtc-hugo;
+  });
+  mc-mujoco-hugo = final.mc-mujoco.overrideAttrs (old: {
+    mc-rtc = final.mc-rtc-hugo;
+  });
   mc-force-shoe-plugin-hugo = final.mc-force-shoe-plugin.overrideAttrs (old: {
     mc-rtc = final.mc-rtc-hugo;
   });
@@ -146,7 +152,8 @@ in rec
   };
   dcm-vrptask = callWithLocal ./pkgs/mc-rtc/controllers/polytopeController/dcm-vrptask.nix {
     mc-rtc = final.mc-rtc-hugo;
-    jrl-cmakemodules = final.jrl-cmakemodulesv2-test;
+    jrl-cmakemodules = final.jrl-cmakemodulesv2;
+  };
 
   ##########
   #  Apps  #
@@ -177,6 +184,23 @@ in rec
   eigen-fmt = prev.callPackage ./pkgs/3rd-party/eigen-fmt {};
   politopix = prev.callPackage ./pkgs/3rd-party/politopix.nix {
     fetchurl = final.stdenv.fetchurlBoot;
+  };
+
+  imguizmo = callWithLocal ./pkgs/3rd-party/imguizmo.nix {
+    jrl-cmakemodules = final.jrl-cmakemodulesv2;
+  };
+  corrade = prev.callPackage ./pkgs/3rd-party/magnum/corrade.nix {};
+  magnum = prev.callPackage ./pkgs/3rd-party/magnum/magnum.nix {};
+  magnum-integration = callWithLocal ./pkgs/3rd-party/magnum/magnum-integration.nix {
+    with-imguiintegration = true;
+  };
+  magnum-plugins = callWithLocal ./pkgs/3rd-party/magnum/magnum-plugins.nix {
+    magnumPluginsWithAssimpImporter = true;
+    magnumPluginsWithStbImageImporter = true;
+  };
+  magnum-with-plugins = prev.callPackage ./pkgs/3rd-party/magnum/magnum-with-plugins.nix {};
+  mc-rtc-imgui = callWithLocal ./pkgs/mc-rtc-imgui {
+    jrl-cmakemodules = final.jrl-cmakemodulesv2;
   };
 
   #####################
@@ -226,10 +250,15 @@ in rec
   mc-rtc-superbuild-hugo = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix { 
     # robots = [ mc-rhps1 ]; # FIXME: missing mc-rhps1
     # observers = [mc-state-observation]; # FIXME missing Attitude observer from mc_state_observation
-    controllers = [polytopeController];
+    # controllers = [polytopeController];
     # configs = [ "${polytopeController}/lib/mc_controller/etc/mc_rtc.yaml" ];
-    Enabled = "PolytopeController";
+    Enabled = "CoM";
     MainRobot = "JVRC1";
-    plugins = [ mc-force-shoe-plugin-hugo ];
+    # plugins = [ mc-force-shoe-plugin-hugo ];
+    #apps = [ mc-rtc-magnum-hugo mujoco ]; #mc-mujoco-hugo ];
+    #apps = [ mujoco mc-mujoco-hugo ];
+    #apps = [ magnum-with-plugins ];
+    apps = [ mc-rtc-magnum-hugo ];
+    # apps = [ mc-mujoco-hugo ];
   };
 })

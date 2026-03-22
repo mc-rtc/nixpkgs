@@ -1,4 +1,14 @@
-{ stdenv, lib, fetchgit, cmake, mc-rtc, glfw, xorg, useLocal ? false, localWorkspace ? null }:
+{ stdenv, lib,
+fetchgit,
+cmake,
+mc-rtc-imgui,
+corrade,
+magnum,
+magnum-integration,
+magnum-plugins,
+magnum-with-plugins,
+imguizmo,
+useLocal ? false, localWorkspace ? null }:
 
 # TODO: modularize the build of mc_rtc-magnum instead of using submodules
 stdenv.mkDerivation {
@@ -29,14 +39,14 @@ stdenv.mkDerivation {
     };
 
   nativeBuildInputs = [ cmake ];
+  dontBuild = true;
   buildInputs = [ 
-    mc-rtc
-    glfw
-    xorg.libX11
-    xorg.libXrandr
-    xorg.libXinerama
-    xorg.libXcursor
-    xorg.libXi
+    mc-rtc-imgui
+    # magnum
+    # magnum-integration
+    # magnum-plugins
+    imguizmo
+    magnum-with-plugins
   ];
 
   preConfigure = ''
@@ -44,6 +54,7 @@ stdenv.mkDerivation {
   '';
 
   cmakeFlags = [
+    "-DMAGNUM_WITH_PLUGINS_LIBDIR=${magnum-with-plugins}/lib/magnum/importers"
   ];
 
   meta = with lib; {

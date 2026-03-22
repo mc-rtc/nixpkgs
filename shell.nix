@@ -13,16 +13,9 @@ pkgs.mkShell {
       ninja
       gdb
     ]
-    ++ (with pkgs.xorg; [
-      assimp
-      libGL
-      libXrandr
-      libXinerama
-      libXcursor
-      libX11
-      libXi
-      libXext
-    ])
+    ++ [ 
+    mc-rtc
+  ]
     ++ extraBuildInputs;
     # ++ (if with-ros then [
     #   colcon
