@@ -1,8 +1,8 @@
 Nix flake for mc-rtc and related project
 ==
 
-🚧 Welcome to mc-rtc's nixpkgs flake
-🚧 This repository is an ongoing effort of packaging the mc-rtc ecosystem under Nix
+🚧 Welcome to mc-rtc's nixpkgs flake<br/>
+🚧 This repository is an ongoing effort of packaging the mc-rtc ecosystem under Nix<br/>
 🚧 Flake API and overlay structure may change without notice
 
 Current status:
