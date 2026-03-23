@@ -240,10 +240,10 @@ in rec
 
   mc-rtc-superbuild-rolkneematics = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix { 
     robots = [
-      mc-panda
-      mc-panda-lirmm
       # note that panda-prosthesis is not strictly-speaking a robot, but it builds a robot module so we need it here as well to populate the robots runtime paths
       panda-prosthesis
+      mc-panda-lirmm
+      mc-panda
     ];
     controllers = [ panda-prosthesis ];
     # extra mc_rtc.yaml

@@ -13,21 +13,16 @@ pkgs.mkShell {
       ninja
       gdb
     ]
-    ++ [ 
-    mc-rtc
-  ]
-    ++ extraBuildInputs;
-    # ++ (if with-ros then [
-    #   colcon
-    #   # rosPackages.jazzy.ros-core
-    #   # rosPackages.jazzy.ament-cmake
-    #   rosPackages.jazzy.rclcpp
-    #   rosPackages.jazzy.geometry-msgs
-    #   rosPackages.jazzy.sensor-msgs
-    #   rosPackages.jazzy.tf2-ros
-    #   rosPackages.jazzy.xacro
-    #   # Add more ROS packages as needed
-    # ] else []);
+    ++ extraBuildInputs
+    ++ (if with-ros then [
+      colcon
+      rosPackages.jazzy.rclcpp
+      rosPackages.jazzy.geometry-msgs
+      rosPackages.jazzy.sensor-msgs
+      rosPackages.jazzy.tf2-ros
+      rosPackages.jazzy.xacro
+      # Add more ROS packages as needed
+    ] else []);
 
   shellHook = ''
     export MC_RTC_PATH=${pkgs.mc-rtc}
@@ -85,7 +80,8 @@ pkgs.mkShell {
     for app in ${pkgs.lib.concatStringsSep " " (map (r: "${r}") mc-rtc-superbuild.apps)}; do
       echo "  $app"
     done
-    echo ""
-    echo "All runtime components are symlinked in MC_RTC_PATH=${mc-rtc-superbuild}"
+    # only true for the symlink version, currently unused
+    # echo ""
+    # echo "All runtime components are symlinked in MC_RTC_PATH=${mc-rtc-superbuild}"
   '';
 }

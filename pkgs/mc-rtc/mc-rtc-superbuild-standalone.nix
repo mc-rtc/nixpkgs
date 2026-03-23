@@ -7,15 +7,16 @@
 #   e.g in ControllerModulePaths, ObserverModulePaths, etc
 { stdenv, lib, writeTextFile
 , mc-rtc
-, MainRobot ? "JVRC1" # default robot module name
-, Enabled ? "CoM" # default controller
-, Timestep ? 0.005 # default timestep
+, MainRobot ? null # default robot module name
+, Enabled ? null # default controller
+, Timestep ? null # default timestep
 , configs ? [] # extra paths to mc_rtc.yaml
 , robots ? []
 , controllers ? []
 , observers ? []
 , plugins ? []
 , apps ? []
+, pname ? "mc-rtc-superbuild-standalone"
 }:
 
 let
@@ -27,49 +28,26 @@ let
     destination = "/etc/mc_rtc.yaml";
     text = ''
       ---
-      ###################################
-      # Default configuration of mc_rtc #
-      ###################################
-      # This file contains the default configuration of mc_rtc
-      #
-      # You may overwrite any of these settings in
-      # - Linux/MacOS: $HOME/.config/mc_rtc/mc_rtc.yaml
-      # - Windows:     %APPDATA%/mc_rtc/mc_rtc.conf
-      #
-      # For further details, refer to https://jrl-umi3218.github.io/mc_rtc/tutorials/introduction/configuration.html
+      # This mc_rtc.yaml file was generated from the mc-rtc-superbuild-standalone nix derivation (pname: ${pname})
 
-      MainRobot: ${MainRobot}
-      Enabled: [${Enabled}]
-      Timestep: ${toString Timestep}
-      InitAttitudeFromSensor: false
-      InitAttitudeSensor: ""
-      Log: true
-      LogTemplate: mc-control
-      GUIServer:
-        Enable: true
-        Timestep: 0.05
-        IPC: {}
-        TCP:
-          Host: "*"
-          Ports: [4242, 4343]
-      VerboseLoader: false
+      ${lib.optionalString (MainRobot != null) "MainRobot: ${MainRobot}\n"}
+      ${lib.optionalString (Enabled != null) "Enabled: [${Enabled}]\n"}
+      ${lib.optionalString (Timestep != null) "Timestep: ${toString Timestep}\n"}
 
       # Dynamically generated module paths
       ControllerModulePaths: [${toYamlList (map (p: "${p}/lib/mc_controller") (controllers))}]
       RobotModulePaths: [${toYamlList (map (p: "${p}/lib/mc_robots") (robots))}]
-      # RobotModulePaths: [${toYamlList (["/home/arnaud/devel/mc-rtc-nix/install/lib64/mc_robots"] ++ (map (p: "${p}/lib/mc_robots") (robots)))}]
       ObserverModulePaths: [${toYamlList (map (p: "${p}/lib/mc_observers") (observers))}]
       GlobalPluginPaths: [${toYamlList (map (p: "${p}/lib/mc_plugins") (plugins))}]
-      ClearControllerModulePath: false
-      ClearRobotModulePath: false
-      ClearObserverModulePath: false
-      ClearGlobalPluginPath: false
+
+      # Ignore ~/.config/mc_rtc/mc_rtc.yaml so that even in impure mode it does not interfere
+      LoadUserConfiguration: false
     '';
   };
 in
 
-stdenv.mkDerivation {
-  pname = "mc-rtc-meta";
+stdenv.mkDerivation (finalAttrs: {
+  pname = "${pname}";
   version = mc-rtc.version;
   src = null;
   dontUnpack = true;
@@ -97,4 +75,4 @@ stdenv.mkDerivation {
   #   export MC_RTC_CONTROLLER_CONFIG="$out/etc/mc_rtc.yaml"
   #   echo "MC_RTC_CONTROLLER_CONFIG set to $MC_RTC_CONTROLLER_CONFIG"
   # '';
-}
+})

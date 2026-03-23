@@ -13,7 +13,7 @@ useLocal ? false, localWorkspace ? null
 }:
 
 let
-  common = import ./mc-rtc-common.nix { inherit useLocal localWorkspace fetchgit; };
+  common = import ./mc-rtc-common.nix { inherit useLocal localWorkspace fetchgit lib; };
 in
 
 (if with-ros then buildRosPackage else stdenv.mkDerivation) {
@@ -54,10 +54,6 @@ in
   with-ros = with-ros;
 
   postInstall = ''
-    sed -i 's/''${PACKAGE_PREFIX_DIR}/''${CMAKE_INSTALL_PREFIX}/' $out/lib/cmake/mc_rtc/mc_rtcMacros.cmake
-    echo 'set(MC_STATES_DEFAULT_INSTALL_PREFIX "''${PACKAGE_PREFIX_DIR}/lib/mc_controller/fsm/states")' >> $out/lib/cmake/mc_rtc/mc_rtcMacros.cmake
-    echo 'set(MC_STATES_DEFAULT_RUNTIME_INSTALL_PREFIX "''${PACKAGE_PREFIX_DIR}/lib/mc_controller/fsm/states")' >> $out/lib/cmake/mc_rtc/mc_rtcMacros.cmake
-    echo 'set(MC_STATES_DEFAULT_LIBRARY_INSTALL_PREFIX "''${PACKAGE_PREFIX_DIR}/lib/mc_controller/fsm/states")' >> $out/lib/cmake/mc_rtc/mc_rtcMacros.cmake
     wrapQtApp $out/bin/mc_log_ui
   '';
 
