@@ -90,6 +90,8 @@
             mc-rtc-superbuild = pkgs.mc-rtc-superbuild;
             mc-rtc-superbuild-rolkneematics = pkgs.mc-rtc-superbuild-rolkneematics;
             mc-rtc-superbuild-hugo = pkgs.mc-rtc-superbuild-hugo;
+            mc-rtc-magnum-standalone = pkgs.mc-rtc-magnum-standalone;
+            mc-mujoco = pkgs.mc-mujoco;
             # mc-rtc-magnum = pkgs.mc-rtc-magnum;
             system-manager = inputs'.system-manager.packages.default;
           };
@@ -134,6 +136,10 @@
             };
             mc-rtc-magnum = pkgs.mkShell {
               inputsFrom = [ pkgs.mc-rtc-magnum ];
+              buildInputs = [ pkgs.ninja ];
+            };
+            mc-rtc-magnum-standalone = pkgs.mkShell {
+              inputsFrom = [ pkgs.mc-rtc-magnum-standalone ];
               buildInputs = [ pkgs.ninja ];
             };
           };

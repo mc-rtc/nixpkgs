@@ -108,8 +108,6 @@ in rec
   mc-rtc-ticker = prev.callPackage ./pkgs/mc-rtc/ros/mc-rtc-ticker.nix {};
   # mc-rtc = callWithLocal ./pkgs/mc-rtc/mc-rtc.nix { with-ros = true; };
   # mc-rtc = prev.callPackage ./pkgs/mc-rtc/mc-rtc.nix { };
-  # mc-rtc-magnum = callWithLocal ./pkgs/mc-rtc-magnum {};
-  mc-rtc-magnum = prev.callPackage ./pkgs/mc-rtc-magnum {};
   # mc-rtc-magnum = prev.callPackage ./pkgs/mc-rtc-magnum {};
   gram-savitzky-golay = prev.callPackage ./pkgs/gram-savitzky-golay {};
 
@@ -206,6 +204,10 @@ in rec
   # and a standalone mc-rtc-imgui version
   # This should ultimately replace mc-rtc-magnum when all issues have been resolved
   mc-rtc-magnum-standalone = callWithLocal ./pkgs/mc-rtc-magnum/standalone.nix {};
+  mc-rtc-magnum = final.mc-rtc-magnum-standalone;
+  # for the non standalone version of mc_rtc-magnum to be removed after further testing
+  # mc-rtc-magnum = callWithLocal ./pkgs/mc-rtc-magnum {};
+  # mc-rtc-magnum = prev.callPackage ./pkgs/mc-rtc-magnum {};
 
   #####################
   # mc-rtc-superbuild #
@@ -231,7 +233,7 @@ in rec
 
   # default superbuild environment
   mc-rtc-superbuild = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix { 
-    apps = [ mc-rtc-magnum mc-rtc-ticker ];
+    apps = [ mc-rtc-magnum mc-mujoco mc-rtc-ticker ];
   };
 
   mc-rtc-superbuild-standalone-magnum = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix { 
