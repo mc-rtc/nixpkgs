@@ -18,12 +18,14 @@ stdenv.mkDerivation (finalAttrs: {
       })
     else
       fetchFromGitHub {
-        owner = "mc-rtc";
+        #owner = "mc-rtc";
+        owner = "arntanguy";
         repo = "mc_rtc-imgui";
         # tag = "v${finalAttrs.version}";
         # future v1.0.0 release from nix-standalone
-        rev = "";
-        hash = "";
+        # http://github.com/mc-rtc/mc_rtc-imgui/pull/25
+        rev = "44a4e51586ea3308457205b2973023fbc2f95485";
+        hash = "sha256-J1oitwCXhtDGLW0vCnAN50BkUQeveuuruLz1TCOYe2Q=";
       };
 
   nativeBuildInputs = [ cmake jrl-cmakemodules ];

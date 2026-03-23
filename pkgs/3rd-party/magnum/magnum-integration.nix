@@ -36,8 +36,8 @@ stdenv.mkDerivation (finalAttrs: {
       fetchFromGitHub {
         owner = "mosra";
         repo = "magnum-integration";
-        rev = "";
-        hash = "";
+        rev = "26a3af2d376b58ba82a0ab8314006d40d630ee73";
+        hash = "sha256-JE+EaTLNxNi5E8Y1J6YBSB6OTadaRM4awpDntIkNfRU=";
       };
 
   nativeBuildInputs = [ cmake ];

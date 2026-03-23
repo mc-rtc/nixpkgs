@@ -27,7 +27,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = if useLocal then
     builtins.trace "Using local workspace for magnum: ${localWorkspace}/magnum"
       (builtins.path {
-        path = "${localWorkspace}/magnum";
+        path = "${localWorkspace}/magnum-standalone";
         name = "magnum-src";
       })
     else
