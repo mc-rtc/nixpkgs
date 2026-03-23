@@ -8,7 +8,7 @@ stdenv.mkDerivation {
   src = fetchgit {
       url = "https://github.com/gergondet/mc_rtc-raylib";
       rev = "refs/heads/master";
-      sha256 = "0yqinyv7pkqyhdlv0haikmd4b2dhaqqq11wq2pv7dx46zmkqw85g";
+      sha256 = "sha256-FSJD1ZTiWekkQlVUmDwaXcCnNJQ9qbJg5LD/xybrZGc=";
     };
 
   nativeBuildInputs = [ cmake ];

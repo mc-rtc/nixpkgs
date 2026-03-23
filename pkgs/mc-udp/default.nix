@@ -4,18 +4,13 @@ stdenv.mkDerivation {
   pname = "mc-udp";
   version = "1.0.0";
 
-  # master branch as of 2021.01.28
-  src = if mc-rtc.with-tvm then
-    fetchgit {
-      url = "https://github.com/gergondet/mc_udp";
-      rev = "5c15b7013353d9d86926dcc258efccbdefa1366d";
-      sha256 = "047q4aw0sgafh7si2bqxl70wanr6kf07ykf4x9dd643d0qimcsrs";
-    }
-  else
+  # master branch as of 2025.24.13
+  # TODO: do a proper 1.0.0 release
+  src = 
     fetchgit {
       url = "https://github.com/jrl-umi3218/mc_udp";
-      rev = "80e4b55811f2dc5d10f2883ed190fc4ade22bf60";
-      sha256 = "1xz5v579lx9srwl26362fp9lgbhw0z09pj740bq3k0ra4226wksn";
+      rev = "b6be9c9423b6c68a3b375641e99affed448cf825";
+      sha256 = "";
     };
 
   nativeBuildInputs = [ cmake ];

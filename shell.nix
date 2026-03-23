@@ -1,101 +1,87 @@
-{ pkgs ? import <nixpkgs> { overlays = [ (import ./ros-overlay/overlay.nix) (import ./default.nix) ]; },
-  with-ros ? true,
-  with-tvm ? false,
-  with-udp ? false
-}:
+{ pkgs, mc-rtc-superbuild, extraBuildInputs, with-ros ? false }:
 
-let
-
-enabled = "CoM";
-main_robot = "JVRC1";
-
-# Here we define a local controller that will be built within the local environment
-my-controller = { cmake, mc-rtc }: pkgs.stdenv.mkDerivation {
-  pname = "my-controller";
-  version = "1.0.0";
-
-  # Shows how the source folder can be changed for mc_rtc 2.0.0 adaptation
-  src = if mc-rtc.with-tvm then
-      /home/gergondet/devel/src/my_controller
-    else
-      /home/gergondet/devel/src/my_controller;
-
-  nativeBuildInputs = [ cmake ];
-  buildInputs = [ mc-rtc ];
-
-  cmakeFlags = [
-    "-DBUILD_TESTING=OFF"
-    "-DPYTHON_BINDING=OFF"
-    "-DINSTALL_DOCUMENTATION=OFF"
-  ];
-
-  doCheck = false;
-};
-
-mc-rtc = pkgs.mc-rtc.override {
-  with-ros = with-ros;
-  with-tvm = with-tvm;
-  # These are the package that will be added to your mc_rtc base installation
-  # The default configuration (JVRC1 robot and CoM controller) requires no extras
-  plugins = with pkgs;
-    [
-      # Example: bring in HRP2/HRP4/HRP5P/panda
-      #          (requires access rights and a correctly configured ssh key for HRP robots)
-      # mc-hrp2 mc-hrp4 mc-hrp5-p mc-panda
-      # Example: bring in lipm-walking-controller which requires mc-state-observation
-      # mc-state-observation
-      # lipm-walking-controller
-    ];
-};
-
-mc-ticker = if with-udp then
-  pkgs.mc-udp.override {
-    mc-rtc = mc-rtc;
-  }
-  else
-  pkgs.callPackage ({ cmake, mc-rtc }: pkgs.stdenv.mkDerivation {
-    pname = "mc-rtc-nix-ticker";
-    version = "1.0.0";
-
-    src = ./ticker;
-
-    nativeBuildInputs = [ cmake ];
-    buildInputs = [ mc-rtc ];
-  }) { mc-rtc = mc-rtc; };
-
-ticker-cmd = if with-udp then "MCUDPControl -f" else "mc-rtc-nix-ticker";
-
-rosbash = if with-ros then pkgs.rosPackages.noetic.rosbash else null;
-
+let 
+  mcRtcConfigs =
+  mc-rtc-superbuild.configs
+  ++ [ "${mc-rtc-superbuild}/etc/mc_rtc.yaml" ];
 in
+pkgs.mkShell {
+  buildInputs =
+    with pkgs; [
+      mc-rtc-superbuild
+      cmake
+      ninja
+      gdb
+    ]
+    ++ extraBuildInputs
+    ++ (if with-ros then [
+      colcon
+      rosPackages.jazzy.rclcpp
+      rosPackages.jazzy.geometry-msgs
+      rosPackages.jazzy.sensor-msgs
+      rosPackages.jazzy.tf2-ros
+      rosPackages.jazzy.xacro
+      # Add more ROS packages as needed
+    ] else []);
 
-pkgs.mkShell rec {
-  buildInputs = [ mc-ticker rosbash ];
   shellHook = ''
+    export MC_RTC_PATH=${pkgs.mc-rtc}
+    export MC_RTC_JEKYLL_PLUGINS=${pkgs.mc-rtc}/share/doc/mc-rtc/jekyll/plugins
+    export MC_RTC_LIB=${pkgs.mc-rtc}/lib
+    export MC_RTC_BIN=${pkgs.mc-rtc}/bin
+    export MC_RTC_PKGCONFIG=${pkgs.mc-rtc}/lib/pkgconfig
+    # For mc-rtc-superbuild-symlinkjoin
+    # export MC_RTC_PATH=${mc-rtc-superbuild}
+    # export MC_RTC_JEKYLL_PLUGINS=${mc-rtc-superbuild}/share/doc/_plugins
+    # export MC_RTC_LIB=${mc-rtc-superbuild}/lib
+    # export MC_RTC_BIN=${mc-rtc-superbuild}/bin
+    # export MC_RTC_PKGCONFIG=${mc-rtc-superbuild}/lib/pkgconfig
+    export MC_RTC_CONTROLLER_CONFIG=${pkgs.lib.concatStringsSep ":" mcRtcConfigs}
+
+    export PATH=$MC_RTC_BIN:$PATH
+    export LD_LIBRARY_PATH=$MC_RTC_LIB:$LD_LIBRARY_PATH
+    export PKG_CONFIG_PATH=$MC_RTC_PKGCONFIG:$PKG_CONFIG_PATH
+
     export TMP=/tmp
     export TMPDIR=/tmp
     export TEMP=/tmp
     export TEMPDIR=/tmp
-    etc_dir=$(cd etc && pwd);
-    tmp_dir=$(mktemp -d /tmp/mc-rtc-nix.XXXXXXXXXXXX)
-    cleanup_build() {
-      cd $HOME
-      rm -rf $tmp_dir
-      return 0
-    }
-    cleanup_and_exit() {
-      cleanup_build
-      exit
-    }
-    trap cleanup_build EXIT
-    trap cleanup_and_exit SIGINT
-    cd $tmp_dir
-    export mc_rtc=${mc-rtc}
-    export enabled=${enabled}
-    export main_robot=${main_robot}
-    cp $etc_dir/mc_rtc.yaml .
-    substituteAllInPlace mc_rtc.yaml
-    ${ticker-cmd} mc_rtc.yaml
-    exit
+
+    # FIXME this flag gets too huge and gcc fails
+    export NIX_CFLAGS_COMPILE=""
+
+    echo "======================================="
+    echo "  mc-rtc-superbuild interactive shell  "
+    echo "======================================="
+
+    echo ""
+    echo "The following convenience environment variables are set:"
+    env | grep '^MC_RTC_'
+    echo ""
+
+    echo "Runtime dependencies (for information):"
+    echo "Robot modules:"
+    for robot in ${pkgs.lib.concatStringsSep " " (map (r: "${r}") mc-rtc-superbuild.robots)}; do
+      echo "  $robot"
+    done
+    echo "Plugins:"
+    for plugin in ${pkgs.lib.concatStringsSep " " (map (r: "${r}") mc-rtc-superbuild.plugins)}; do
+      echo "  $plugin"
+    done
+    echo "Observers:"
+    for observer in ${pkgs.lib.concatStringsSep " " (map (r: "${r}") mc-rtc-superbuild.observers)}; do
+      echo "  $observer"
+    done
+    echo "Controllers:"
+    for controller in ${pkgs.lib.concatStringsSep " " (map (r: "${r}") mc-rtc-superbuild.controllers)}; do
+      echo "  $controller"
+    done
+    echo "Apps:"
+    for app in ${pkgs.lib.concatStringsSep " " (map (r: "${r}") mc-rtc-superbuild.apps)}; do
+      echo "  $app"
+    done
+    # only true for the symlink version, currently unused
+    # echo ""
+    # echo "All runtime components are symlinked in MC_RTC_PATH=${mc-rtc-superbuild}"
   '';
 }

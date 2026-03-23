@@ -1,14 +1,12 @@
-{ stdenv, lib, fetchgit, cmake, boost, eigen }:
+{ stdenv, lib, cmake, boost, eigen, fetchurl }:
 
-stdenv.mkDerivation {
+stdenv.mkDerivation rec {
   pname = "state-observation";
-  version = "1.3.3";
+  version = "1.7.0";
 
-  # current master as of 2021.01.21
-  src = fetchgit {
-    url = "https://github.com/jrl-umi3218/state-observation";
-    rev = "4a6b8eb6fa841cf706a074132fb24b50e8534e35";
-    sha256 = "13wazgqak89m24k0g3rignfs6pzacj7ck8nhz2ap8ypbscw024bs";
+  src = fetchurl {
+    url = "https://github.com/jrl-umi3218/state-observation/releases/download/v${version}/state-observation-v${version}.tar.gz";
+    sha256 = "317603aebde3343c90a9ca2f4a8e9a249eaef25e156773a6eb7eab078fcc0191";
   };
 
   nativeBuildInputs = [ cmake ];
