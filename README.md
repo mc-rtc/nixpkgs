@@ -1,11 +1,32 @@
-mc_rtc - Nix package
+Nix flake for mc-rtc and related project
 ==
 
-This repository hosts a nix overlay for mc_rtc.
+🚧 Welcome to mc-rtc's nixpkgs flake
+🚧 This repository is an ongoing effort of packaging the mc-rtc ecosystem under Nix
+🚧 Flake API and overlay structure may change without notice
 
-This is especially meant to be used to tests controllers in clean environments, in particular during the mc_rtc "vanilla" edition and mc_rtc with TVM (i.e. mc_rtc 2.0.0).
-
-It is currently possible to run `MCUDPControl` within this setup and thus to run experiments on a robot that uses mc_udp servers.
+Current status:
+- [x] Default devShell: `mc-rtc-superbuild`
+      Allows to build mc-rtc and configure its runtime dependencies (`robots`, `controllers`, `observers`, `plugins`)
+- [x] Run `MCFrankaControl` with real Panda robots
+- [x] `mc-rtc-magnum` support (with older `glfw/imgui/implot` as submodules, as done in `mc-rtc-superbuild`)
+- [ ] Robots
+  - [x] JVRC1
+  - [x] HRP-2Kai
+  - [x] HRP-4
+  - [x] Panda*
+  - [x] PandaLIRMM*
+  - [ ] RHPS1
+- [ ] Controllers
+  - [x] Rolkneematics `panda-prosthesis`
+  - [ ] WIP: Hugo's polytopeController
+- [ ] `mc-mujoco`: building and running but some HiDPI scaling issues on Wayland with glfw 3.4
+- [ ] magnum packaging (external): in progress
+  - [x] magnum
+    - [x] SDL2Application: works
+    - [ ] GlfwApplication: HiDPI scaling issue on Wayland with GlfW 3.4, works otherwise
+  - [x] magnum-plugins (only those needed by `mc-rtc-magnum`/`mc-mujoco`
+  - [x] magnum-integration
 
 Usage
 --
@@ -13,17 +34,18 @@ Usage
 ### Locally
 
 1. Install [Nix](https://nixos.org/download.html) on your system
-2. Install [cachix](https://github.com/cachix/cachix): `nix-env -iA cachix -f https://cachix.org/api/v1/install`
-3. Enable the ROS cache: `cachix use ros`
+2. Install [cachix](https://github.com/cachix/cachix)
+3. Enable the cachix cache (some user configuration)
 4. Clone this repository
 5. Navigate to the cloned folder
 6. Run `nix develop`
 
 ### Options
 
-- `with-ros`
-  - `true` (default) build mc_rtc with ROS support
-  - `false` build mc_rtc without ROS support
+Options are provided through env variables
+
+- `MC_RTC_WITH_ROS="1"`: build `mc-rtc` and depencencies (e.g robots) with ros support (ros2 humble) [default=1]
+- `MC_RTC_USE_LOCAL="1"`: for derivations in `overlay.nix` that are called with `useLocal = true` (using `callWithLocal ...`), use a cloned folder in `localWorkspace` folder. This is not intended to be kept long-term, mostly a convenient debugging option until this repo is stable.
 
 ### Override the shell's environment for local development
 
@@ -36,14 +58,23 @@ mkdir -p nix-workspace/install nix-workspace/devel
 now create a `.direnv` file with the following content
 
 ```sh
+# Do not auto-update the flake, do so manually through nix-direnv-reload
+# This avoids triggering potentially long compilations upon entering a shell
+nix_direnv_manual_reload
+
+# Use this flake
 use flake https://github.com/mc-rtc/nixpkgs
-# or 
+
+# or use a local copy for development
 # export MC_RTC_WITH_ROS=1
 # export MC_RTC_USE_LOCAL=1
-# use flake nixpkgs --impure # if you cloned it locally
+# use flake nixpkgs --impure # if you cloned it locally in ./nixpkgs
+
+# Override LD_LIBRARY_PATH and PATH to use the local install folder for your custom controller
 export LD_LIBRARY_PATH=$PWD/install/lib:$LD_LIBRARY_PATH
 export LD_LIBRARY_PATH=$PWD/install/lib64:$LD_LIBRARY_PATH
 export PATH=$PWD/install/bin:$PATH
+# convenient cmake alias to ensure that the controller is installed in the expected local path
 alias cmake_local="cmake -DCMAKE_PREFIX_PATH=$PWD/install -DMC_RTC_HONOR_INSTALL_PREFIX=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -G Ninja"
 ```
 
@@ -71,40 +102,42 @@ cd build
 cmake_local ..
 ```
 
+Define your own superbuild
+--
+
+This is still a WIP, but the gist of it is:
+- define a derivation in your overlay containing all the derivations you wish to have available to mc-rtc. Runtime dependencies are passed to the `robots/controllers/observers/plugins` list and a corresponding `mc_rtc.yaml` containing the required library paths is auto-generated and added to `MC_RTC_CONTROLLER_CONFIG` env variable.
+
+  ```nix
+  mc-rtc-superbuild-rolkneematics = final.mc-rtc-superbuild.overrideAttrs (old: {
+    robots = [
+      # note that panda-prosthesis is not strictly-speaking a robot, but it builds a robot module so we need it here as well to populate the robots runtime paths
+      panda-prosthesis
+      mc-panda-lirmm
+      mc-panda
+    ];
+    controllers = [ panda-prosthesis ];
+    # extra mc_rtc.yaml
+    configs = [ "${panda-prosthesis}/lib/mc_controller/etc/mc_rtc.yaml" ];
+    observers = [];
+    plugins = [ panda-prosthesis mc-force-shoe-plugin ];
+    apps = [ mc-rtc-magnum mc-franka mc-rtc-ticker sch-visualization ];
+  });
+  ```
+
+  Full doc coming soon...
+
 Run your own controller
 --
 
-`shell.nix` contains a simple example to show how to point nix to your local source for trying out your code on mc_rtc 2.0.0, you should change the following:
-
-1. Change `enabled` to your controller name
-2. Point the src attribute of the `my-controller` derivation to your local source folder
-3. Add `(pkgs.callPackage my-controller {})` in mc-rtc plugins list
-
-If you need extra dependencies you should add them as arguments to the derivation and in the `buildInputs` array.
-
-Migration from mc_rtc 1.x
---
-
-A migration guide is provided on [mc_rtc wiki](https://github.com/jrl-umi3218/mc_rtc/wiki/Migration-from-mc_rtc-1.x-to-2.0.0)
-
-Visualize the controller output
---
-
-You can still visualize your controller output using your host RViZ installation:
-
 ```bash
-roslaunch mc_rtc_ticker display.launch
+# if cachix is setup correctly this should just pull binary dependencies. Otherwise
+# it will build everything specified in the `mc-rtc-superbuild` derivation (and their depencencies)
+nix develop
+# or nix develop .#mc-rtc-superbuild-rolkneematics # if you want to use your own derivation
+mc-rtc-magnum &
+# By default mc_rtc_ticker will use the configuration provided by `MC_RTC_CONTROLLER_CONFIG` env variable
+# This is set by the mc-rtc-superbuild derivation and devShell to contain all needed runtime depencencies
+# and optionally a default controller's configuration
+mc_rtc_ticker
 ```
-
-You can also try [mc_rtc-raylib](https://github.com/gergondet/mc_rtc-raylib/) within nix:
-
-```bash
-nix-shell display.nix --pure
-```
-
-Note: If you are using an intel graphics card change `nixGLNvidia` to `nixGLIntel` in `display.nix`
-
-Planned features
---
-
-- [ ] Enable mc_openrtm in Nix (requires Choreonoid to build in Nix first)
