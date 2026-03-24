@@ -33,10 +33,14 @@ stdenv.mkDerivation {
   else
     fetchgit {
       url = "https://github.com/mc-rtc/mc_rtc-magnum.git";
+      # NOTE
       # topic/nix
-      # https://github.com/mc-rtc/mc_rtc-magnum/pull/4
-      rev = "8f21d05f6e277151368b2593533c36535eb1750d";
-      sha256 = "sha256-skQ0sCbPoaS8IBzsW6+e29Hk7KvQRWZ78rlOsMspuf4=";
+      # Use `nix` branch because it is hard to build against
+      # imgui/implot/imguizmo on non nix systems, and we need to keep
+      # supporting this: https://github.com/mc-rtc/mc_rtc-magnum/pull/4
+      # To be rebased on top of master on upgrade
+      rev = "97eb246eebda380b65b366e178a32107ad5a08d5";
+      sha256 = "sha256-Lek+JAQR6L2tgWXP1tsy077kVVh5roonuJqIDmWSNv4=";
       fetchSubmodules = true;
     };
 
