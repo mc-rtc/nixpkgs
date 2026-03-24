@@ -129,6 +129,7 @@
             # This can be used to test building the mc_mujoco app manually with all dependencies available (and a working find_pacakge)
             mc-mujoco = pkgs.mkShell {
               inputsFrom = [ pkgs.mc-mujoco ];
+              buildInputs = [ pkgs.ninja ];
             };
             mc-rtc-imgui = pkgs.mkShell {
               inputsFrom = [ pkgs.mc-rtc-imgui ];
