@@ -2,8 +2,9 @@
 stdenv, lib, fetchgit,
 makeWrapper,
 mc-mujoco-robots,
-cmake, mc-rtc, mujoco, jrl-cmakemodules
-, libtorch-bin # for RL examples, should be an option
+cmake, jrl-cmakemodules,
+mc-rtc, mujoco, pugixml,
+libtorch-bin # for RL examples, should be an option
 # XXX see if all of these are really necessary
 ,    libXrandr ,    libXinerama ,    libXcursor ,    libX11 ,    libXi ,    libXext
 ,    glew
@@ -30,8 +31,8 @@ stdenv.mkDerivation (finalAttrs: {
         url = "https://github.com/arntanguy/mc_mujoco.git";
         # tag = "v${finalAttrs.version}";
         # future v2.0.0 version once https://github.com/rohanpsingh/mc_mujoco/pull/98 is merged
-        rev = "45b3fe8587c753daf435c6afa1383744e4e82e45";
-        sha256 = "sha256-4+5tzLPmKImu6x8WYXN/k91ksDJD3HcyN08AkJh2ZOo=";
+        rev = "a43b2af02fced68914f5e619da03d87c8c51e792";
+        sha256 = "sha256-6doLp+Kcbam+XnPwGLprLZYm5b3AtBrZpLg5yZfvE98=";
         fetchSubmodules = true;
       };
 
@@ -42,6 +43,7 @@ stdenv.mkDerivation (finalAttrs: {
       mc-rtc-imgui
       imguizmo
       mujoco
+      pugixml
       libXrandr
       libXinerama
       libXcursor
