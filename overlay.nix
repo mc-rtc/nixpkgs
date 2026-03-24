@@ -162,10 +162,11 @@ in rec
   #mc-mujoco = prev.callPackage ./pkgs/mc-rtc/mc-mujoco.nix {};
 
   jvrc1-mj-description = callWithLocal ./pkgs/mc-rtc/mc-mujoco/robots/jvrc1-mj-description.nix {};
+  rhps1-mj-description = callWithLocal ./pkgs/mc-rtc/mc-mujoco/robots/rhps1-mj-description.nix {};
   env-mj-description = callWithLocal ./pkgs/mc-rtc/mc-mujoco/robots/env-mj-description.nix {};
   # symlinkJoin all robots
   mc-mujoco-robots = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/default.nix {
-    # robots = [...];
+    robots = [rhps1-mj-description];
   };
   mc-mujoco = callWithLocal ./pkgs/mc-rtc/mc-mujoco {
     jrl-cmakemodules = final.jrl-cmakemodulesv2;
@@ -267,14 +268,8 @@ in rec
     # observers = [mc-state-observation]; # FIXME missing Attitude observer from mc_state_observation
     controllers = [polytopeController];
     configs = [ "${polytopeController}/lib/mc_controller/etc/mc_rtc.yaml" ];
-    Enabled = "CoM";
-    MainRobot = "JVRC1";
-    # plugins = [ mc-force-shoe-plugin-hugo ];
-    #apps = [ mc-rtc-magnum-hugo mujoco ]; #mc-mujoco-hugo ];
-    #apps = [ mujoco mc-mujoco-hugo ];
-    #apps = [ magnum-with-plugins ];
-    apps = [ mc-rtc-magnum-hugo ];
-    # apps = [ mc-mujoco-hugo ];
+    plugins = [ mc-force-shoe-plugin-hugo ];
+    apps = [ mc-rtc-magnum-hugo mc-mujoco-hugo ];
   };
 
 })
