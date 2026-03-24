@@ -1,15 +1,15 @@
-{ stdenv, lib, fetchgit,
+{
+stdenv, lib, fetchgit,
 makeWrapper,
+mc-mujoco-robots,
 cmake, mc-rtc, mujoco, jrl-cmakemodules
-, libtorch-bin # for RL examples
-,    libXrandr
-,    libXinerama
-,    libXcursor
-,    libX11
-,    libXi
-,    libXext
+, libtorch-bin # for RL examples, should be an option
+# XXX see if all of these are really necessary
+,    libXrandr ,    libXinerama ,    libXcursor ,    libX11 ,    libXi ,    libXext
 ,    glew
 ,     glfw3
+, mc-rtc-imgui
+, imguizmo
 , useLocal ? false, localWorkspace ? null
 }:
 
@@ -39,6 +39,8 @@ stdenv.mkDerivation (finalAttrs: {
   propagatedBuildInputs =
     [
       mc-rtc
+      mc-rtc-imgui
+      imguizmo
       mujoco
       libXrandr
       libXinerama
@@ -53,6 +55,8 @@ stdenv.mkDerivation (finalAttrs: {
 
   cmakeFlags = [
     "-DMC_RTC_HONOR_INSTALL_PREFIX=ON"
+    "-DSTANDALONE_ROBOTS=ON"
+    "-DMC_MUJOCO_SHARE_DESTINATION=${mc-mujoco-robots}"
   ];
 
   # See https://github.com/glfw/glfw/issues/2839

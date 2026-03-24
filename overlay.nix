@@ -160,7 +160,14 @@ in rec
     propagatedBuildInputs = (old.propagatedBuildInputs or []) ++ [ final.libGL ];
   });
   #mc-mujoco = prev.callPackage ./pkgs/mc-rtc/mc-mujoco.nix {};
-  mc-mujoco = callWithLocal ./pkgs/mc-rtc/mc-mujoco.nix {
+
+  jvrc1-mj-description = callWithLocal ./pkgs/mc-rtc/mc-mujoco/robots/jvrc1-mj-description.nix {};
+  env-mj-description = callWithLocal ./pkgs/mc-rtc/mc-mujoco/robots/env-mj-description.nix {};
+  # symlinkJoin all robots
+  mc-mujoco-robots = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/default.nix {
+    # robots = [...];
+  };
+  mc-mujoco = callWithLocal ./pkgs/mc-rtc/mc-mujoco {
     jrl-cmakemodules = final.jrl-cmakemodulesv2;
   };
 
