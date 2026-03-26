@@ -25,7 +25,7 @@ stdenv.mkDerivation {
   #   fetchsubmodules = true;
   # };
   src = if useLocal then
-    builtins.trace "Using local workspace for mc_rtc-magnum: ${localWorkspace}/mc_rtc-magnum"
+    builtins.trace "Using local workspace for mc_rtc-magnum: ${localWorkspace}/mc_rtc-magnum-standalone"
     (builtins.path {
       path = "${localWorkspace}/mc_rtc-magnum-standalone";
       name = "mc_rtc-magnum-src";

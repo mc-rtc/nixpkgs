@@ -50,6 +50,9 @@ pkgs.mkShell {
     # FIXME this flag gets too huge and gcc fails
     export NIX_CFLAGS_COMPILE=""
 
+    # FIXME we might need to run ros2 daemon stop && ros2 daemon start
+    export ROS_DOMAIN_ID=100
+
     echo "======================================="
     echo "  mc-rtc-superbuild interactive shell  "
     echo "======================================="
