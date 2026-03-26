@@ -2,9 +2,9 @@
 useLocal ? false, localWorkspace ? null }:
 
 stdenv.mkDerivation (finalAttrs: {
-  pname = "env-mj-description";
   version = "1.0.0";
-  srcPath = "${localWorkspace}/env_mj_description";
+  pname = "hrp4cr-mj-description";
+  srcPath = if localWorkspace != null then "${localWorkspace}/hrp4cr_mj_description" else null;
 
   src = if useLocal then
         builtins.trace "Using local workspace for ${finalAttrs.pname}: ${finalAttrs.srcPath}"
@@ -15,16 +15,12 @@ stdenv.mkDerivation (finalAttrs: {
       else
         fetchFromGitHub {
           owner = "isri-aist";
-          repo = "env_mj_description";
+          repo = "hrp4cr_mj_description";
           tag = "v${finalAttrs.version}";
-          hash = "sha256-PiSbUX7+nSk8mNLsRBQGvo+sf/XCyN9xgcsY4BweyZo=";
+          hash = "";
         };
 
   nativeBuildInputs = [ cmake ];
-
-  preConfigure = ''
-    export ROS_VERSION=2
-  '';
 
   cmakeFlags = [
     "-DHONOR_INSTALL_PREFIX=ON"
@@ -33,8 +29,8 @@ stdenv.mkDerivation (finalAttrs: {
   doCheck = true;
 
   meta = with lib; {
-    description = "Environment robot data for mc_mujoco";
-    homepage    = "https://github.com/jrl-umi3218/mc_env_description";
+    description = "hrp4cr simulation robot model mc_mujoco";
+    homepage    = "https://github.com/jrl-umi3218/hrp4cr_env_description";
     license     = licenses.bsd2;
     platforms   = platforms.all;
   };
