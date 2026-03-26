@@ -76,6 +76,7 @@
               jrl-cmakemodulesv2 = inputs.jrl-cmakemodulesv2.packages.${prev.system}.default;
               jrl-cmakemodulesv2-test = inputs.jrl-cmakemodulesv2-test.packages.${prev.system}.default;
             })
+            (import ./overlay-ccache.nix {})
           ];
           pkgs = import inputs.nixpkgs {
             inherit system overlays;
