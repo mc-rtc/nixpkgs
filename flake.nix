@@ -96,6 +96,10 @@
             system-manager = inputs'.system-manager.packages.default;
           };
           devShells = {
+            mc-rtc = pkgs.mkShell {
+              inputsFrom = [ pkgs.mc-rtc ];
+              buildInputs = [ pkgs.ninja ];
+            };
             mc-rtc-superbuild = import ./shell.nix
             { 
               inherit pkgs;

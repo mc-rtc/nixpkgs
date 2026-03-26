@@ -3,22 +3,23 @@ useLocal ? false, localWorkspace ? null }:
 
 stdenv.mkDerivation (finalAttrs: {
   version = "1.0.0";
-  pname = "rhps1-mj-description";
-  srcPath = "${localWorkspace}/rhps1_mj_description";
+  pname = "hrp5p-mj-description";
+  srcPath = "";
   separateDebugInfo = false;
   postInstall = "touch $out";
 
   src = if useLocal then
-        builtins.trace "Using local workspace for ${finalAttrs.pname}: ${finalAttrs.srcPath}"
+        builtins.trace "Using local workspace for ${finalAttrs.pname}: ${localWorkspace}/hrp5p_mj_description"
         (builtins.path {
-          path = "${finalAttrs.srcPath}";
+          path = "${localWorkspace}/hrp5p_mj_description";
           name = "${finalAttrs.pname}-src";
         })
       else
-        builtins.fetchGit {
-          url = "git@github.com:isri-aist/rhps1_mj_description";
-          # Release v1.0.0
-          rev = "ac2d198b21b6f431fffc2c93ad03b04f98c4135a";
+        fetchFromGitHub {
+          owner = "isri-aist";
+          repo = "hrp5p_mj_description";
+          tag = "v${finalAttrs.version}";
+          hash = "sha256-uLrXuYI2w+fg5a/WOZfs8kj5QB3NT35sziN3YsDmRmg=";
         };
 
   nativeBuildInputs = [ cmake ];
@@ -34,8 +35,8 @@ stdenv.mkDerivation (finalAttrs: {
   doCheck = true;
 
   meta = with lib; {
-    description = "rhps1 simulation robot model mc_mujoco";
-    homepage    = "https://github.com/jrl-umi3218/rhps1_env_description";
+    description = "hrp5p simulation robot model mc_mujoco";
+    homepage    = "https://github.com/jrl-umi3218/hrp5p_env_description";
     license     = licenses.bsd2;
     platforms   = platforms.all;
   };

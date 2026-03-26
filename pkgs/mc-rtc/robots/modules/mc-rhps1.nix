@@ -14,6 +14,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   src = builtins.fetchGit {
       url = "git@github.com:isri-aist/mc_rhps1";
+      # Release v1.0.0
       rev = "4e53bc180321b29354fbd1b2f0f3d30dea8df282";
   };
 

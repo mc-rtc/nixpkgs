@@ -3,8 +3,8 @@ useLocal ? false, localWorkspace ? null }:
 
 stdenv.mkDerivation (finalAttrs: {
   version = "1.0.0";
-  pname = "rhps1-mj-description";
-  srcPath = "${localWorkspace}/rhps1_mj_description";
+  pname = "hrp4cr-mj-description";
+  srcPath = "${localWorkspace}/hrp4cr_mj_description";
   separateDebugInfo = false;
   postInstall = "touch $out";
 
@@ -15,17 +15,14 @@ stdenv.mkDerivation (finalAttrs: {
           name = "${finalAttrs.pname}-src";
         })
       else
-        builtins.fetchGit {
-          url = "git@github.com:isri-aist/rhps1_mj_description";
-          # Release v1.0.0
-          rev = "ac2d198b21b6f431fffc2c93ad03b04f98c4135a";
+        fetchFromGitHub {
+          owner = "isri-aist";
+          repo = "hrp4cr_mj_description";
+          tag = "v${finalAttrs.version}";
+          hash = "";
         };
 
   nativeBuildInputs = [ cmake ];
-
-  preConfigure = ''
-    export ROS_VERSION=2
-  '';
 
   cmakeFlags = [
     "-DHONOR_INSTALL_PREFIX=ON"
@@ -34,8 +31,8 @@ stdenv.mkDerivation (finalAttrs: {
   doCheck = true;
 
   meta = with lib; {
-    description = "rhps1 simulation robot model mc_mujoco";
-    homepage    = "https://github.com/jrl-umi3218/rhps1_env_description";
+    description = "hrp4cr simulation robot model mc_mujoco";
+    homepage    = "https://github.com/jrl-umi3218/hrp4cr_env_description";
     license     = licenses.bsd2;
     platforms   = platforms.all;
   };

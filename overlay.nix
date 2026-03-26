@@ -52,9 +52,6 @@ in rec
   #sch-visualization = prev.callPackage ./pkgs/sch-visualization {};
   sch-visualization = callWithLocal ./pkgs/sch-visualization {};
   tasks = prev.callPackage ./pkgs/tasks {};
-  mc-env-description = callWithRos ./pkgs/mc-rtc-data/mc-env-description.nix {};
-  mc-int-obj-description = callWithRos ./pkgs/mc-rtc-data/mc-int-obj-description.nix {};
-  jvrc-description = callWithRos ./pkgs/mc-rtc-data/jvrc-description.nix {};
   # mc-rtc-data = prev.callPackage ./pkgs/mc-rtc-data { with-ros = false; };
   mc-rtc-data = callWithRos ./pkgs/mc-rtc-data {};
   state-observation = prev.callPackage ./pkgs/state-observation {};
@@ -82,24 +79,41 @@ in rec
   #mc-rtc-raylib = prev.callPackage ./pkgs/mc-rtc-raylib {};
   mc-rtc-msgs = prev.callPackage ./pkgs/mc-rtc-msgs {};
   mc-udp = prev.callPackage ./pkgs/mc-udp {};
-  hrp4-description = callWithRos ./pkgs/mc-rtc/robots/hrp4-description {};
-  mc-hrp4 = prev.callPackage ./pkgs/mc-rtc/robots/mc-hrp4 {};
-  hrp2-description = callWithRos ./pkgs/hrp2-description {};
-  mc-hrp2 = prev.callPackage ./pkgs/mc-rtc/robots/mc-hrp2 { };
-  hrp5-p-description = callWithRos ./pkgs/mc-rtc/robots/hrp5-p-description {};
-  mc-hrp5-p = prev.callPackage ./pkgs/mc-rtc/robots/mc-hrp5-p {};
-  mc-rhps1 = prev.callPackage ./pkgs/mc-rtc/robots/mc-rhps1 {};
-  rhps1-description = callWithRosLocal ./pkgs/mc-rtc/robots/rhps1-description {};
-  libfranka = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/libfranka.nix {};
+
+  ## Robot description packages
+  franka-description = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/franka-description.nix {};
+  g1-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/g1-description.nix {};
+  h1-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/h1-description.nix {};
+  hrp2-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/hrp2-description.nix {};
+  hrp4-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/hrp4-description.nix {};
+  hrp5-p-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/hrp5-p-description.nix {};
+  ur-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/ur-description.nix {};
+  ur5e-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/ur5e-description.nix {};
+  jvrc-description = callWithRos ./pkgs/mc-rtc-data/jvrc-description.nix {};
+  mc-env-description = callWithRos ./pkgs/mc-rtc-data/mc-env-description.nix {};
+  mc-int-obj-description = callWithRos ./pkgs/mc-rtc-data/mc-int-obj-description.nix {};
+  rhps1-description = callWithRosLocal ./pkgs/mc-rtc/robots/descriptions/rhps1-description.nix {};
+
+  # Robot modules
+  mc-g1 = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-g1.nix { };
+  mc-h1 = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-h1.nix { };
+  mc-hrp2 = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-hrp2.nix { };
+  mc-hrp4 = callWithLocal ./pkgs/mc-rtc/robots/modules/mc-hrp4.nix {};
+  mc-hrp5-p = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-hrp5-p.nix {};
+  mc-ur5e = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-ur5e.nix { };
   mc-panda = callWithRos ./pkgs/mc-rtc/robots/mc-panda {};
   mc-panda-lirmm = callWithLocal ./pkgs/mc-rtc/robots/mc-panda/mc-panda-lirmm.nix {};
+  mc-rhps1 = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-rhps1.nix {};
+
+  libfranka = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/libfranka.nix {};
   # mc-franka = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/mc-franka.nix {};
   mc-franka = callWithLocal ./pkgs/mc-rtc/robots/mc-panda/mc-franka.nix {};
-  franka-description = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/franka-description.nix {};
   poco = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/libpoco.nix {};
   mesh-sampling = prev.callPackage ./pkgs/mesh-sampling {};
   # mesh-sampling = callWithLocal ./pkgs/mesh-sampling {};
-  mc-rtc = callWithRosLocal ./pkgs/mc-rtc/mc-rtc.nix {};
+  mc-rtc = callWithRosLocal ./pkgs/mc-rtc/mc-rtc.nix {
+    stdenv = final.ccacheStdenv;
+  };
   mc-rtc-python-utils = callWithLocal ./pkgs/mc-rtc/mc-rtc-python-utils.nix {};
   #mc-rtc = callWithRos ./pkgs/mc-rtc/mc-rtc.nix {};
   # mc-rtc-rviz-panel = prev.libsForQt5.callPackage ./pkgs/mc-rtc/ros/mc-rtc-rviz-panel.nix { inherit useLocal; inherit localWorkspace; };
@@ -163,10 +177,29 @@ in rec
 
   jvrc1-mj-description = callWithLocal ./pkgs/mc-rtc/mc-mujoco/robots/jvrc1-mj-description.nix {};
   rhps1-mj-description = callWithLocal ./pkgs/mc-rtc/mc-mujoco/robots/rhps1-mj-description.nix {};
+  g1-mj-description = final.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/g1-mj-description.nix {};
+  h1-mj-description = callWithLocal ./pkgs/mc-rtc/mc-mujoco/robots/h1-mj-description.nix {};
+  hrp4-mj-description = callWithLocal ./pkgs/mc-rtc/mc-mujoco/robots/hrp4-mj-description.nix {};
+  # TODO: hrp2-mj-description does not exist
+  #hrp5p-mj-description = final.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/hrp5p-mj-description.nix {};
+  hrp5p-mj-description = callWithLocal ./pkgs/mc-rtc/mc-mujoco/robots/hrp5p-mj-description.nix {};
+  ur5e-mj-description = final.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/ur5e-mj-description.nix {};
+
   env-mj-description = callWithLocal ./pkgs/mc-rtc/mc-mujoco/robots/env-mj-description.nix {};
+
   # symlinkJoin all robots
+  # FIXME: this triggers a full rebuild of mc-mujoco
   mc-mujoco-robots = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/default.nix {
-    robots = [rhps1-mj-description];
+    robots = [
+      rhps1-mj-description
+      g1-mj-description
+      h1-mj-description
+      hrp4-mj-description
+      # hrp2-mj-description does not exist
+      hrp5p-mj-description
+      rhps1-mj-description
+      ur5e-mj-description
+      ];
   };
   mc-mujoco = callWithLocal ./pkgs/mc-rtc/mc-mujoco {
     jrl-cmakemodules = final.jrl-cmakemodulesv2;
@@ -240,9 +273,25 @@ in rec
   # mc-rtc-superbuild = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-symlinkjoin.nix.nix { 
 
   # default superbuild environment
-  mc-rtc-superbuild = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix { 
+  mc-rtc-superbuild-base = final.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix { 
     apps = [ mc-rtc-magnum mc-mujoco mc-rtc-ticker ];
   };
+
+  mc-rtc-superbuild-full = final.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix { 
+    robots = [
+      mc-g1
+      mc-h1
+      mc-hrp2
+      mc-hrp4
+      mc-hrp5-p
+      mc-rhps1
+      mc-ur5e
+    ];
+    #apps = [ mc-rtc-magnum mc-mujoco mc-rtc-ticker ];
+    apps = [ mc-rtc-magnum mc-mujoco ];
+  };
+
+  mc-rtc-superbuild = final.mc-rtc-superbuild-full;
 
   mc-rtc-superbuild-standalone-magnum = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix { 
     apps = [ mc-rtc-magnum-standalone ];
@@ -259,7 +308,7 @@ in rec
     # extra mc_rtc.yaml
     configs = [ "${panda-prosthesis}/lib/mc_controller/etc/mc_rtc.yaml" ];
     observers = [];
-    plugins = [ panda-prosthesis mc-force-shoe-plugin ];
+    plugins = [ panda-prosthesis ];
     apps = [ mc-rtc-magnum mc-franka mc-rtc-ticker sch-visualization ];
   };
 

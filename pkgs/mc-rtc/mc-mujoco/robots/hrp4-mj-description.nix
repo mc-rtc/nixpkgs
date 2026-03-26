@@ -1,10 +1,10 @@
-{ stdenv, lib, fetchFromGitHub, cmake,
+{ stdenv, lib, cmake,
 useLocal ? false, localWorkspace ? null }:
 
 stdenv.mkDerivation (finalAttrs: {
-  version = "1.0.0";
-  pname = "rhps1-mj-description";
-  srcPath = "${localWorkspace}/rhps1_mj_description";
+  version = "0.0.0";
+  pname = "hrp4-mj-description";
+  srcPath = "${localWorkspace}/hrp4_mj_description";
   separateDebugInfo = false;
   postInstall = "touch $out";
 
@@ -15,17 +15,15 @@ stdenv.mkDerivation (finalAttrs: {
           name = "${finalAttrs.pname}-src";
         })
       else
+        # XXX should we merge with https://gite.lirmm.fr/mc-hrp4/hrp4_mj_description
+        # I don't remember what hugo changes were
+        # TODO release
         builtins.fetchGit {
-          url = "git@github.com:isri-aist/rhps1_mj_description";
-          # Release v1.0.0
-          rev = "ac2d198b21b6f431fffc2c93ad03b04f98c4135a";
+          url = "git@gite.lirmm.fr:hlefevre/hrp4_mj_descrition";
+          rev = "5f8df7e6eeb5153ee381394312f5700f36bda1e2";
         };
 
   nativeBuildInputs = [ cmake ];
-
-  preConfigure = ''
-    export ROS_VERSION=2
-  '';
 
   cmakeFlags = [
     "-DHONOR_INSTALL_PREFIX=ON"
@@ -34,9 +32,9 @@ stdenv.mkDerivation (finalAttrs: {
   doCheck = true;
 
   meta = with lib; {
-    description = "rhps1 simulation robot model mc_mujoco";
-    homepage    = "https://github.com/jrl-umi3218/rhps1_env_description";
-    license     = licenses.bsd2;
+    description = "HRP-4 simulation robot model mc_mujoco";
+    homepage    = "https://gite.lirmm.fr/hlefevre/hrp4_mj_description";
+    # license     = licenses.bsd2;
     platforms   = platforms.all;
   };
 })

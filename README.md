@@ -10,13 +10,18 @@ Current status:
       Allows to build mc-rtc and configure its runtime dependencies (`robots`, `controllers`, `observers`, `plugins`)
 - [x] Run `MCFrankaControl` with real Panda robots
 - [x] `mc-rtc-magnum` support (with older `glfw/imgui/implot` as submodules, as done in `mc-rtc-superbuild`)
-- [ ] Robots
+- [ ] Robots - all most commonly used robots are supported:
   - [x] JVRC1
   - [x] HRP-2Kai
   - [x] HRP-4
+  - [x] HRP-5P
+  - [x] H1
   - [x] Panda*
   - [x] PandaLIRMM*
-  - [ ] RHPS1
+  - [x] RHPS1
+  - [ ] UR
+    - [x] UR5e
+    - [ ] UR10
 - [ ] Controllers
   - [x] Rolkneematics `panda-prosthesis`
   - [ ] WIP: Hugo's polytopeController

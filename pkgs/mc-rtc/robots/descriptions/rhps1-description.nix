@@ -1,21 +1,22 @@
 { stdenv, lib, fetchgit, cmake, with-ros ? false, ament-cmake, buildRosPackage, useLocal ? false, localWorkspace ? null }:
 
 (if with-ros then buildRosPackage else stdenv.mkDerivation) {
-  pname = "hrp2-description";
+  pname = "rhps1-description";
   version = "1.0.0";
   separateDebugInfo = false;
 
-  # TODO: release hrp2_drc_descriptioin
-  src = if useLocal then
-      builtins.trace "Using local workspace for hrp2-description: ${localWorkspace}/hrp2_drc_description"
+  src =
+    if useLocal then
+      builtins.trace "Using local workspace for rhps1-description: ${localWorkspace}/rhps1_description"
       (builtins.path {
-        path = "${localWorkspace}/hrp2_drc_description";
-        name = "mc_rtc-src";
+        path = "${localWorkspace}/rhps1_description";
+        name = "rhps1-description-src";
       })
     else
       builtins.fetchGit {
-        url = "git@github.com:isri-aist/hrp2_drc_description.git";
-        rev = "c2b2e9886ed07cdf5ddb6018c2dc53aca0f5f098";
+        url = "git@github.com:isri-aist/rhps1_description";
+        # Release v1.0.0
+        rev = "fd50b0d3424a926b8ad78b983389573b0453c88a";
       };
 
   buildType = "ament_cmake";
@@ -37,8 +38,8 @@
   doCheck = false;
 
   meta = with lib; {
-    description = "HRP2 urdf and data";
-    homepage    = "https://gite.lirmm.fr/mc-hrp2/hrp2_drc";
+    description = "rhps1 urdf and data";
+    homepage    = "https://github.com/isri-aist/mc_rhps1";
     license     = licenses.bsd2;
     platforms   = platforms.all;
   };
