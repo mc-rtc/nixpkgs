@@ -4,9 +4,6 @@ useLocal ? false, localWorkspace ? null }:
 stdenv.mkDerivation (finalAttrs: {
   version = "1.0.0";
   pname = "hrp5p-mj-description";
-  srcPath = "";
-  separateDebugInfo = false;
-  postInstall = "touch $out";
 
   src = if useLocal then
         builtins.trace "Using local workspace for ${finalAttrs.pname}: ${localWorkspace}/hrp5p_mj_description"

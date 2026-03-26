@@ -5,8 +5,6 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "env-mj-description";
   version = "1.0.0";
   srcPath = "${localWorkspace}/env_mj_description";
-  separateDebugInfo = false;
-  postInstall = "touch $out";
 
   src = if useLocal then
         builtins.trace "Using local workspace for ${finalAttrs.pname}: ${finalAttrs.srcPath}"

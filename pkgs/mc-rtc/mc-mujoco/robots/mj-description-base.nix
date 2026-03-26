@@ -7,8 +7,6 @@ stdenv.mkDerivation (finalAttrs: {
   version = version;
   pname = pname;
   srcPath = if localWorkspace != null then "${localWorkspace}/${repo}" else null;
-  separateDebugInfo = false;
-  postInstall = "touch $out";
 
   src = if useLocal then
     builtins.trace "Using local workspace for ${finalAttrs.pname}: ${finalAttrs.srcPath}"

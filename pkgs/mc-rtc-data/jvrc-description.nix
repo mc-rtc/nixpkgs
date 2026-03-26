@@ -3,20 +3,17 @@ with-ros ? false, buildRosPackage,
 useLocal ? false, localWorkspace ? null }:
 
 let
-  version = "1.0.8"; # TODO release
+  version = "1.0.8";
   pname = "jvrc-description";
-  srcPath = "${localWorkspace}/jvrc_description";
 in
 (if with-ros then buildRosPackage else stdenv.mkDerivation) {
   pname = "${pname}";
   version = "${version}";
-  separateDebugInfo = false;
-  postInstall = "touch $out";
 
   src = if useLocal then
-        builtins.trace "Using local workspace for ${pname}: ${srcPath}"
+        builtins.trace "Using local workspace for ${pname}: ${localWorkspace}/jvrc_description"
         (builtins.path {
-          path = "${srcPath}";
+          path = "${localWorkspace}/jvrc_description";
           name = "${pname}-src";
         })
       else

@@ -4,14 +4,11 @@ useLocal ? false, localWorkspace ? null }:
 stdenv.mkDerivation (finalAttrs: {
   version = "1.0.0";
   pname = "rhps1-mj-description";
-  srcPath = "${localWorkspace}/rhps1_mj_description";
-  separateDebugInfo = false;
-  postInstall = "touch $out";
 
   src = if useLocal then
-        builtins.trace "Using local workspace for ${finalAttrs.pname}: ${finalAttrs.srcPath}"
+        builtins.trace "Using local workspace for ${finalAttrs.pname}: ${localWorkspace}/rhps1_mj_description"
         (builtins.path {
-          path = "${finalAttrs.srcPath}";
+          path = "${localWorkspace}/rhps1_mj_description";
           name = "${finalAttrs.pname}-src";
         })
       else
