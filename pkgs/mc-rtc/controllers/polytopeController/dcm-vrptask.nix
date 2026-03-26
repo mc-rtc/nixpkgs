@@ -28,18 +28,6 @@ stdenv.mkDerivation (finalAttrs: {
       mc-rtc gram-savitzky-golay eigen-quadprog
     ];
 
-  # postInstall = ''
-  #   ls -R $out
-  #   exit 4
-  # '';
-
-  # FIXME why do i need this?!
-  postInstall = ''
-    cd $out/lib/cmake/DCM_VRPTask
-    cp DCM_VRPTask-config.cmake DCM_VRPTaskConfig.cmake
-    cp DCM_VRPTask-config-version.cmake DCM_VRPTaskConfigVersion.cmake
-  '';
-
   doCheck = false;
 
   meta = with lib; {
