@@ -76,6 +76,7 @@
               jrl-cmakemodulesv2 = inputs.jrl-cmakemodulesv2.packages.${prev.system}.default;
               jrl-cmakemodulesv2-test = inputs.jrl-cmakemodulesv2-test.packages.${prev.system}.default;
             })
+            (import ./overlay-ccache.nix {})
           ];
           pkgs = import inputs.nixpkgs {
             inherit system overlays;
@@ -131,8 +132,20 @@
             # Creates a custom devShell with all dependencies required to build mc_mujoco as defined in its derivation,
             # but without actually building the derivation
             # This can be used to test building the mc_mujoco app manually with all dependencies available (and a working find_pacakge)
+            mc-rtc = pkgs.mkShell {
+              inputsFrom = [ pkgs.mc-rtc ];
+              buildInputs = [ pkgs.ninja ];
+            };
             mc-mujoco = pkgs.mkShell {
               inputsFrom = [ pkgs.mc-mujoco ];
+              buildInputs = [ pkgs.ninja ];
+            };
+            mc-panda = pkgs.mkShell {
+              inputsFrom = [ pkgs.mc-panda ];
+              buildInputs = [ pkgs.ninja ];
+            };
+            mc-panda-lirmm = pkgs.mkShell {
+              inputsFrom = [ pkgs.mc-panda-lirmm ];
               buildInputs = [ pkgs.ninja ];
             };
             mc-rtc-imgui = pkgs.mkShell {
