@@ -17,7 +17,7 @@
       inherit lib; inherit jrl-cmakemodulesv2; 
       with-ros = true;
       # FIXME: stop doing this and do proper flake.nix overrides in each package ;)
-      withLocal = true;
+      useLocal = true;
       localWorkspace = "/home/arnaud/devel/mc-rtc-nix/workspace";
     };
     flakoboros.overlays = 

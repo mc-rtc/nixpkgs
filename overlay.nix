@@ -111,8 +111,18 @@ in rec
   poco = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/libpoco.nix {};
   mesh-sampling = prev.callPackage ./pkgs/mesh-sampling {};
   # mesh-sampling = callWithLocal ./pkgs/mesh-sampling {};
+
+  # XXX
+  # The current nixpkgs input uses fmt_12
+  # This breaks both eigen-fmt and PTransformd
+  # In mc-rtc fmt is brought in through spdlog. Thus we build an older version
+  # 1.12.0 against fmt_9 (technically it supports fmt_10 but nixpkgs used to build it against fmt_9 on purpose). To avoid rebuilding the world, we leave fmt_12 everywhere else,
+  # this might cause some headache down the line.
+  # TODO: patch mc-rtc and eigen-fmt with fmt_12 support
   mc-rtc = callWithRosLocal ./pkgs/mc-rtc/mc-rtc.nix {
-    stdenv = final.ccacheStdenv;
+    spdlog = prev.callPackage ./pkgs/spdlog-1.12.0.nix {
+      fmt = final.fmt_9;
+    };
   };
   mc-rtc-python-utils = callWithLocal ./pkgs/mc-rtc/mc-rtc-python-utils.nix {};
   #mc-rtc = callWithRos ./pkgs/mc-rtc/mc-rtc.nix {};
@@ -220,7 +230,9 @@ in rec
   #############
   # 3rd-party #
   #############
-  eigen-fmt = prev.callPackage ./pkgs/3rd-party/eigen-fmt {};
+  eigen-fmt = prev.callPackage ./pkgs/3rd-party/eigen-fmt {
+    fmt = prev.fmt_10;
+  };
   politopix = prev.callPackage ./pkgs/3rd-party/politopix.nix {
     fetchurl = final.stdenv.fetchurlBoot;
   };

@@ -15,11 +15,15 @@
   nixConfig = {
     extra-substituters = [
       "https://mc-rtc-nix.cachix.org"
-      "https://ros.cachix.org"
+      "https://gepetto.cachix.org"
+      # "https://ros.cachix.org"
+      "https://attic.iid.ciirc.cvut.cz/ros"
     ];
     extra-trusted-public-keys = [
       "mc-rtc-nix.cachix.org-1:5M3sLvHXJCep4wc1tQl7QuFWL2eH2I0jkuvWtqJDYQs="
-      "ros.cachix.org-1:dSyZxI8geDCJrwgvCOHDoAfOm5sV1wCPjBkKL+38Rvo="
+      "gepetto.cachix.org-1:toswMl31VewC0jGkN6+gOelO2Yom0SOHzPwJMY2XiDY="
+      # "ros.cachix.org-1:dSyZxI8geDCJrwgvCOHDoAfOm5sV1wCPjBkKL+38Rvo="
+      "ros:JR95vUYsShSqfA1VTYoFt1Nz6uXasm5QrcOsGry9f6Q="
     ];
   };
 

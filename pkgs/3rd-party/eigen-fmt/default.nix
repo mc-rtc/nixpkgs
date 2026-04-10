@@ -1,5 +1,5 @@
 { stdenv, lib, fetchgit, cmake,
-eigen,
+eigen, fmt,
 useLocal ? false, localWorkspace ? null
 }:
 
@@ -35,7 +35,7 @@ stdenv.mkDerivation (finalAttrs:{
   '';
 
   nativeBuildInputs = [ cmake ];
-  propagatedBuildInputs = [ eigen ];
+  propagatedBuildInputs = [ eigen fmt ];
 
   doCheck = false;
 
