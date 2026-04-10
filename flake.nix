@@ -17,16 +17,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nvim-nix = {
-      url = "github:arntanguy/nvim-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     jrl-cmakemodulesv2 = {
       url = "github:ahoarau/jrl-cmakemodules?ref=jrl-next";
-    };
-    jrl-cmakemodulesv2-test = {
-      url = "git+file:///home/arnaud/devel/mc-rtc-nix/workspace/jrl-cmakemodules";
     };
   };
 
@@ -74,7 +66,6 @@
             (import ./overlay.nix { inherit useLocal localWorkspace with-ros; })
             (final: prev: {
               jrl-cmakemodulesv2 = inputs.jrl-cmakemodulesv2.packages.${prev.system}.default;
-              jrl-cmakemodulesv2-test = inputs.jrl-cmakemodulesv2-test.packages.${prev.system}.default;
             })
             (import ./overlay-ccache.nix {})
           ];
@@ -97,37 +88,29 @@
             system-manager = inputs'.system-manager.packages.default;
           };
           devShells = {
-            mc-rtc = pkgs.mkShell {
-              inputsFrom = [ pkgs.mc-rtc ];
-              buildInputs = [ pkgs.ninja ];
-            };
             mc-rtc-superbuild = import ./shell.nix
             { 
               inherit pkgs;
               with-ros = true;
               mc-rtc-superbuild = packages.mc-rtc-superbuild;
-              extraBuildInputs = [ inputs.nvim-nix.packages.${system}.nixCats ];
             };
             mc-rtc-superbuild-rolkneematics = import ./shell.nix
             { 
               inherit pkgs;
               with-ros = true;
               mc-rtc-superbuild = packages.mc-rtc-superbuild-rolkneematics;
-              extraBuildInputs = [ inputs.nvim-nix.packages.${system}.nixCats ];
             };
             mc-rtc-superbuild-hugo = import ./shell.nix
             { 
               inherit pkgs;
               with-ros = true;
               mc-rtc-superbuild = packages.mc-rtc-superbuild-hugo;
-              extraBuildInputs = [ inputs.nvim-nix.packages.${system}.nixCats ];
             };
             mc-rtc-superbuild-standalone-magnum = import ./shell.nix
             { 
               inherit pkgs;
               with-ros = true;
               mc-rtc-superbuild = pkgs.mc-rtc-superbuild-standalone-magnum;
-              extraBuildInputs = [ inputs.nvim-nix.packages.${system}.nixCats ];
             };
             # Creates a custom devShell with all dependencies required to build mc_mujoco as defined in its derivation,
             # but without actually building the derivation

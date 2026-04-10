@@ -1,4 +1,4 @@
-{ pkgs, mc-rtc-superbuild, extraBuildInputs, with-ros ? false }:
+{ pkgs, mc-rtc-superbuild, extraBuildInputs ? [], with-ros ? false }:
 
 let 
   mcRtcConfigs =

@@ -101,7 +101,7 @@ in rec
   mc-hrp4 = callWithLocal ./pkgs/mc-rtc/robots/modules/mc-hrp4.nix {};
   mc-hrp5-p = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-hrp5-p.nix {};
   mc-ur5e = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-ur5e.nix { };
-  mc-panda = callWithRos ./pkgs/mc-rtc/robots/mc-panda {};
+  mc-panda = callWithLocal ./pkgs/mc-rtc/robots/mc-panda {};
   mc-panda-lirmm = callWithLocal ./pkgs/mc-rtc/robots/mc-panda/mc-panda-lirmm.nix {};
   mc-rhps1 = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-rhps1.nix {};
 
