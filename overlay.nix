@@ -309,7 +309,7 @@ in rec
     configs = [ "${panda-prosthesis}/lib/mc_controller/etc/mc_rtc.yaml" ];
     observers = [];
     plugins = [ panda-prosthesis ];
-    apps = [ mc-rtc-magnum mc-franka mc-rtc-ticker sch-visualization ];
+    apps = [ mc-rtc-magnum mc-franka mc-rtc-ticker ];
   };
 
   mc-rtc-superbuild-hugo = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix { 

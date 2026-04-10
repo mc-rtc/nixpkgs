@@ -4,6 +4,7 @@
   inputs = {
     gepetto.url = "github:gepetto/nix";
     flake-parts.follows = "gepetto/flake-parts";
+    nixpkgs.follows = "gepetto/nixpkgs";
     systems.follows = "gepetto/systems";
     jrl-cmakemodulesv2 = {
       url = "github:ahoarau/jrl-cmakemodules?ref=jrl-next";
@@ -28,7 +29,7 @@ outputs =
   { lib, ...}:
   let
     flakeModule = inputs.flake-parts.lib.importApply ./module.nix {
-      inherit (inputs) gepetto;
+      inherit (inputs) gepetto jrl-cmakemodulesv2;
     };
   in
   {
@@ -52,9 +53,11 @@ outputs =
           devShells = inputs'.gepetto.devShells
           // 
           {
-            mc-rtc = pkgs.mkShell {
-              inputsFrom = [ pkgs.mc-rtc ];
-              buildInputs = [ pkgs.ninja ];
+            mc-rtc-superbuild-rolkneematics = import ./shell.nix
+            { 
+              inherit pkgs;
+              with-ros = true;
+              mc-rtc-superbuild = pkgs.mc-rtc-superbuild-rolkneematics;
             };
           };
           packages = inputs'.gepetto.packages;

@@ -491,6 +491,10 @@
         ],
         "gepetto": "gepetto",
         "jrl-cmakemodulesv2": "jrl-cmakemodulesv2",
+        "nixpkgs": [
+          "gepetto",
+          "nixpkgs"
+        ],
         "systems": [
           "gepetto",
           "systems"
