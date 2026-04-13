@@ -119,7 +119,7 @@ in rec
   # 1.12.0 against fmt_9 (technically it supports fmt_10 but nixpkgs used to build it against fmt_9 on purpose). To avoid rebuilding the world, we leave fmt_12 everywhere else,
   # this might cause some headache down the line.
   # TODO: patch mc-rtc and eigen-fmt with fmt_12 support
-  mc-rtc = callWithRosLocal ./pkgs/mc-rtc/mc-rtc.nix {
+  mc-rtc = callWithRos ./pkgs/mc-rtc/mc-rtc.nix {
     spdlog = prev.callPackage ./pkgs/spdlog-1.12.0.nix {
       fmt = final.fmt_9;
     };
@@ -303,7 +303,7 @@ in rec
     apps = [ mc-rtc-magnum mc-mujoco ];
   };
 
-  mc-rtc-superbuild = final.mc-rtc-superbuild-full;
+  mc-rtc-superbuild = final.mc-rtc-superbuild-base;
 
   mc-rtc-superbuild-standalone-magnum = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix { 
     apps = [ mc-rtc-magnum-standalone ];
