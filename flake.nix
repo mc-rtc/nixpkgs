@@ -61,6 +61,12 @@ outputs =
           devShells = inputs'.gepetto.devShells
           // 
           {
+            mc-rtc-superbuild = import ./shell.nix
+            { 
+              inherit pkgs;
+              with-ros = true;
+              mc-rtc-superbuild = pkgs.mc-rtc-superbuild-base;
+            };
             mc-rtc-superbuild-rolkneematics = import ./shell.nix
             { 
               inherit pkgs;
