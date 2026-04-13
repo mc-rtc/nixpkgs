@@ -37,8 +37,12 @@ outputs =
     };
   in
   {
-      systems = import inputs.systems;
-      imports = 
+      # systems = import inputs.systems;
+      systems =
+      [
+        "x86_64-linux"
+      ];
+      imports =
       [
         flakeModule
       ];
