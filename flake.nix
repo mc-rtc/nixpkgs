@@ -47,8 +47,8 @@ outputs =
       flake = {
         inherit flakeModule;
         lib.mkFlakoboros =
-            module:
-            inputs.flake-parts.lib.mkFlake { inherit inputs; } (args: {
+            localInputs: module:
+            inputs.flake-parts.lib.mkFlake { inputs = localInputs; } (args: {
               systems = import inputs.systems;
               imports = [
                 flakeModule
