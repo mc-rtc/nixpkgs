@@ -1,0 +1,111 @@
+name: "CI - Nix"
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  populate-cache:
+    name: "${{ matrix.build }} on ${{ matrix.os }}"
+    runs-on: "${{ matrix.os }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        # os: TODO [macos-15, ubuntu-24.04]
+        os: [ubuntu-24.04]
+        build: ["mc-rtc-superbuild", devShells.x86_64-linux.mc-rtc-superbuild"]
+        # build: ["pinocchio", "py-aligator", "gepetto-viewer", "devShells.x86_64-linux.hpp", "devShells.x86_64-linux.hpp-bin", "python"]
+        # include:
+        #   - os: macos-15-intel
+        #     build: py-aligator
+        #   - os: ubuntu-24.04-arm
+        #     build: coal
+        #   - os: ubuntu-24.04-arm
+        #     build: proxsuite
+        #   - os: ubuntu-24.04-arm
+        #     build: py-casadi
+        #   - os: ubuntu-24.04-arm
+        #     build: aligator
+        #   - os: ubuntu-24.04-arm
+        #     build: py-aligator
+    steps:
+      - uses: actions/checkout@v6
+      - uses: cachix/install-nix-action@v31
+      - uses: cachix/cachix-action@v17
+        with:
+          name: mc-rtc-nix
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+      - run: nix build -L ".#${{ matrix.build }}" --cores 4
+  complete:
+    needs: populate-cache
+    name: "complete ${{ matrix.os }}"
+    runs-on: "${{ matrix.os }}-latest"
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu] # TODO: macos
+    steps:
+      - uses: jlumbroso/free-disk-space@main
+        if: ${{ matrix.os == 'ubuntu' }}
+      - uses: actions/checkout@v6
+      - uses: cachix/install-nix-action@v31
+      - uses: cachix/cachix-action@v17
+        with:
+          name: mc-rtc-nix
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+      - run: nix flake check -L
+  fallback:
+    needs: complete
+    if: always() && needs.complete.result == 'failure'
+    name: "fallback ${{ matrix.os }}"
+    runs-on: "${{ matrix.os }}-latest"
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu] # TODO: macos
+    steps:
+      - uses: jlumbroso/free-disk-space@main
+        if: ${{ matrix.os == 'ubuntu' }}
+      - uses: actions/checkout@v6
+      - uses: cachix/install-nix-action@v31
+      - uses: cachix/cachix-action@v17
+        with:
+          name: mc-rtc-nix
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+      - run: nix flake check -L -j 1 --cores 1
+  system:
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: cachix/install-nix-action@v31
+      - uses: cachix/cachix-action@v17
+        with:
+          name: mc-rtc-nix
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+          extraPullNames: ros
+      - run: nix build -L .#systemConfigs.default
+  home:
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: cachix/install-nix-action@v31
+      - uses: cachix/cachix-action@v17
+        with:
+          name: mc-rtc-nix
+      - run: nix build -L .#homeConfigurations.cpene.activationPackage
+  check:
+    if: always()
+    name: check-macos-linux-nix
+    runs-on: ubuntu-latest
+    needs:
+      - fallback
+      - system
+      - home
+    steps:
+      - uses: re-actors/alls-green@release/v1
+        with:
+          allowed-skips: fallback
+          jobs: ${{ toJSON(needs) }}
+
