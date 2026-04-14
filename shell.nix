@@ -1,4 +1,4 @@
-{ pkgs, mc-rtc-superbuild, name ? "default", extraBuildInputs ? [], with-ros ? false }:
+{ pkgs, mc-rtc-superbuild, extraBuildInputs, with-ros ? false }:
 
 let 
   mcRtcConfigs =
@@ -54,7 +54,7 @@ pkgs.mkShell {
     export ROS_DOMAIN_ID=100
 
     echo "======================================="
-    echo "  mc-rtc-superbuild interactive shell (${name}) "
+    echo "  mc-rtc-superbuild interactive shell  "
     echo "======================================="
 
     echo ""

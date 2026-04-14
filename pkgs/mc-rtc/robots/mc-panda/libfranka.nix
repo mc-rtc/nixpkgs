@@ -1,5 +1,5 @@
 { stdenv, lib, fetchgit, cmake, pkg-config
-, eigen, poco, tinyxml-2
+, eigen, fmt, poco, tinyxml-2
 # , doxygen, graphviz
 , useLocal ? false, localWorkspace ? null
 }:
@@ -23,8 +23,8 @@ stdenv.mkDerivation {
     };
 
   nativeBuildInputs = [ cmake pkg-config ];
-  buildInputs = [ eigen poco tinyxml-2 ];
-  propagatedBuildInputs = [ poco tinyxml-2 ];
+  buildInputs = [ eigen fmt poco tinyxml-2 ];
+  propagatedBuildInputs = [ fmt poco tinyxml-2 ];
 
   # Optional: enable documentation if you want
   # nativeBuildInputs = nativeBuildInputs ++ [ doxygen graphviz ];

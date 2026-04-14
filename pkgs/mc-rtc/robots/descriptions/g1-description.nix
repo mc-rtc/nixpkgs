@@ -17,7 +17,7 @@
         owner = "isri-aist";
         repo = "g1_description";
         rev = "v1.0.0";
-        hash = "sha256-kjuMnP1qoL7LWTU55uvt9/n6KlUkUO5/rgxs1H77cV8=";
+        hash = "sha256-Z/BB2ljjZqs0z9/ItHkOjADUFUjEnnbvvC0syDXcFpA=";
       };
 
   buildType = "ament_cmake";

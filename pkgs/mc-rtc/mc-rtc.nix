@@ -2,7 +2,7 @@
 # See mc-rtc-superbuild.nix for a full derivation with optional plugins
 
 { lib, buildRosPackage, stdenv, fetchgit, cmake, pkg-config,
-tasks, tvm, eigen-quadprog, libtool, geos, spdlog, ndcurves, mc-rtc-data,
+tasks, tvm, eigen-quadprog, libtool, geos, spdlog, fmt, ndcurves, mc-rtc-data,
 state-observation, nanomsg, libnotify, rapidjson, boost, mesh-sampling,
 python313Packages, qt5,
 eigen-fmt,
@@ -28,7 +28,7 @@ in
     "";
 
     nativeBuildInputs = [ cmake qt5.wrapQtAppsHook ];
-  propagatedBuildInputs = [ pkg-config tasks eigen-quadprog libtool geos spdlog ndcurves mc-rtc-data state-observation nanomsg tvm libnotify rapidjson boost mesh-sampling eigen-fmt ]
+  propagatedBuildInputs = [ pkg-config tasks eigen-quadprog libtool geos spdlog fmt ndcurves mc-rtc-data state-observation nanomsg tvm libnotify rapidjson boost mesh-sampling eigen-fmt ]
   ++ [ python313Packages.gitpython python313Packages.pyqt5 python313Packages.matplotlib]
   ++ [ doxygen bundler ] # for documentation
     ++ lib.optional (with-ros && rclcpp != null) rclcpp

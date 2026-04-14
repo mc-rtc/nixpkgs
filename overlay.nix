@@ -101,7 +101,7 @@ in rec
   mc-hrp4 = callWithLocal ./pkgs/mc-rtc/robots/modules/mc-hrp4.nix {};
   mc-hrp5-p = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-hrp5-p.nix {};
   mc-ur5e = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-ur5e.nix { };
-  mc-panda = callWithLocal ./pkgs/mc-rtc/robots/mc-panda {};
+  mc-panda = callWithRos ./pkgs/mc-rtc/robots/mc-panda {};
   mc-panda-lirmm = callWithLocal ./pkgs/mc-rtc/robots/mc-panda/mc-panda-lirmm.nix {};
   mc-rhps1 = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-rhps1.nix {};
 
@@ -111,18 +111,8 @@ in rec
   poco = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/libpoco.nix {};
   mesh-sampling = prev.callPackage ./pkgs/mesh-sampling {};
   # mesh-sampling = callWithLocal ./pkgs/mesh-sampling {};
-
-  # XXX
-  # The current nixpkgs input uses fmt_12
-  # This breaks both eigen-fmt and PTransformd
-  # In mc-rtc fmt is brought in through spdlog. Thus we build an older version
-  # 1.12.0 against fmt_9 (technically it supports fmt_10 but nixpkgs used to build it against fmt_9 on purpose). To avoid rebuilding the world, we leave fmt_12 everywhere else,
-  # this might cause some headache down the line.
-  # TODO: patch mc-rtc and eigen-fmt with fmt_12 support
-  mc-rtc = callWithRos ./pkgs/mc-rtc/mc-rtc.nix {
-    spdlog = prev.callPackage ./pkgs/spdlog-1.12.0.nix {
-      fmt = final.fmt_9;
-    };
+  mc-rtc = callWithRosLocal ./pkgs/mc-rtc/mc-rtc.nix {
+    stdenv = final.ccacheStdenv;
   };
   mc-rtc-python-utils = callWithLocal ./pkgs/mc-rtc/mc-rtc-python-utils.nix {};
   #mc-rtc = callWithRos ./pkgs/mc-rtc/mc-rtc.nix {};
@@ -230,9 +220,7 @@ in rec
   #############
   # 3rd-party #
   #############
-  eigen-fmt = prev.callPackage ./pkgs/3rd-party/eigen-fmt {
-    fmt = prev.fmt_10;
-  };
+  eigen-fmt = prev.callPackage ./pkgs/3rd-party/eigen-fmt {};
   politopix = prev.callPackage ./pkgs/3rd-party/politopix.nix {
     fetchurl = final.stdenv.fetchurlBoot;
   };
@@ -303,7 +291,7 @@ in rec
     apps = [ mc-rtc-magnum mc-mujoco ];
   };
 
-  mc-rtc-superbuild = final.mc-rtc-superbuild-base;
+  mc-rtc-superbuild = final.mc-rtc-superbuild-full;
 
   mc-rtc-superbuild-standalone-magnum = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix { 
     apps = [ mc-rtc-magnum-standalone ];
@@ -321,7 +309,7 @@ in rec
     configs = [ "${panda-prosthesis}/lib/mc_controller/etc/mc_rtc.yaml" ];
     observers = [];
     plugins = [ panda-prosthesis ];
-    apps = [ mc-rtc-magnum mc-franka mc-rtc-ticker ];
+    apps = [ mc-rtc-magnum mc-franka mc-rtc-ticker sch-visualization ];
   };
 
   mc-rtc-superbuild-hugo = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix { 
