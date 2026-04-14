@@ -1,4 +1,4 @@
-{ stdenv, lib, cmake, eigen, fetchurl }:
+{ stdenv, lib, cmake, jrl-cmakemodules, eigen, boost, fetchurl }:
 
 stdenv.mkDerivation rec {
   pname = "spacevecalg";
@@ -10,7 +10,7 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [ cmake ];
-  propagatedBuildInputs = [ eigen ];
+  propagatedBuildInputs = [ eigen boost jrl-cmakemodules ];
 
   cmakeFlags = [
     "-DBUILD_TESTING=OFF"
