@@ -1,5 +1,5 @@
 {
-  description = "mc-rtc Nix flake";
+  description = "mc-rtc Nix flake (extends gepetto's)";
 
   inputs = {
     gepetto.url = "github:gepetto/nix";
@@ -16,13 +16,11 @@
     extra-substituters = [
       "https://mc-rtc-nix.cachix.org"
       "https://gepetto.cachix.org"
-      # "https://ros.cachix.org"
       "https://attic.iid.ciirc.cvut.cz/ros"
     ];
     extra-trusted-public-keys = [
       "mc-rtc-nix.cachix.org-1:5M3sLvHXJCep4wc1tQl7QuFWL2eH2I0jkuvWtqJDYQs="
       "gepetto.cachix.org-1:toswMl31VewC0jGkN6+gOelO2Yom0SOHzPwJMY2XiDY="
-      # "ros.cachix.org-1:dSyZxI8geDCJrwgvCOHDoAfOm5sV1wCPjBkKL+38Rvo="
       "ros:JR95vUYsShSqfA1VTYoFt1Nz6uXasm5QrcOsGry9f6Q="
     ];
   };
@@ -67,15 +65,48 @@ outputs =
           ...
         }:
         {
+        packages = inputs'.gepetto.packages // {
+          # Main GUIs and applications
+          mc-rtc-magnum = pkgs.mc-rtc-magnum;
+          mc-mujoco = pkgs.mc-mujoco;
+          mc-rtc-ticker = pkgs.mc-rtc-ticker;
+          # Control interfaces
+          mc-franka = pkgs.mc-franka;
+
+          # Main superbuild configurations
+          mc-rtc-superbuild = pkgs.mc-rtc-superbuild;
+          mc-rtc-superbuild-base = pkgs.mc-rtc-superbuild-base;
+          mc-rtc-superbuild-full = pkgs.mc-rtc-superbuild-full;
+          mc-rtc-superbuild-rolkneematics = pkgs.mc-rtc-superbuild-rolkneematics;
+          mc-rtc-superbuild-hugo = pkgs.mc-rtc-superbuild-hugo;
+
+          # Main controllers
+          panda-prosthesis = pkgs.panda-prosthesis;
+          polytopeController = pkgs.polytopeController;
+
+          # Main plugins
+          mc-force-shoe-plugin = pkgs.mc-force-shoe-plugin;
+
+          # Main robots
+          mc-g1 = pkgs.mc-g1;
+          mc-h1 = pkgs.mc-h1;
+          mc-hrp2 = pkgs.mc-hrp2;
+          mc-hrp4 = pkgs.mc-hrp4;
+          mc-hrp5-p = pkgs.mc-hrp5-p;
+          mc-rhps1 = pkgs.mc-rhps1;
+          mc-ur5e = pkgs.mc-ur5e;
+          mc-panda = pkgs.mc-panda;
+          mc-panda-lirmm = pkgs.mc-panda-lirmm;
+        };
           devShells = inputs'.gepetto.devShells
-          // 
+          //
           {
-            # mc-rtc-superbuild = import ./shell.nix
-            # { 
-            #   inherit pkgs;
-            #   with-ros = true;
-            #   mc-rtc-superbuild = pkgs.mc-rtc-superbuild-base;
-            # };
+            mc-rtc-superbuild = import ./shell.nix
+            { 
+              inherit pkgs;
+              with-ros = true;
+              mc-rtc-superbuild = pkgs.mc-rtc-superbuild-base;
+            };
             mc-rtc-superbuild-rolkneematics = import ./shell.nix
             { 
               inherit pkgs;
@@ -83,8 +114,6 @@ outputs =
               mc-rtc-superbuild = pkgs.mc-rtc-superbuild-rolkneematics;
             };
           };
-          packages = inputs'.gepetto.packages // { mc-rtc-magnum = pkgs.mc-rtc-magnum; mc-rtc-superbuild = pkgs.mc-rtc-superbuild; };
-          # treefmt = inputs'.gepetto.treefmt;
         };
   });
 }
