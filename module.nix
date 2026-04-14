@@ -20,8 +20,8 @@
       useLocal = true;
       localWorkspace = "/home/arnaud/devel/mc-rtc-nix/workspace";
     };
-    flakoboros.overlays = 
-    [ 
+    flakoboros.overlays =
+    [
       self.overlays.mc-rtc-pkgs 
       (final: prev: { jrl-cmakemodulesv2 = jrl-cmakemodulesv2.packages.${prev.system}.default; })
     ];

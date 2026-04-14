@@ -37,17 +37,26 @@ outputs =
     };
   in
   {
-      # systems = import inputs.systems;
-      systems =
-      [
-        "x86_64-linux"
-      ];
+      systems = import inputs.systems;
+      # systems =
+      # [
+      #   "x86_64-linux"
+      # ];
       imports =
       [
         flakeModule
       ];
       flake = {
         inherit flakeModule;
+        lib.mkFlakoboros =
+            module:
+            inputs.flake-parts.lib.mkFlake { inherit inputs; } (args: {
+              systems = import inputs.systems;
+              imports = [
+                flakeModule
+                { flakoboros = module args; }
+              ];
+            });
       };
       perSystem =
         {
@@ -61,12 +70,12 @@ outputs =
           devShells = inputs'.gepetto.devShells
           // 
           {
-            mc-rtc-superbuild = import ./shell.nix
-            { 
-              inherit pkgs;
-              with-ros = true;
-              mc-rtc-superbuild = pkgs.mc-rtc-superbuild-base;
-            };
+            # mc-rtc-superbuild = import ./shell.nix
+            # { 
+            #   inherit pkgs;
+            #   with-ros = true;
+            #   mc-rtc-superbuild = pkgs.mc-rtc-superbuild-base;
+            # };
             mc-rtc-superbuild-rolkneematics = import ./shell.nix
             { 
               inherit pkgs;
@@ -74,7 +83,7 @@ outputs =
               mc-rtc-superbuild = pkgs.mc-rtc-superbuild-rolkneematics;
             };
           };
-          packages = inputs'.gepetto.packages;
+          packages = inputs'.gepetto.packages // { mc-rtc-magnum = pkgs.mc-rtc-magnum; mc-rtc-superbuild = pkgs.mc-rtc-superbuild; };
           # treefmt = inputs'.gepetto.treefmt;
         };
   });
