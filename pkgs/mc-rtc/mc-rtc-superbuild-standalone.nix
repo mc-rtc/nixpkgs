@@ -17,11 +17,16 @@
 , plugins ? []
 , apps ? []
 , pname ? "mc-rtc-superbuild-standalone"
+, traceRuntimeDependencies ? false
 }:
 
 let
   # Helper to build YAML lists
   toYamlList = paths: lib.concatMapStringsSep ", " (p: "\"${p}\"") paths;
+
+  traceGroup = name: pkgs: if traceRuntimeDependencies then
+    map (p: builtins.trace "${pname} ${name}: ${toString p}" p) pkgs
+  else pkgs;
 
   default_mc_rtc_yaml = writeTextFile {
     name = "mc_rtc.yaml";
@@ -47,7 +52,7 @@ let
 in
 
 stdenv.mkDerivation (finalAttrs: {
-  pname = "${pname}";
+  pname = builtins.trace "pname: ${pname}" "${pname}";
   version = mc-rtc.version;
   src = null;
   dontUnpack = true;
@@ -55,7 +60,12 @@ stdenv.mkDerivation (finalAttrs: {
   dontBuild = true;
   dontWrapQtApps = true;
 
-  propagatedBuildInputs = [ mc-rtc ] ++ apps ++ robots ++ plugins ++ controllers ++ observers;
+  propagatedBuildInputs = [ mc-rtc ]
+    ++ traceGroup "apps" apps
+    ++ traceGroup "robots" robots
+    ++ traceGroup "plugins" plugins
+    ++ traceGroup "controllers" controllers
+    ++ traceGroup "observers" observers;
 
   installPhase = ''
     mkdir -p $out/etc
