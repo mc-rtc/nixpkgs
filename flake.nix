@@ -47,8 +47,8 @@ outputs =
       flake = {
         inherit flakeModule;
         lib.mkFlakoboros =
-            module:
-            inputs.flake-parts.lib.mkFlake { inherit inputs; } (args: {
+            localInputs: module:
+            inputs.flake-parts.lib.mkFlake { inputs = localInputs; } (args: {
               systems = import inputs.systems;
               imports = [
                 flakeModule
@@ -88,11 +88,11 @@ outputs =
 
           # Main superbuild configurations
           mc-rtc-superbuild = pkgs.mc-rtc-superbuild;
-          mc-rtc-superbuild-base = pkgs.mc-rtc-superbuild-base;
+          # Includes private repositories
           mc-rtc-superbuild-full = pkgs.mc-rtc-superbuild-full;
+          # Todo: move those to their own project
           mc-rtc-superbuild-rolkneematics = pkgs.mc-rtc-superbuild-rolkneematics;
           mc-rtc-superbuild-hugo = pkgs.mc-rtc-superbuild-hugo;
-
           # Main controllers
           panda-prosthesis = pkgs.panda-prosthesis;
           polytopeController = pkgs.polytopeController;
@@ -106,7 +106,7 @@ outputs =
           mc-hrp2 = pkgs.mc-hrp2;
           mc-hrp4 = pkgs.mc-hrp4;
           mc-hrp5-p = pkgs.mc-hrp5-p;
-          mc-rhps1 = pkgs.mc-rhps1;
+          # mc-rhps1 = pkgs.mc-rhps1;
           mc-ur5e = pkgs.mc-ur5e;
           mc-panda = pkgs.mc-panda;
           mc-panda-lirmm = pkgs.mc-panda-lirmm;
@@ -118,7 +118,7 @@ outputs =
             { 
               inherit pkgs;
               with-ros = true;
-              mc-rtc-superbuild = pkgs.mc-rtc-superbuild-base;
+              mc-rtc-superbuild = pkgs.mc-rtc-superbuild;
             };
             mc-rtc-superbuild-rolkneematics = import ./shell.nix
             { 
