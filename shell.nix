@@ -1,9 +1,12 @@
-{ pkgs, mc-rtc-superbuild, name ? "default", extraBuildInputs ? [], with-ros ? false }:
+{ pkgs, mc-rtc-superbuild, extraBuildInputs ? [], with-ros ? false }:
 
 let 
   mcRtcConfigs =
   mc-rtc-superbuild.configs
   ++ [ "${mc-rtc-superbuild}/etc/mc_rtc.yaml" ];
+
+  title = "  ${mc-rtc-superbuild.pname} interactive shell  ";
+  line = builtins.concatStringsSep "" (builtins.genList (_: "=") (builtins.stringLength title));
 in
 pkgs.mkShell {
   buildInputs =
@@ -53,16 +56,16 @@ pkgs.mkShell {
     # FIXME we might need to run ros2 daemon stop && ros2 daemon start
     export ROS_DOMAIN_ID=100
 
-    echo "======================================="
-    echo "  mc-rtc-superbuild interactive shell (${name}) "
-    echo "======================================="
-
+    echo "${line}"
+    echo "${title}"
+    echo "${line}"
     echo ""
+
     echo "The following convenience environment variables are set:"
     env | grep '^MC_RTC_'
     echo ""
 
-    echo "Runtime dependencies (for information):"
+    echo "Runtime dependencies (store paths):"
     echo "Robot modules:"
     for robot in ${pkgs.lib.concatStringsSep " " (map (r: "${r}") mc-rtc-superbuild.robots)}; do
       echo "  $robot"
@@ -83,6 +86,8 @@ pkgs.mkShell {
     for app in ${pkgs.lib.concatStringsSep " " (map (r: "${r}") mc-rtc-superbuild.apps)}; do
       echo "  $app"
     done
+    echo ""
+    echo "mc_rtc will use the following configuration files $MC_RTC_CONTROLLER_CONFIG"
     # only true for the symlink version, currently unused
     # echo ""
     # echo "All runtime components are symlinked in MC_RTC_PATH=${mc-rtc-superbuild}"
