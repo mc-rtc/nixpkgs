@@ -66,6 +66,19 @@ outputs =
         }:
         {
         packages = inputs'.gepetto.packages // {
+          # Main dependencies
+          spacevecalg = pkgs.spacevecalg;
+          rbdyn = pkgs.rbdyn;
+          sch-core = pkgs.sch-core;
+          tasks = pkgs.tasks;
+          tvm = pkgs.tvm;
+          eigen-quadprog = pkgs.eigen-quadprog;
+          eigen-qld = pkgs.eigen-qld;
+          mc-rtc-data = pkgs.mc-rtc-data;
+          state-observation = pkgs.state-observation;
+          mesh-sampling = pkgs.mesh-sampling;
+          eigen-fmt = pkgs.eigen-fmt;
+
           # Main GUIs and applications
           mc-rtc-magnum = pkgs.mc-rtc-magnum;
           mc-mujoco = pkgs.mc-mujoco;
