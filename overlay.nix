@@ -160,7 +160,7 @@ in rec
   mc-rtc-magnum-hugo = final.mc-rtc-magnum.overrideAttrs (old: {
     mc-rtc = final.mc-rtc-hugo;
   });
-  mc-mujoco-hugo = final.mc-mujoco.overrideAttrs (old: {
+  mc-mujoco-hugo = final.mc-mujoco-full.overrideAttrs (old: {
     mc-rtc = final.mc-rtc-hugo;
   });
   mc-force-shoe-plugin-hugo = final.mc-force-shoe-plugin.overrideAttrs (old: {
@@ -183,7 +183,6 @@ in rec
   mujoco = prev.mujoco.overrideAttrs (old: {
     propagatedBuildInputs = (old.propagatedBuildInputs or []) ++ [ final.libGL ];
   });
-  #mc-mujoco = prev.callPackage ./pkgs/mc-rtc/mc-mujoco.nix {};
 
   jvrc1-mj-description = callWithLocal ./pkgs/mc-rtc/mc-mujoco/robots/jvrc1-mj-description.nix {};
   rhps1-mj-description = callWithLocal ./pkgs/mc-rtc/mc-mujoco/robots/rhps1-mj-description.nix {};
@@ -199,20 +198,27 @@ in rec
 
   # symlinkJoin all robots
   # FIXME: this triggers a full rebuild of mc-mujoco
-  mc-mujoco-robots = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/default.nix {
+  mc-mujoco = callWithLocal ./pkgs/mc-rtc/mc-mujoco {
+    jrl-cmakemodules = final.jrl-cmakemodulesv2;
+  };
+
+  # mc-mujoco with private robots
+  mc-mujoco-robots-full = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/default.nix {
     robots = [
       rhps1-mj-description
       g1-mj-description
       h1-mj-description
       hrp4-mj-description
-      # hrp2-mj-description does not exist
       hrp5p-mj-description
       rhps1-mj-description
       ur5e-mj-description
+      # NOTE: hrp2-mj-description does not exist
       ];
   };
-  mc-mujoco = callWithLocal ./pkgs/mc-rtc/mc-mujoco {
+  mc-mujoco-robots = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/default.nix {};
+  mc-mujoco-full = callWithLocal ./pkgs/mc-rtc/mc-mujoco {
     jrl-cmakemodules = final.jrl-cmakemodulesv2;
+    mc-mujoco-robots = mc-mujoco-robots-full;
   };
 
   ###############
@@ -255,12 +261,7 @@ in rec
   };
   # standlone version of mc-rtc-magnum, with independent packaging for magnum and its plugins
   # and a standalone mc-rtc-imgui version
-  # This should ultimately replace mc-rtc-magnum when all issues have been resolved
-  mc-rtc-magnum-standalone = callWithLocal ./pkgs/mc-rtc-magnum/standalone.nix {};
-  mc-rtc-magnum = final.mc-rtc-magnum-standalone;
-  # for the non standalone version of mc_rtc-magnum to be removed after further testing
-  # mc-rtc-magnum = callWithLocal ./pkgs/mc-rtc-magnum {};
-  # mc-rtc-magnum = prev.callPackage ./pkgs/mc-rtc-magnum {};
+  mc-rtc-magnum = prev.callPackage ./pkgs/mc-rtc-magnum/standalone.nix {};
 
   #####################
   # mc-rtc-superbuild #
@@ -285,7 +286,7 @@ in rec
   # mc-rtc-superbuild = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-symlinkjoin.nix.nix { 
 
   # default superbuild environment
-  mc-rtc-superbuild-base = final.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix { 
+  mc-rtc-superbuild = final.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix { 
     apps = [ mc-rtc-magnum mc-mujoco mc-rtc-ticker ];
   };
 
@@ -303,12 +304,7 @@ in rec
     apps = [ mc-rtc-magnum mc-mujoco ];
   };
 
-  mc-rtc-superbuild = final.mc-rtc-superbuild-base;
-
-  mc-rtc-superbuild-standalone-magnum = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix { 
-    apps = [ mc-rtc-magnum-standalone ];
-  };
-
+  # TODO: move to rolkneematic's panda_prosthesis repository
   mc-rtc-superbuild-rolkneematics = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix { 
     robots = [
       # note that panda-prosthesis is not strictly-speaking a robot, but it builds a robot module so we need it here as well to populate the robots runtime paths
@@ -324,6 +320,7 @@ in rec
     apps = [ mc-rtc-magnum mc-franka mc-rtc-ticker ];
   };
 
+  # TODO move to Hugo's
   mc-rtc-superbuild-hugo = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix { 
     robots = [ mc-rhps1 ];
     # observers = [mc-state-observation]; # FIXME missing Attitude observer from mc_state_observation
@@ -332,5 +329,4 @@ in rec
     plugins = [ mc-force-shoe-plugin-hugo ];
     apps = [ mc-rtc-magnum-hugo mc-mujoco-hugo ];
   };
-
 })
