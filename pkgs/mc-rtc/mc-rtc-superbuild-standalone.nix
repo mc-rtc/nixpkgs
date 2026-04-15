@@ -10,27 +10,31 @@
   lib,
   writeTextFile,
   mc-rtc,
-  MainRobot ? null, # default robot module name
-  Enabled ? null, # default controller
-  Timestep ? null, # default timestep
-  configs ? [ ], # extra paths to mc_rtc.yaml
-  robots ? [ ],
-  controllers ? [ ],
-  observers ? [ ],
-  plugins ? [ ],
-  apps ? [ ],
-  pname ? "mc-rtc-superbuild-standalone",
-  traceRuntimeDependencies ? false,
+  superbuildArgs ? { },
+  ...
 }:
 
 let
+  cfg = superbuildArgs // {
+    pname = superbuildArgs.pname or "mc-rtc-superbuild";
+    MainRobot = superbuildArgs.MainRobot or "JVRC1";
+    Enabled = superbuildArgs.Enabled or "CoM";
+    Timestep = superbuildArgs.Timestep or 0.005;
+    configs = superbuildArgs.configs or [ ];
+    robots = superbuildArgs.robots or [ ];
+    controllers = superbuildArgs.controllers or [ ];
+    observers = superbuildArgs.observers or [ ];
+    plugins = superbuildArgs.plugins or [ ];
+    apps = superbuildArgs.apps or [ ];
+  };
+
   # Helper to build YAML lists
   toYamlList = paths: lib.concatMapStringsSep ", " (p: "\"${p}\"") paths;
 
   traceGroup =
     name: pkgs:
-    if traceRuntimeDependencies then
-      map (p: builtins.trace "${pname} ${name}: ${toString p}" p) pkgs
+    if cfg.traceRuntimeDependencies or false then
+      map (p: builtins.trace "${cfg.pname} ${name}: ${toString p}" p) pkgs
     else
       pkgs;
 
@@ -39,17 +43,17 @@ let
     destination = "/etc/mc_rtc.yaml";
     text = ''
       ---
-      # This mc_rtc.yaml file was generated from the mc-rtc-superbuild-standalone nix derivation (pname: ${pname})
+      # This mc_rtc.yaml file was generated from the mc-rtc-superbuild-standalone nix derivation (pname: ${cfg.pname})
 
-      ${lib.optionalString (MainRobot != null) "MainRobot: ${MainRobot}\n"}
-      ${lib.optionalString (Enabled != null) "Enabled: [${Enabled}]\n"}
-      ${lib.optionalString (Timestep != null) "Timestep: ${toString Timestep}\n"}
+      ${lib.optionalString (cfg.MainRobot or null != null) "MainRobot: ${cfg.MainRobot}\n"}
+      ${lib.optionalString (cfg.Enabled or null != null) "Enabled: [${cfg.Enabled}]\n"}
+      ${lib.optionalString (cfg.Timestep or null != null) "Timestep: ${toString (cfg.Timestep or "")}\n"}
 
       # Dynamically generated module paths
-      ControllerModulePaths: [${toYamlList (map (p: "${p}/lib/mc_controller") (controllers))}]
-      RobotModulePaths: [${toYamlList (map (p: "${p}/lib/mc_robots") (robots))}]
-      ObserverModulePaths: [${toYamlList (map (p: "${p}/lib/mc_observers") (observers))}]
-      GlobalPluginPaths: [${toYamlList (map (p: "${p}/lib/mc_plugins") (plugins))}]
+      ControllerModulePaths: [${toYamlList (map (p: "${p}/lib/mc_controller") (cfg.controllers or [ ]))}]
+      RobotModulePaths: [${toYamlList (map (p: "${p}/lib/mc_robots") (cfg.robots or [ ]))}]
+      ObserverModulePaths: [${toYamlList (map (p: "${p}/lib/mc_observers") (cfg.observers or [ ]))}]
+      GlobalPluginPaths: [${toYamlList (map (p: "${p}/lib/mc_plugins") (cfg.plugins or [ ]))}]
 
       # Ignore ~/.config/mc_rtc/mc_rtc.yaml so that even in impure mode it does not interfere
       LoadUserConfiguration: false
@@ -57,8 +61,8 @@ let
   };
 in
 
-stdenv.mkDerivation (_finalAttrs: {
-  pname = builtins.trace "pname: ${pname}" "${pname}";
+stdenv.mkDerivation {
+  pname = builtins.trace "pname: ${cfg.pname}" cfg.pname;
   version = mc-rtc.version;
   src = null;
   dontUnpack = true;
@@ -69,11 +73,11 @@ stdenv.mkDerivation (_finalAttrs: {
   propagatedBuildInputs = [
     mc-rtc
   ]
-  ++ traceGroup "apps" apps
-  ++ traceGroup "robots" robots
-  ++ traceGroup "plugins" plugins
-  ++ traceGroup "controllers" controllers
-  ++ traceGroup "observers" observers;
+  ++ traceGroup "apps" (cfg.apps or [ ])
+  ++ traceGroup "robots" (cfg.robots or [ ])
+  ++ traceGroup "plugins" (cfg.plugins or [ ])
+  ++ traceGroup "controllers" (cfg.controllers or [ ])
+  ++ traceGroup "observers" (cfg.observers or [ ]);
 
   installPhase = ''
     mkdir -p $out/etc
@@ -81,16 +85,8 @@ stdenv.mkDerivation (_finalAttrs: {
   '';
 
   passthru = {
-    inherit
-      mc-rtc
-      robots
-      controllers
-      observers
-      plugins
-      apps
-      configs
-      pname
-      ;
+    inherit mc-rtc;
+    superbuildArgs = cfg;
   };
 
   meta = mc-rtc.meta // {
@@ -103,4 +99,4 @@ stdenv.mkDerivation (_finalAttrs: {
   #   export MC_RTC_CONTROLLER_CONFIG="$out/etc/mc_rtc.yaml"
   #   echo "MC_RTC_CONTROLLER_CONFIG set to $MC_RTC_CONTROLLER_CONFIG"
   # '';
-})
+}
