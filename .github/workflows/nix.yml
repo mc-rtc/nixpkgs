@@ -97,7 +97,7 @@ jobs:
   #     - uses: cachix/cachix-action@v17
   #       with:
   #         name: mc-rtc-nix
-            extraPullNames: "ros,gepetto"
+  #         extraPullNames: "ros,gepetto"
   #     - run: nix build -L .#homeConfigurations.cpene.activationPackage
   check:
     if: always()
