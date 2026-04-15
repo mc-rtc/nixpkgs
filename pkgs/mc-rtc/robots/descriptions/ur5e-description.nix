@@ -1,7 +1,16 @@
-{ stdenv, lib, fetchFromGitHub, cmake, 
-with-ros ? true, ament-cmake, buildRosPackage, xacro,
-ur-description,
-useLocal ? false, localWorkspace ? null, }:
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  cmake,
+  with-ros ? true,
+  ament-cmake,
+  buildRosPackage,
+  xacro,
+  ur-description,
+  useLocal ? false,
+  localWorkspace ? null,
+}:
 
 (if with-ros then buildRosPackage else stdenv.mkDerivation) {
   pname = "ur5e-description";
@@ -10,11 +19,12 @@ useLocal ? false, localWorkspace ? null, }:
 
   src =
     if useLocal then
-      builtins.trace "Using local workspace for ur5e-description: ${localWorkspace}/mc_ur5e_description"
-      (builtins.path {
-        path = "${localWorkspace}/mc_ur5e_description";
-        name = "ur5e-description-src";
-      })
+      builtins.trace "Using local workspace for ur5e-description: ${localWorkspace}/mc_ur5e_description" (
+        builtins.path {
+          path = "${localWorkspace}/mc_ur5e_description";
+          name = "ur5e-description-src";
+        }
+      )
     else
       fetchFromGitHub {
         owner = "isri-aist";
@@ -25,17 +35,13 @@ useLocal ? false, localWorkspace ? null, }:
 
   buildType = "ament_cmake";
   nativeBuildInputs = if with-ros then [ ament-cmake ] else [ cmake ];
-  propagatedBuildInputs = [ ur-description ]
-   ++ lib.optionals with-ros [ xacro ];
+  propagatedBuildInputs = [ ur-description ] ++ lib.optionals with-ros [ xacro ];
 
   preConfigure = ''
     export ROS_VERSION=2
   '';
 
-  cmakeFlags = 
-  lib.optional (!with-ros) "-DDISABLE_ROS=ON"
-  ++
-  [
+  cmakeFlags = lib.optional (!with-ros) "-DDISABLE_ROS=ON" ++ [
     "-DBUILD_TESTING=OFF"
   ];
 
@@ -43,9 +49,8 @@ useLocal ? false, localWorkspace ? null, }:
 
   meta = with lib; {
     description = "UR5e robot urdf and data";
-    homepage    = "https://github.com/isri-aist/mc_ur5e_description";
-    license     = licenses.bsd2;
-    platforms   = platforms.all;
+    homepage = "https://github.com/isri-aist/mc_ur5e_description";
+    license = licenses.bsd2;
+    platforms = platforms.all;
   };
 }
-

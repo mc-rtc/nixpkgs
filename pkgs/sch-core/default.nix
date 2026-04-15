@@ -5,7 +5,7 @@
   eigen,
   doxygen,
   boost,
-  fetchurl
+  fetchurl,
 }:
 
 stdenv.mkDerivation rec {
@@ -17,8 +17,14 @@ stdenv.mkDerivation rec {
     sha256 = "aa10a427bafc3fbe4fc687d1785b079539a438597b7b6ba20ae230d5286074dd";
   };
 
-  nativeBuildInputs = [ cmake doxygen ];
-  propagatedBuildInputs = [ eigen boost ];
+  nativeBuildInputs = [
+    cmake
+    doxygen
+  ];
+  propagatedBuildInputs = [
+    eigen
+    boost
+  ];
 
   cmakeFlags = [
     "-DBUILD_TESTING=OFF"
@@ -30,8 +36,8 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     description = "sch-core: Effective proximity queries";
-    homepage    = "https://github.com/jrl-umi3218/sch-core";
-    license     = licenses.bsd2;
-    platforms   = platforms.all;
+    homepage = "https://github.com/jrl-umi3218/sch-core";
+    license = licenses.bsd2;
+    platforms = platforms.all;
   };
 }

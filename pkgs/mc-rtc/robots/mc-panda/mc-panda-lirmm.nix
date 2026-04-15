@@ -1,7 +1,11 @@
-{ stdenv, lib, fetchgit, 
-mc-panda,
-cmake,
-useLocal ? false, localWorkspace ? null
+{
+  stdenv,
+  lib,
+  fetchgit,
+  mc-panda,
+  cmake,
+  useLocal ? false,
+  localWorkspace ? null,
 }:
 
 let
@@ -12,12 +16,14 @@ stdenv.mkDerivation {
   pname = "mc-panda-lirmm";
   version = "${version}";
 
-  src = if useLocal then
-      builtins.trace "Using local workspace for mc-panda: ${localWorkspace}/${localFolder}"
-      (builtins.path {
-        path = "${localWorkspace}/${localFolder}";
-        name = "mc-panda-lirmm-src";
-      })
+  src =
+    if useLocal then
+      builtins.trace "Using local workspace for mc-panda: ${localWorkspace}/${localFolder}" (
+        builtins.path {
+          path = "${localWorkspace}/${localFolder}";
+          name = "mc-panda-lirmm-src";
+        }
+      )
     else
       # TODO: release mc-panda-lirmm
       fetchgit {
@@ -41,8 +47,8 @@ stdenv.mkDerivation {
 
   meta = with lib; {
     description = "Panda RobotModule specialization for LIRMM robots for mc-rtc";
-    homepage    = "https://github.com/jrl-umi3218/mc_panda_lirmm";
-    license     = licenses.bsd2;
-    platforms   = platforms.all;
+    homepage = "https://github.com/jrl-umi3218/mc_panda_lirmm";
+    license = licenses.bsd2;
+    platforms = platforms.all;
   };
 }

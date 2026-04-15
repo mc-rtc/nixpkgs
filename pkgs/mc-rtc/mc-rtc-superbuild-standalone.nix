@@ -1,32 +1,38 @@
 # The main purpose of this derivation is to provide an mc_rtc environment
 # with runtime dependencies available, e.g robot modules, controllers, observers and plugins
-# 
+#
 # This is achieved by:
 # - declaring the runtime dependencies in either robots, controllers, observers and plugins list
 # - this derivation generates and mc_rtc.yaml configuration with runtime path to these dependencies
 #   e.g in ControllerModulePaths, ObserverModulePaths, etc
-{ stdenv, lib, writeTextFile
-, mc-rtc
-, MainRobot ? null # default robot module name
-, Enabled ? null # default controller
-, Timestep ? null # default timestep
-, configs ? [] # extra paths to mc_rtc.yaml
-, robots ? []
-, controllers ? []
-, observers ? []
-, plugins ? []
-, apps ? []
-, pname ? "mc-rtc-superbuild-standalone"
-, traceRuntimeDependencies ? false
+{
+  stdenv,
+  lib,
+  writeTextFile,
+  mc-rtc,
+  MainRobot ? null, # default robot module name
+  Enabled ? null, # default controller
+  Timestep ? null, # default timestep
+  configs ? [ ], # extra paths to mc_rtc.yaml
+  robots ? [ ],
+  controllers ? [ ],
+  observers ? [ ],
+  plugins ? [ ],
+  apps ? [ ],
+  pname ? "mc-rtc-superbuild-standalone",
+  traceRuntimeDependencies ? false,
 }:
 
 let
   # Helper to build YAML lists
   toYamlList = paths: lib.concatMapStringsSep ", " (p: "\"${p}\"") paths;
 
-  traceGroup = name: pkgs: if traceRuntimeDependencies then
-    map (p: builtins.trace "${pname} ${name}: ${toString p}" p) pkgs
-  else pkgs;
+  traceGroup =
+    name: pkgs:
+    if traceRuntimeDependencies then
+      map (p: builtins.trace "${pname} ${name}: ${toString p}" p) pkgs
+    else
+      pkgs;
 
   default_mc_rtc_yaml = writeTextFile {
     name = "mc_rtc.yaml";
@@ -51,7 +57,7 @@ let
   };
 in
 
-stdenv.mkDerivation (finalAttrs: {
+stdenv.mkDerivation (_finalAttrs: {
   pname = builtins.trace "pname: ${pname}" "${pname}";
   version = mc-rtc.version;
   src = null;
@@ -60,12 +66,14 @@ stdenv.mkDerivation (finalAttrs: {
   dontBuild = true;
   dontWrapQtApps = true;
 
-  propagatedBuildInputs = [ mc-rtc ]
-    ++ traceGroup "apps" apps
-    ++ traceGroup "robots" robots
-    ++ traceGroup "plugins" plugins
-    ++ traceGroup "controllers" controllers
-    ++ traceGroup "observers" observers;
+  propagatedBuildInputs = [
+    mc-rtc
+  ]
+  ++ traceGroup "apps" apps
+  ++ traceGroup "robots" robots
+  ++ traceGroup "plugins" plugins
+  ++ traceGroup "controllers" controllers
+  ++ traceGroup "observers" observers;
 
   installPhase = ''
     mkdir -p $out/etc
@@ -73,11 +81,21 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   passthru = {
-    inherit mc-rtc robots controllers observers plugins apps configs pname;
+    inherit
+      mc-rtc
+      robots
+      controllers
+      observers
+      plugins
+      apps
+      configs
+      pname
+      ;
   };
 
   meta = mc-rtc.meta // {
-    description = mc-rtc.meta.description + " (meta-package with robots, controllers, observers, plugins)";
+    description =
+      mc-rtc.meta.description + " (meta-package with robots, controllers, observers, plugins)";
   };
 
   # Set MC_RTC_CONTROLLER_CONFIG to point to the generated YAML

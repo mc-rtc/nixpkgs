@@ -1,5 +1,8 @@
 # filepath: pkgs/3rd-party/magnum/magnum.nix
-{ stdenv, lib, fetchFromGitHub,
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
   cmake,
   corrade,
   libGL,
@@ -15,21 +18,23 @@
   magnumWithAnySceneImporter ? true,
   magnumWithObjImporter ? true,
   magnumWithAssimpImporter ? true,
-  magnumWithStbImageImporter ? false
+  magnumWithStbImageImporter ? false,
 }:
 
-stdenv.mkDerivation (finalAttrs: {
+stdenv.mkDerivation (_finalAttrs: {
   pname = "magnum";
   version = "0.0.0";
 
   dontBuild = true;
 
-  src = if useLocal then
-    builtins.trace "Using local workspace for magnum: ${localWorkspace}/magnum"
-      (builtins.path {
-        path = "${localWorkspace}/magnum-standalone";
-        name = "magnum-src";
-      })
+  src =
+    if useLocal then
+      builtins.trace "Using local workspace for magnum: ${localWorkspace}/magnum" (
+        builtins.path {
+          path = "${localWorkspace}/magnum-standalone";
+          name = "magnum-src";
+        }
+      )
     else
       fetchFromGitHub {
         owner = "mosra";
@@ -67,8 +72,8 @@ stdenv.mkDerivation (finalAttrs: {
 
   meta = with lib; {
     description = "Lightweight and modular C++11 graphics middleware for games and data visualization ";
-    homepage    = "https://github.com/msora/magnum";
-    license     = licenses.bsd2; # FIXME
-    platforms   = platforms.all;
+    homepage = "https://github.com/msora/magnum";
+    license = licenses.bsd2; # FIXME
+    platforms = platforms.all;
   };
 })

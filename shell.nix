@@ -1,31 +1,40 @@
-{ pkgs, mc-rtc-superbuild, extraBuildInputs ? [], with-ros ? false }:
+{
+  pkgs,
+  mc-rtc-superbuild,
+  extraBuildInputs ? [ ],
+  with-ros ? false,
+}:
 
-let 
-  mcRtcConfigs =
-  mc-rtc-superbuild.configs
-  ++ [ "${mc-rtc-superbuild}/etc/mc_rtc.yaml" ];
+let
+  mcRtcConfigs = mc-rtc-superbuild.configs ++ [ "${mc-rtc-superbuild}/etc/mc_rtc.yaml" ];
 
   title = "  ${mc-rtc-superbuild.pname} interactive shell  ";
   line = builtins.concatStringsSep "" (builtins.genList (_: "=") (builtins.stringLength title));
 in
 pkgs.mkShell {
   buildInputs =
-    with pkgs; [
+    with pkgs;
+    [
       mc-rtc-superbuild
       cmake
       ninja
       gdb
     ]
     ++ extraBuildInputs
-    ++ (if with-ros then [
-      colcon
-      rosPackages.jazzy.rclcpp
-      rosPackages.jazzy.geometry-msgs
-      rosPackages.jazzy.sensor-msgs
-      rosPackages.jazzy.tf2-ros
-      rosPackages.jazzy.xacro
-      # Add more ROS packages as needed
-    ] else []);
+    ++ (
+      if with-ros then
+        [
+          colcon
+          rosPackages.jazzy.rclcpp
+          rosPackages.jazzy.geometry-msgs
+          rosPackages.jazzy.sensor-msgs
+          rosPackages.jazzy.tf2-ros
+          rosPackages.jazzy.xacro
+          # Add more ROS packages as needed
+        ]
+      else
+        [ ]
+    );
 
   shellHook = ''
     export MC_RTC_PATH=${pkgs.mc-rtc}
@@ -79,7 +88,9 @@ pkgs.mkShell {
       echo "  $observer"
     done
     echo "Controllers:"
-    for controller in ${pkgs.lib.concatStringsSep " " (map (r: "${r}") mc-rtc-superbuild.controllers)}; do
+    for controller in ${
+      pkgs.lib.concatStringsSep " " (map (r: "${r}") mc-rtc-superbuild.controllers)
+    }; do
       echo "  $controller"
     done
     echo "Apps:"

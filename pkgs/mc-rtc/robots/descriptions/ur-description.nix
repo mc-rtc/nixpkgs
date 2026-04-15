@@ -1,4 +1,12 @@
-{ stdenv, lib, fetchFromGitHub, cmake, with-ros ? false, ament-cmake, buildRosPackage, useLocal ? false, localWorkspace ? null, xacro }:
+{
+  lib,
+  fetchFromGitHub,
+  ament-cmake,
+  buildRosPackage,
+  useLocal ? false,
+  localWorkspace ? null,
+  xacro,
+}:
 
 buildRosPackage {
   pname = "ur-description";
@@ -7,11 +15,12 @@ buildRosPackage {
 
   src =
     if useLocal then
-      builtins.trace "Using local workspace for ur-description: ${localWorkspace}/ur_description"
-      (builtins.path {
-        path = "${localWorkspace}/ur_description";
-        name = "ur-description-src";
-      })
+      builtins.trace "Using local workspace for ur-description: ${localWorkspace}/ur_description" (
+        builtins.path {
+          path = "${localWorkspace}/ur_description";
+          name = "ur-description-src";
+        }
+      )
     else
       fetchFromGitHub {
         owner = "UniversalRobots";
@@ -23,7 +32,7 @@ buildRosPackage {
 
   buildType = "ament_cmake";
   nativeBuildInputs = [ ament-cmake ];
-  propagatedBuildInputs = [xacro];
+  propagatedBuildInputs = [ xacro ];
 
   preConfigure = ''
     export ROS_VERSION=2
@@ -33,9 +42,8 @@ buildRosPackage {
 
   meta = with lib; {
     description = "ur robot urdf and data";
-    homepage    = "https://github.com/isri-aist/mc_ur_description";
-    license     = licenses.bsd2;
-    platforms   = platforms.all;
+    homepage = "https://github.com/isri-aist/mc_ur_description";
+    license = licenses.bsd2;
+    platforms = platforms.all;
   };
 }
-

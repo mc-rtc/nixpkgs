@@ -1,4 +1,14 @@
-{ stdenv, lib, fetchFromGitHub, cmake, with-ros ? false, ament-cmake, buildRosPackage, useLocal ? false, localWorkspace ? null }:
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  cmake,
+  with-ros ? false,
+  ament-cmake,
+  buildRosPackage,
+  useLocal ? false,
+  localWorkspace ? null,
+}:
 
 (if with-ros then buildRosPackage else stdenv.mkDerivation) {
   pname = "g1-description";
@@ -7,11 +17,12 @@
 
   src =
     if useLocal then
-      builtins.trace "Using local workspace for g1-description: ${localWorkspace}/g1_description"
-      (builtins.path {
-        path = "${localWorkspace}/g1_description";
-        name = "g1-description-src";
-      })
+      builtins.trace "Using local workspace for g1-description: ${localWorkspace}/g1_description" (
+        builtins.path {
+          path = "${localWorkspace}/g1_description";
+          name = "g1-description-src";
+        }
+      )
     else
       fetchFromGitHub {
         owner = "isri-aist";
@@ -22,16 +33,13 @@
 
   buildType = "ament_cmake";
   nativeBuildInputs = if with-ros then [ ament-cmake ] else [ cmake ];
-  propagatedBuildInputs = [];
+  propagatedBuildInputs = [ ];
 
   preConfigure = ''
     export ROS_VERSION=2
   '';
 
-  cmakeFlags = 
-  lib.optional (!with-ros) "-DDISABLE_ROS=ON"
-  ++
-  [
+  cmakeFlags = lib.optional (!with-ros) "-DDISABLE_ROS=ON" ++ [
     "-DBUILD_TESTING=OFF"
   ];
 
@@ -39,9 +47,8 @@
 
   meta = with lib; {
     description = "g1 urdf and data";
-    homepage    = "https://github.com/isri-aist/g1_description";
-    license     = licenses.bsd2;
-    platforms   = platforms.all;
+    homepage = "https://github.com/isri-aist/g1_description";
+    license = licenses.bsd2;
+    platforms = platforms.all;
   };
 }
-

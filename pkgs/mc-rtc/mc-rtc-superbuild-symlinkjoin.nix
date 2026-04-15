@@ -1,18 +1,19 @@
 # The main purpose of this derivation is to provide an mc_rtc environment
 # with runtime dependencies available, e.g robot modules, controllers, observers and plugins
-{ stdenv, lib, writeTextFile
-, symlinkJoin
-, rsync
-, mc-rtc
-, MainRobot ? "JVRC1"
-, Enabled ? "CoM"
-, Timestep ? 0.005
-, configs ? []
-, robots ? []
-, controllers ? []
-, observers ? []
-, plugins ? []
-, apps ? []
+{
+  stdenv,
+  symlinkJoin,
+  rsync,
+  mc-rtc,
+  MainRobot ? "JVRC1",
+  Enabled ? "CoM",
+  Timestep ? 0.005,
+  configs ? [ ],
+  robots ? [ ],
+  controllers ? [ ],
+  observers ? [ ],
+  plugins ? [ ],
+  apps ? [ ],
 }:
 
 let
@@ -29,7 +30,10 @@ stdenv.mkDerivation {
   dontConfigure = true;
   dontBuild = true;
 
-  buildInputs = [ rsync merged ];
+  buildInputs = [
+    rsync
+    merged
+  ];
 
   installPhase = ''
     mkdir $out
@@ -66,10 +70,19 @@ stdenv.mkDerivation {
   '';
 
   passthru = {
-    inherit mc-rtc robots controllers observers plugins apps configs;
+    inherit
+      mc-rtc
+      robots
+      controllers
+      observers
+      plugins
+      apps
+      configs
+      ;
   };
 
   meta = mc-rtc.meta // {
-    description = mc-rtc.meta.description + " (meta-package with robots, controllers, observers, plugins)";
+    description =
+      mc-rtc.meta.description + " (meta-package with robots, controllers, observers, plugins)";
   };
 }

@@ -1,4 +1,13 @@
-{ stdenv, lib, fetchgit, cmake, with-ros ? false, ament-cmake, buildRosPackage, useLocal ? false, localWorkspace ? null }:
+{
+  stdenv,
+  lib,
+  cmake,
+  with-ros ? false,
+  ament-cmake,
+  buildRosPackage,
+  useLocal ? false,
+  localWorkspace ? null,
+}:
 
 (if with-ros then buildRosPackage else stdenv.mkDerivation) {
   pname = "rhps1-description";
@@ -7,11 +16,12 @@
 
   src =
     if useLocal then
-      builtins.trace "Using local workspace for rhps1-description: ${localWorkspace}/rhps1_description"
-      (builtins.path {
-        path = "${localWorkspace}/rhps1_description";
-        name = "rhps1-description-src";
-      })
+      builtins.trace "Using local workspace for rhps1-description: ${localWorkspace}/rhps1_description" (
+        builtins.path {
+          path = "${localWorkspace}/rhps1_description";
+          name = "rhps1-description-src";
+        }
+      )
     else
       builtins.fetchGit {
         url = "git@github.com:isri-aist/rhps1_description";
@@ -26,10 +36,7 @@
     export ROS_VERSION=2
   '';
 
-  cmakeFlags = 
-  lib.optional (!with-ros) "-DDISABLE_ROS=ON"
-  ++
-  [
+  cmakeFlags = lib.optional (!with-ros) "-DDISABLE_ROS=ON" ++ [
     "-DBUILD_TESTING=OFF"
     "-DPYTHON_BINDING=OFF"
     "-DINSTALL_DOCUMENTATION=OFF"
@@ -39,9 +46,8 @@
 
   meta = with lib; {
     description = "rhps1 urdf and data";
-    homepage    = "https://github.com/isri-aist/mc_rhps1";
-    license     = licenses.bsd2;
-    platforms   = platforms.all;
+    homepage = "https://github.com/isri-aist/mc_rhps1";
+    license = licenses.bsd2;
+    platforms = platforms.all;
   };
 }
-

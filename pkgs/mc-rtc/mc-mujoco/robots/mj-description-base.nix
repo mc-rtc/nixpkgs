@@ -1,6 +1,16 @@
-{ stdenv, lib, fetchFromGitHub, cmake
-, useLocal ? false, localWorkspace ? null
-, pname, owner ? "isri-aist", repo, description ? null, version ? "1.0.0", hash ? null
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  cmake,
+  useLocal ? false,
+  localWorkspace ? null,
+  pname,
+  owner ? "isri-aist",
+  repo,
+  description ? null,
+  version ? "1.0.0",
+  hash ? null,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -8,12 +18,14 @@ stdenv.mkDerivation (finalAttrs: {
   pname = pname;
   srcPath = if localWorkspace != null then "${localWorkspace}/${repo}" else null;
 
-  src = if useLocal then
-    builtins.trace "Using local workspace for ${finalAttrs.pname}: ${finalAttrs.srcPath}"
-      (builtins.path {
-        path = "${finalAttrs.srcPath}";
-        name = "${finalAttrs.pname}-src";
-      })
+  src =
+    if useLocal then
+      builtins.trace "Using local workspace for ${finalAttrs.pname}: ${finalAttrs.srcPath}" (
+        builtins.path {
+          path = "${finalAttrs.srcPath}";
+          name = "${finalAttrs.pname}-src";
+        }
+      )
     else
       fetchFromGitHub {
         owner = owner;
@@ -35,9 +47,10 @@ stdenv.mkDerivation (finalAttrs: {
   doCheck = true;
 
   meta = with lib; {
-    description = if description != null then description else "${pname} simulation robot model for mc_mujoco";
-    homepage    = "https://github.com/${owner}/${repo}";
-    license     = licenses.bsd2;
-    platforms   = platforms.all;
+    description =
+      if description != null then description else "${pname} simulation robot model for mc_mujoco";
+    homepage = "https://github.com/${owner}/${repo}";
+    license = licenses.bsd2;
+    platforms = platforms.all;
   };
 })

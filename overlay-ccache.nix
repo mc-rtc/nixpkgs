@@ -1,12 +1,16 @@
-{}:
+{ }:
 
-final: prev:
+_final: prev:
 let
-  withCCache = packages: with builtins; listToAttrs (map
-    (name: {
-      inherit name; value = (getAttr name prev).override { stdenv = prev.ccacheStdenv; };
-    })
-    packages);
+  withCCache =
+    packages:
+    with builtins;
+    listToAttrs (
+      map (name: {
+        inherit name;
+        value = (getAttr name prev).override { stdenv = prev.ccacheStdenv; };
+      }) packages
+    );
 in
 {
   ccacheWrapper = prev.ccacheWrapper.override {
@@ -40,7 +44,8 @@ in
       fi
     '';
   };
-} // withCCache [
+}
+// withCCache [
   "spacevecalg"
   "rbdyn"
   "sch-core"

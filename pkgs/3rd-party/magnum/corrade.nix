@@ -1,20 +1,26 @@
-{ stdenv, lib, fetchFromGitHub,
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
   cmake,
-  useLocal ? false, localWorkspace ? null
+  useLocal ? false,
+  localWorkspace ? null,
 }:
 
-stdenv.mkDerivation (finalAttrs: {
+stdenv.mkDerivation (_finalAttrs: {
   pname = "corrade";
   version = "0.0.0";
 
   dontBuild = true;
 
-  src = if useLocal then
-      builtins.trace "Using local workspace for magnum: ${localWorkspace}/corrade"
-      (builtins.path {
-        path = "${localWorkspace}/corrade";
-        name = "magnum-src";
-      })
+  src =
+    if useLocal then
+      builtins.trace "Using local workspace for magnum: ${localWorkspace}/corrade" (
+        builtins.path {
+          path = "${localWorkspace}/corrade";
+          name = "magnum-src";
+        }
+      )
     else
       fetchFromGitHub {
         owner = "mosra";
@@ -25,7 +31,7 @@ stdenv.mkDerivation (finalAttrs: {
       };
 
   nativeBuildInputs = [ cmake ];
-  propagatedBuildInputs = [];
+  propagatedBuildInputs = [ ];
 
   cmakeFlags = [
   ];
@@ -34,8 +40,8 @@ stdenv.mkDerivation (finalAttrs: {
 
   meta = with lib; {
     description = "C++11 multiplatform utility library ";
-    homepage    = "https://github.com/msora/corrade";
-    license     = licenses.bsd2; # FIXME
-    platforms   = platforms.all;
+    homepage = "https://github.com/msora/corrade";
+    license = licenses.bsd2; # FIXME
+    platforms = platforms.all;
   };
 })

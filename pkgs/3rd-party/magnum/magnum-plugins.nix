@@ -1,4 +1,7 @@
-{ stdenv, lib, fetchFromGitHub,
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
   cmake,
   magnum,
   useLocal ? false,
@@ -34,21 +37,23 @@
   magnumPluginsWithStbImageConverter ? false,
   magnumPluginsWithStbVorbisAudioImporter ? false,
   magnumPluginsWithTinyGltfImporter ? false,
-  magnumPluginsWithUvImageConverter ? false
+  magnumPluginsWithUvImageConverter ? false,
 }:
 
-stdenv.mkDerivation (finalAttrs: {
+stdenv.mkDerivation (_finalAttrs: {
   pname = "magnum-plugins";
   version = "0.0.0";
 
   dontBuild = true;
 
-  src = if useLocal then
-    builtins.trace "Using local workspace for magnum-plugins: ${localWorkspace}/magnum-plugins"
-      (builtins.path {
-        path = "${localWorkspace}/magnum-plugins";
-        name = "magnum-plugins-src";
-      })
+  src =
+    if useLocal then
+      builtins.trace "Using local workspace for magnum-plugins: ${localWorkspace}/magnum-plugins" (
+        builtins.path {
+          path = "${localWorkspace}/magnum-plugins";
+          name = "magnum-plugins-src";
+        }
+      )
     else
       fetchFromGitHub {
         owner = "mosra";
@@ -61,8 +66,10 @@ stdenv.mkDerivation (finalAttrs: {
   propagatedBuildInputs = [
     magnum
   ]
-  ++ lib.optionals magnumPluginsWithAssimpImporter [ assimp libz ]
-  ;
+  ++ lib.optionals magnumPluginsWithAssimpImporter [
+    assimp
+    libz
+  ];
 
   cmakeFlags = [
     "-DMAGNUM_WITH_ASSIMPIMPORTER=${if magnumPluginsWithAssimpImporter then "ON" else "OFF"}"
@@ -81,7 +88,9 @@ stdenv.mkDerivation (finalAttrs: {
     "-DMAGNUM_WITH_KTXIMAGECONVERTER=${if magnumPluginsWithKtxImageConverter then "ON" else "OFF"}"
     "-DMAGNUM_WITH_KTXIMPORTER=${if magnumPluginsWithKtxImporter then "ON" else "OFF"}"
     "-DMAGNUM_WITH_MESHOPTIMIZER=${if magnumPluginsWithMeshOptimizer then "ON" else "OFF"}"
-    "-DMAGNUM_WITH_MINIEXRIMAGECONVERTER=${if magnumPluginsWithMiniExrImageConverter then "ON" else "OFF"}"
+    "-DMAGNUM_WITH_MINIEXRIMAGECONVERTER=${
+      if magnumPluginsWithMiniExrImageConverter then "ON" else "OFF"
+    }"
     "-DMAGNUM_WITH_OPENDDL=${if magnumPluginsWithOpenDdl then "ON" else "OFF"}"
     "-DMAGNUM_WITH_OPENGEXIMPORTER=${if magnumPluginsWithOpenGexImporter then "ON" else "OFF"}"
     "-DMAGNUM_WITH_PNGIMAGECONVERTER=${if magnumPluginsWithPngImageConverter then "ON" else "OFF"}"
@@ -90,7 +99,9 @@ stdenv.mkDerivation (finalAttrs: {
     "-DMAGNUM_WITH_STANFORDIMPORTER=${if magnumPluginsWithStanfordImporter then "ON" else "OFF"}"
     "-DMAGNUM_WITH_STBIMAGECONVERTER=${if magnumPluginsWithStbImageConverter then "ON" else "OFF"}"
     "-DMAGNUM_WITH_STBIMAGEIMPORTER=${if magnumPluginsWithStbImageImporter then "ON" else "OFF"}"
-    "-DMAGNUM_WITH_STBVORBISAUDIOIMPORTER=${if magnumPluginsWithStbVorbisAudioImporter then "ON" else "OFF"}"
+    "-DMAGNUM_WITH_STBVORBISAUDIOIMPORTER=${
+      if magnumPluginsWithStbVorbisAudioImporter then "ON" else "OFF"
+    }"
     "-DMAGNUM_WITH_TINYGLTFIMPORTER=${if magnumPluginsWithTinyGltfImporter then "ON" else "OFF"}"
     "-DMAGNUM_WITH_UVIMAGECONVERTER=${if magnumPluginsWithUvImageConverter then "ON" else "OFF"}"
   ];
@@ -99,8 +110,8 @@ stdenv.mkDerivation (finalAttrs: {
 
   meta = with lib; {
     description = "Plugins for the Magnum C++11 graphics engine";
-    homepage    = "https://github.com/msora/magnum-plugins";
-    license     = licenses.bsd2; # FIXME
-    platforms   = platforms.all;
+    homepage = "https://github.com/msora/magnum-plugins";
+    license = licenses.bsd2; # FIXME
+    platforms = platforms.all;
   };
 })

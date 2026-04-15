@@ -1,4 +1,12 @@
-{ stdenv, lib, cmake, jrl-cmakemodules, eigen, boost, fetchurl }:
+{
+  stdenv,
+  lib,
+  cmake,
+  jrl-cmakemodules,
+  eigen,
+  boost,
+  fetchurl,
+}:
 
 stdenv.mkDerivation rec {
   pname = "spacevecalg";
@@ -10,7 +18,11 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [ cmake ];
-  propagatedBuildInputs = [ eigen boost jrl-cmakemodules ];
+  propagatedBuildInputs = [
+    eigen
+    boost
+    jrl-cmakemodules
+  ];
 
   cmakeFlags = [
     "-DBUILD_TESTING=OFF"
@@ -22,8 +34,8 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     description = "Spatial Vector Algebra with the Eigen library";
-    homepage    = "https://github.com/jrl-umi3218/SpaceVecAlg";
-    license     = licenses.bsd2;
-    platforms   = platforms.all;
+    homepage = "https://github.com/jrl-umi3218/SpaceVecAlg";
+    license = licenses.bsd2;
+    platforms = platforms.all;
   };
 }

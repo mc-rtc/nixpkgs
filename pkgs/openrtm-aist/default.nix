@@ -1,4 +1,17 @@
-{ stdenv, lib, fetchFromGitHub, libuuid, omniorb, which, autoconf, automake, autogen, libtool, python, ccache }:
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  libuuid,
+  omniorb,
+  which,
+  autoconf,
+  automake,
+  autogen,
+  libtool,
+  python,
+  ccache,
+}:
 
 stdenv.mkDerivation {
   pname = "openrtm-aist";
@@ -11,8 +24,19 @@ stdenv.mkDerivation {
     sha256 = "14xdv5kqkwz9wi1bizzypcsgg2lc7h3n3ssjr9lj0dwxn6m0m6qz";
   };
 
-  nativeBuildInputs = [ autoconf autogen automake which python ccache ];
-  propagatedBuildInputs = [ libuuid omniorb libtool ];
+  nativeBuildInputs = [
+    autoconf
+    autogen
+    automake
+    which
+    python
+    ccache
+  ];
+  propagatedBuildInputs = [
+    libuuid
+    omniorb
+    libtool
+  ];
 
   doCheck = false;
 
@@ -39,8 +63,8 @@ stdenv.mkDerivation {
 
   meta = with lib; {
     description = "OpenRTM-aist is a software platform developed on the basis of the RT middleware standard.";
-    homepage    = "https://www.openrtm.org";
-    license     = licenses.lgpl3;
-    platforms   = platforms.all;
+    homepage = "https://www.openrtm.org";
+    license = licenses.lgpl3;
+    platforms = platforms.all;
   };
 }

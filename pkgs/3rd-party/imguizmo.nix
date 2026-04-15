@@ -1,5 +1,8 @@
 # filepath: pkgs/3rd-party/imguizmo/imguizmo.nix
-{ stdenv, lib, fetchgit,
+{
+  stdenv,
+  lib,
+  fetchgit,
   cmake,
   imgui,
   jrl-cmakemodules,
@@ -7,18 +10,20 @@
   localWorkspace ? null,
 }:
 
-stdenv.mkDerivation (finalAttrs: {
+stdenv.mkDerivation (_finalAttrs: {
   pname = "imguizmo";
   version = "0.0.0";
 
   dontBuild = true;
 
-  src = if useLocal then
-    builtins.trace "Using local workspace for imguizmo: ${localWorkspace}/ImGuizmo"
-      (builtins.path {
-        path = "${localWorkspace}/ImGuizmo";
-        name = "imguizmo-src";
-      })
+  src =
+    if useLocal then
+      builtins.trace "Using local workspace for imguizmo: ${localWorkspace}/ImGuizmo" (
+        builtins.path {
+          path = "${localWorkspace}/ImGuizmo";
+          name = "imguizmo-src";
+        }
+      )
     else
       # fetchFromGitHub {
       #   owner = "CedricGuillemet";
@@ -32,19 +37,22 @@ stdenv.mkDerivation (finalAttrs: {
         hash = "sha256-JLwciNGo90vR5tsFB4z5JPvhCz38FhN9Ja/5+Ct6YPo=";
       };
 
-  nativeBuildInputs = [ cmake jrl-cmakemodules ];
+  nativeBuildInputs = [
+    cmake
+    jrl-cmakemodules
+  ];
   propagatedBuildInputs = [
     imgui
   ];
 
-  cmakeFlags = [];
+  cmakeFlags = [ ];
 
   doCheck = false;
 
   meta = with lib; {
     description = "Immediate mode 3D gizmo for scene editing and other controls based on Dear Imgui ";
-    homepage    = "https://github.com/CedricGuillemet/imguizmo";
-    license     = licenses.mit;
-    platforms   = platforms.all;
+    homepage = "https://github.com/CedricGuillemet/imguizmo";
+    license = licenses.mit;
+    platforms = platforms.all;
   };
 })

@@ -44,7 +44,7 @@ let
   robot_module_paths = [ "${mc-rtc}/lib/mc_robots" ];
   controller_module_paths = [ "${mc-rtc}/lib/mc_controller" ];
   global_plugin_paths = [ "${mc-rtc}/lib/mc_plugins" ];
- 
+
   mc_rtc_yaml = pkgs.writeTextFile {
     name = "mc_rtc.yaml";
     text = ''
@@ -64,7 +64,9 @@ let
       RobotModulePaths: [${builtins.concatStringsSep "," (map (p: "\"${p}\"") robot_module_paths)}]
 
       ClearControllerModulePath: true
-      ControllerModulePaths: [${builtins.concatStringsSep "," (map (p: "\"${p}\"") controller_module_paths)}]
+      ControllerModulePaths: [${
+        builtins.concatStringsSep "," (map (p: "\"${p}\"") controller_module_paths)
+      }]
 
       ClearGlobalPluginPath: true
       GlobalPluginPaths: [${builtins.concatStringsSep "," (map (p: "\"${p}\"") global_plugin_paths)}]
@@ -73,7 +75,10 @@ let
 in
 
 pkgs.mkShell {
-  buildInputs = [ mc-rtc pkgs.clang-tools ];
+  buildInputs = [
+    mc-rtc
+    pkgs.clang-tools
+  ];
   shellHook = ''
     export TMP=/tmp
     export TMPDIR=/tmp
@@ -101,4 +106,3 @@ pkgs.mkShell {
     exit
   '';
 }
-

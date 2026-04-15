@@ -1,4 +1,13 @@
-{ stdenv, lib, cmake, spacevecalg, yaml-cpp, tinyxml-2, boost, fetchurl }:
+{
+  stdenv,
+  lib,
+  cmake,
+  spacevecalg,
+  yaml-cpp,
+  tinyxml-2,
+  boost,
+  fetchurl,
+}:
 
 stdenv.mkDerivation rec {
   pname = "rbyn";
@@ -10,7 +19,12 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [ cmake ];
-  propagatedBuildInputs = [ spacevecalg yaml-cpp tinyxml-2 boost ]; # Add other dependencies here
+  propagatedBuildInputs = [
+    spacevecalg
+    yaml-cpp
+    tinyxml-2
+    boost
+  ]; # Add other dependencies here
 
   postPatch = ''
     # Remove the include from the main CMakeLists.txt
@@ -24,8 +38,8 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     description = "Model the dynamics of rigid body systems";
-    homepage    = "https://github.com/jrl-umi3218/RBDyn";
-    license     = licenses.bsd2;
-    platforms   = platforms.all;
+    homepage = "https://github.com/jrl-umi3218/RBDyn";
+    license = licenses.bsd2;
+    platforms = platforms.all;
   };
 }

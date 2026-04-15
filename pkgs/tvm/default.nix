@@ -1,4 +1,12 @@
-{ stdenv, lib, cmake, eigen-qld, eigen-quadprog, boost, fetchurl, fetchgit }:
+{
+  stdenv,
+  lib,
+  cmake,
+  eigen-qld,
+  eigen-quadprog,
+  boost,
+  fetchgit,
+}:
 
 stdenv.mkDerivation {
   pname = "tvm";
@@ -15,10 +23,13 @@ stdenv.mkDerivation {
     rev = "67d09664e34db3dc8ce3d03ed77449eb552124ff";
     sha256 = "mZ40sjGG56PNgeXcXpHzyNJqmX7yProgFQ09WC1sUSs=";
   };
-  
 
   nativeBuildInputs = [ cmake ];
-  propagatedBuildInputs = [ eigen-qld eigen-quadprog boost ];
+  propagatedBuildInputs = [
+    eigen-qld
+    eigen-quadprog
+    boost
+  ];
 
   cmakeFlags = [
     "-DBUILD_TESTING=OFF"
@@ -33,8 +44,8 @@ stdenv.mkDerivation {
 
   meta = with lib; {
     description = "Tasks with Variable Management";
-    homepage    = "https://github.com/jrl-umi3218/tvm";
-    license     = licenses.bsd2;
-    platforms   = platforms.all;
+    homepage = "https://github.com/jrl-umi3218/tvm";
+    license = licenses.bsd2;
+    platforms = platforms.all;
   };
 }

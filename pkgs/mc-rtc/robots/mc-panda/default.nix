@@ -1,18 +1,29 @@
-{ stdenv, lib, fetchFromGitHub, fetchgit, 
-cmake, mc-rtc, libfranka, franka-description, xacro,
-useLocal ? false, localWorkspace ? null,
-with-ros ? false } :
+{
+  stdenv,
+  lib,
+  fetchgit,
+  cmake,
+  mc-rtc,
+  libfranka,
+  franka-description,
+  xacro,
+  useLocal ? false,
+  localWorkspace ? null,
+  with-ros ? false,
+}:
 
 stdenv.mkDerivation {
   pname = "mc-panda";
   version = "1.0.0";
 
-  src = if useLocal then
-      builtins.trace "Using local workspace for mc-panda: ${localWorkspace}/mc_panda"
-      (builtins.path {
-        path = "${localWorkspace}/mc_panda";
-        name = "mc-panda-src";
-      })
+  src =
+    if useLocal then
+      builtins.trace "Using local workspace for mc-panda: ${localWorkspace}/mc_panda" (
+        builtins.path {
+          path = "${localWorkspace}/mc_panda";
+          name = "mc-panda-src";
+        }
+      )
     else
       # TODO: release mc-panda
       fetchgit {
@@ -23,11 +34,16 @@ stdenv.mkDerivation {
       };
 
   nativeBuildInputs = [ cmake ];
-  propagatedBuildInputs =
-    builtins.trace "panda with-ros: ${toString with-ros}"
-    (
-    [ mc-rtc libfranka ]
-    ++ lib.optional (with-ros) [franka-description xacro]);
+  propagatedBuildInputs = builtins.trace "panda with-ros: ${toString with-ros}" (
+    [
+      mc-rtc
+      libfranka
+    ]
+    ++ lib.optional (with-ros) [
+      franka-description
+      xacro
+    ]
+  );
 
   cmakeFlags = [
     "-DBUILD_TESTING=OFF"
@@ -40,8 +56,8 @@ stdenv.mkDerivation {
 
   meta = with lib; {
     description = "Panda RobotModule for mc-rtc";
-    homepage    = "https://github.com/jrl-umi3218/mc_panda";
-    license     = licenses.bsd2;
-    platforms   = platforms.all;
+    homepage = "https://github.com/jrl-umi3218/mc_panda";
+    license = licenses.bsd2;
+    platforms = platforms.all;
   };
 }

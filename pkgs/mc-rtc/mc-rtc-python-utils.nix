@@ -1,10 +1,18 @@
-{ lib, buildRosPackage, fetchgit, cmake, python313Packages, mc-rtc, useLocal ? false, localWorkspace ? null,
-    rosidl-default-generators,
-    geometry-msgs,
-    rosidl-default-runtime,
-    rosidl-typesupport-c,
-    rosidl-typesupport-cpp,
-    pkg-config
+{
+  lib,
+  buildRosPackage,
+  fetchgit,
+  cmake,
+  python313Packages,
+  mc-rtc,
+  useLocal ? false,
+  localWorkspace ? null,
+  rosidl-default-generators,
+  geometry-msgs,
+  rosidl-default-runtime,
+  rosidl-typesupport-c,
+  rosidl-typesupport-cpp,
+  pkg-config,
 }:
 
 let
@@ -17,17 +25,21 @@ buildRosPackage {
   inherit (common) version src;
   format = "other"; # built by cmake
 
-  nativeBuildInputs = [ cmake pkg-config ];
-  propagatedBuildInputs = [ mc-rtc python313Packages.gitpython ]
-  ++
-  [
+  nativeBuildInputs = [
+    cmake
+    pkg-config
+  ];
+  propagatedBuildInputs = [
+    mc-rtc
+    python313Packages.gitpython
+  ]
+  ++ [
     rosidl-default-generators
     geometry-msgs
     rosidl-default-runtime
     rosidl-typesupport-c
     rosidl-typesupport-cpp
-   ];
-
+  ];
 
   cmakeFlags = [
     "-DPROJECT_USE_CMAKE_EXPORT=OFF"
@@ -51,13 +63,13 @@ buildRosPackage {
     echo "AMENT_PREFIX_PATH=$AMENT_PREFIX_PATH"
     echo "CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH"
   '';
- 
+
   doCheck = false;
 
   meta = with lib; {
     description = "Python utilities from mc-rtc";
-    homepage    = "https://github.com/jrl-umi3218/mc_rtc";
-    license     = licenses.bsd2;
-    platforms   = platforms.all;
+    homepage = "https://github.com/jrl-umi3218/mc_rtc";
+    license = licenses.bsd2;
+    platforms = platforms.all;
   };
 }

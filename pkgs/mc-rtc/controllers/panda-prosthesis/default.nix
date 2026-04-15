@@ -1,20 +1,32 @@
-{ stdenv, lib, fetchFromGitHub, fetchgit, 
-cmake, mc-rtc,
-socat, picocom, screen, minicom,
-mc-panda-lirmm,
-useLocal ? false, localWorkspace ? null
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  cmake,
+  mc-rtc,
+  socat,
+  picocom,
+  screen,
+  minicom,
+  mc-panda-lirmm,
+  useLocal ? false,
+  localWorkspace ? null,
 }:
 
 stdenv.mkDerivation {
   pname = "panda-prosthesis";
   version = "1.0.0";
 
-  src = if useLocal then
-      builtins.trace "Using local workspace for panda-prosthesis: ${localWorkspace}/panda_prosthesis_rolkneematics"
-      (builtins.path {
-        path = "${localWorkspace}/panda_prosthesis_rolkneematics";
-        name = "panda-prosthesis-src";
-      })
+  src =
+    if useLocal then
+      builtins.trace
+        "Using local workspace for panda-prosthesis: ${localWorkspace}/panda_prosthesis_rolkneematics"
+        (
+          builtins.path {
+            path = "${localWorkspace}/panda_prosthesis_rolkneematics";
+            name = "panda-prosthesis-src";
+          }
+        )
     else
       # TODO: release panda-prosthesis
       # fetchgit {
@@ -32,11 +44,14 @@ stdenv.mkDerivation {
       };
 
   nativeBuildInputs = [ cmake ];
-  propagatedBuildInputs =
-    [
-      mc-rtc mc-panda-lirmm
-      socat picocom screen minicom # make serial communication debugging tools available
-    ];
+  propagatedBuildInputs = [
+    mc-rtc
+    mc-panda-lirmm
+    socat
+    picocom
+    screen
+    minicom # make serial communication debugging tools available
+  ];
 
   cmakeFlags = [
     "-DBUILD_TESTING=OFF"
@@ -49,8 +64,8 @@ stdenv.mkDerivation {
 
   meta = with lib; {
     description = "Panda RobotModule for mc-rtc";
-    homepage    = "https://github.com/jrl-umi3218/mc_panda";
-    license     = licenses.bsd2;
-    platforms   = platforms.all;
+    homepage = "https://github.com/jrl-umi3218/mc_panda";
+    license = licenses.bsd2;
+    platforms = platforms.all;
   };
 }
