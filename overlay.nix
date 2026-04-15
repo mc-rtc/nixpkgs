@@ -138,49 +138,25 @@
     # mc-rtc-magnum = prev.callPackage ./pkgs/mc-rtc-magnum {};
     gram-savitzky-golay = prev.callPackage ./pkgs/gram-savitzky-golay { };
 
-    ######################
-    # Overrides for hugo #
-    # polytopeController #
-    ######################
-    mc-rtc-hugo = final.mc-rtc.overrideAttrs (_old: {
-      tvm = final.tvm-hugo;
-      src = final.fetchgit {
-        url = "https://github.com/arntanguy/mc_rtc.git";
-        rev = "73b10e8d7db6671e901d16f6ec9cde299c07ba4d";
-        sha256 = "sha256-MJrulDf6Qm8esLLJxIZoLerG3p/ug5M9WnMYoonHtrw=";
-      };
-      pname = "mc-rtc-hugo";
-    });
-
-    tvm-hugo = final.tvm.overrideAttrs (_old: {
-      src = final.fetchgit {
-        # tvm pr 53
-        url = "https://github.com/Hugo-L3174/tvm.git";
-        rev = "0c66fac37db38f2e5bc4f3df2b418f3ae50cea68";
-        sha256 = "sha256-wLalEmtXO4Id8PFtVoJD9KzCU4QKeAv/xp5mCjDvpnA=";
-      };
-    });
-    mc-rtc-magnum-hugo = final.mc-rtc-magnum.overrideAttrs (_old: {
-      mc-rtc = final.mc-rtc-hugo;
-    });
-    mc-mujoco-hugo = final.mc-mujoco-full.overrideAttrs (_old: {
-      mc-rtc = final.mc-rtc-hugo;
-    });
-    mc-force-shoe-plugin-hugo = final.mc-force-shoe-plugin.overrideAttrs (_old: {
-      mc-rtc = final.mc-rtc-hugo;
-    });
-    polytopeController = callWithLocal ./pkgs/mc-rtc/controllers/polytopeController { };
-    #mc-dynamic-polytopes = prev.callPackage ./pkgs/mc-rtc/controllers/polytopeController/mc-dynamic-polytopes.nix {};
-    mc-dynamic-polytopes =
-      callWithLocal ./pkgs/mc-rtc/controllers/polytopeController/mc-dynamic-polytopes.nix
-        {
-          jrl-cmakemodules = final.jrl-cmakemodulesv2;
-          mc-rtc = final.mc-rtc-hugo;
-        };
+    # Hugo's dependencies
+    # FIXME: { won't build as-is here as it requires a branch of mc-rtc for now
+    # See https://github.com/Hugo-L3174/polytopeController's flake.nix
+    # As they are currently not in the flake.nix's package set, this is probably ok to
+    # have non-building versions in the overlay (?)
+    mc-dynamic-polytopes = prev.callPackage ./pkgs/mc-rtc/controllers/polytopeController/mc-dynamic-polytopes.nix
+    {
+      jrl-cmakemodules = final.jrl-cmakemodulesv2;
+      # mc-rtc = final.mc-rtc-hugo;
+    };
     dcm-vrptask = callWithLocal ./pkgs/mc-rtc/controllers/polytopeController/dcm-vrptask.nix {
-      mc-rtc = final.mc-rtc-hugo;
+      # mc-rtc = final.mc-rtc-hugo;
       jrl-cmakemodules = final.jrl-cmakemodulesv2;
     };
+    polytopeController = prev.callPackage ./pkgs/mc-rtc/controllers/polytopeController/default.nix {
+      # mc-rtc = final.mc-rtc-hugo;
+    };
+    # End of Hugo's dependencies
+    # } end of FIXME
 
     ##########
     #  Apps  #

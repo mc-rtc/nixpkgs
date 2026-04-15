@@ -41,7 +41,8 @@ stdenv.mkDerivation (_finalAttrs: {
       # https://github.com/Hugo-L3174/mc_dynamic_polytopes/pull/6 future v1.0.1
       fetchgit {
         url = "https://github.com/Hugo-L3174/mc_dynamic_polytopes.git";
-        rev = "75a0d1ca6dc703ba2ad8ed79d8ae647496682ca8"; # or a commit hash or branch name
+        # PR#6
+        rev = "35b98db7feb8d10e95737c419ec54ea30ef9780a"; # or a commit hash or branch name
         hash = "";
       };
 
