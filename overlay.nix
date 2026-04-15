@@ -315,27 +315,5 @@
         pname = "mc-rtc-superbuild-full";
       };
     };
-
-    # TODO: move to rolkneematic's panda_prosthesis repository
-    # mc-rtc-superbuild-rolkneematics = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix {
-    #   superbuildArgs = final.mc-rtc-superbuild.superbuildArgs // {
-    #     pname = "mc-rtc-superbuild-rolkneematics";
-    #     robots = [
-    #       # note that panda-prosthesis is not strictly-speaking a robot, but it builds a robot module so we need it here as well to populate the robots runtime paths
-    #       final.panda-prosthesis
-    #       final.mc-panda-lirmm
-    #       final.mc-panda
-    #     ];
-    #     controllers = [ final.panda-prosthesis ];
-    #     # extra mc_rtc.yaml
-    #     configs = [ "${final.panda-prosthesis}/lib/mc_controller/etc/mc_rtc.yaml" ];
-    #     observers = [ ];
-    #     plugins = [ final.panda-prosthesis ];
-    #     apps = [
-    #       final.mc-rtc-magnum
-    #       final.mc-franka
-    #       final.mc-rtc-ticker
-    #     ];
-    # };
   }
 )
