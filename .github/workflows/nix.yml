@@ -37,6 +37,7 @@ jobs:
         with:
           name: mc-rtc-nix
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+          extraPullNames: "ros,gepetto"
       - run: nix build -L ".#${{ matrix.build }}" --cores 4
   complete:
     needs: populate-cache
@@ -55,6 +56,7 @@ jobs:
         with:
           name: mc-rtc-nix
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+          extraPullNames: "ros,gepetto"
       - run: nix flake check -L
   fallback:
     needs: complete
@@ -74,6 +76,7 @@ jobs:
         with:
           name: mc-rtc-nix
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+          extraPullNames: "ros,gepetto"
       - run: nix flake check -L -j 1 --cores 1
   # system:
   #   runs-on: "ubuntu-latest"
@@ -94,6 +97,7 @@ jobs:
   #     - uses: cachix/cachix-action@v17
   #       with:
   #         name: mc-rtc-nix
+            extraPullNames: "ros,gepetto"
   #     - run: nix build -L .#homeConfigurations.cpene.activationPackage
   check:
     if: always()
