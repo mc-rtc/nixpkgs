@@ -143,11 +143,12 @@
     # See https://github.com/Hugo-L3174/polytopeController's flake.nix
     # As they are currently not in the flake.nix's package set, this is probably ok to
     # have non-building versions in the overlay (?)
-    mc-dynamic-polytopes = prev.callPackage ./pkgs/mc-rtc/controllers/polytopeController/mc-dynamic-polytopes.nix
-    {
-      jrl-cmakemodules = final.jrl-cmakemodulesv2;
-      # mc-rtc = final.mc-rtc-hugo;
-    };
+    mc-dynamic-polytopes =
+      prev.callPackage ./pkgs/mc-rtc/controllers/polytopeController/mc-dynamic-polytopes.nix
+        {
+          jrl-cmakemodules = final.jrl-cmakemodulesv2;
+          # mc-rtc = final.mc-rtc-hugo;
+        };
     dcm-vrptask = callWithLocal ./pkgs/mc-rtc/controllers/polytopeController/dcm-vrptask.nix {
       # mc-rtc = final.mc-rtc-hugo;
       jrl-cmakemodules = final.jrl-cmakemodulesv2;
@@ -256,6 +257,7 @@
     mc-rtc-superbuild-minimal = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix {
       superbuildArgs = {
         pname = "mc-rtc-superbuild-minimal";
+        observers = [ final.mc-state-observation ];
       };
     };
 
