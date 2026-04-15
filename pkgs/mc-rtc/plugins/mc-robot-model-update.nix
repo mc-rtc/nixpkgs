@@ -1,18 +1,27 @@
-{ stdenv, lib, fetchFromGitHub,
-cmake, mc-rtc,
-useLocal ? false, localWorkspace ? null
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  cmake,
+  mc-rtc,
+  useLocal ? false,
+  localWorkspace ? null,
 }:
 
-stdenv.mkDerivation (finalAttrs: {
+stdenv.mkDerivation (_finalAttrs: {
   pname = "mc-robot-model-update";
   version = "2.0.0";
 
-  src = if useLocal then
-      builtins.trace "Using local workspace for mc-robot-model-update: ${localWorkspace}/mc_robot_model_update"
-      (builtins.path {
-        path = "${localWorkspace}/mc_robot_model_update";
-        name = "mc-robot-model-update-src";
-      })
+  src =
+    if useLocal then
+      builtins.trace
+        "Using local workspace for mc-robot-model-update: ${localWorkspace}/mc_robot_model_update"
+        (
+          builtins.path {
+            path = "${localWorkspace}/mc_robot_model_update";
+            name = "mc-robot-model-update-src";
+          }
+        )
     else
       fetchFromGitHub {
         owner = "jrl-umi3218";
@@ -24,10 +33,9 @@ stdenv.mkDerivation (finalAttrs: {
       };
 
   nativeBuildInputs = [ cmake ];
-  propagatedBuildInputs =
-    [
-      mc-rtc
-    ];
+  propagatedBuildInputs = [
+    mc-rtc
+  ];
 
   cmakeFlags = [
     "-DMC_RTC_HONOR_INSTALL_PREFIX=ON"
@@ -37,8 +45,8 @@ stdenv.mkDerivation (finalAttrs: {
 
   meta = with lib; {
     description = "Plugin to update some parameters of a robot model live or from configuration ";
-    homepage    = "https://github.com/jrl-umi3218/mc_robot_model_update";
-    license     = licenses.bsd2;
-    platforms   = platforms.all;
+    homepage = "https://github.com/jrl-umi3218/mc_robot_model_update";
+    license = licenses.bsd2;
+    platforms = platforms.all;
   };
 })

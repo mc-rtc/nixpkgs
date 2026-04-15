@@ -1,19 +1,27 @@
-{ stdenv, lib, fetchgit, cmake,
-eigen, fmt,
-useLocal ? false, localWorkspace ? null
+{
+  stdenv,
+  lib,
+  fetchgit,
+  cmake,
+  eigen,
+  fmt,
+  useLocal ? false,
+  localWorkspace ? null,
 }:
 
 # eigen-fmt derivation, avoiding the use of PID build system
-stdenv.mkDerivation (finalAttrs:{
+stdenv.mkDerivation (finalAttrs: {
   pname = "eigen-fmt";
   version = "1.0.4";
 
-  src = if useLocal then
-      builtins.trace "Using local workspace for eigen-fmt: ${localWorkspace}/eigen-fmt"
-      (builtins.path {
-        path = "${localWorkspace}/${finalAttrs.pname}";
-        name = "${finalAttrs.pname}-src";
-      })
+  src =
+    if useLocal then
+      builtins.trace "Using local workspace for eigen-fmt: ${localWorkspace}/eigen-fmt" (
+        builtins.path {
+          path = "${localWorkspace}/${finalAttrs.pname}";
+          name = "${finalAttrs.pname}-src";
+        }
+      )
     else
       # fetchgit {
       #   url = "https://gite.lirmm.fr/rpc/utils/eigen-fmt.git";
@@ -35,14 +43,17 @@ stdenv.mkDerivation (finalAttrs:{
   '';
 
   nativeBuildInputs = [ cmake ];
-  propagatedBuildInputs = [ eigen fmt ];
+  propagatedBuildInputs = [
+    eigen
+    fmt
+  ];
 
   doCheck = false;
 
   meta = with lib; {
     description = "Provides custom formatters for eigen types to be used with the {fmt} library";
-    homepage    = "https://gite.lirmm.fr/rpc/utils/eigen-fmt";
-    license     = licenses.cecill21;
-    platforms   = platforms.all;
+    homepage = "https://gite.lirmm.fr/rpc/utils/eigen-fmt";
+    license = licenses.cecill21;
+    platforms = platforms.all;
   };
 })

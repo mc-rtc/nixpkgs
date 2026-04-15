@@ -1,4 +1,11 @@
-{ stdenv, lib, fetchurl, cmake, rbdyn, boost }:
+{
+  stdenv,
+  lib,
+  fetchurl,
+  cmake,
+  rbdyn,
+  boost,
+}:
 
 stdenv.mkDerivation {
   pname = "mc-rbdyn-urdf";
@@ -10,7 +17,10 @@ stdenv.mkDerivation {
   };
 
   nativeBuildInputs = [ cmake ];
-  propagatedBuildInputs = [ rbdyn boost ];
+  propagatedBuildInputs = [
+    rbdyn
+    boost
+  ];
 
   cmakeFlags = [
     "-DBUILD_TESTING=OFF"
@@ -22,8 +32,8 @@ stdenv.mkDerivation {
 
   meta = with lib; {
     description = "mc-rbdyn-urdf allows one to parse an URDF file and create RBDyn structure from it";
-    homepage    = "https://github.com/jrl-umi3218/mc_rbdyn_urdf";
-    license     = licenses.bsd2;
-    platforms   = platforms.all;
+    homepage = "https://github.com/jrl-umi3218/mc_rbdyn_urdf";
+    license = licenses.bsd2;
+    platforms = platforms.all;
   };
 }

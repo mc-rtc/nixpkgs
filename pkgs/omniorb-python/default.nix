@@ -1,4 +1,10 @@
-{ lib, fetchurl, python2, buildPythonPackage, omniorb }:
+{
+  lib,
+  fetchurl,
+  python2,
+  buildPythonPackage,
+  omniorb,
+}:
 
 buildPythonPackage rec {
 
@@ -11,7 +17,10 @@ buildPythonPackage rec {
     sha256 = "1di73mx9m639adsjzmf234zwdfzsswdc0svm5c039jcwamkxis6s";
   };
 
-  buildInputs = [ python2 omniorb ];
+  buildInputs = [
+    python2
+    omniorb
+  ];
 
   format = "other";
 
@@ -21,8 +30,8 @@ buildPythonPackage rec {
 
   meta = with lib; {
     description = "A robust high performance CORBA ORB for C++ and Python. It is freely available under the terms of the GNU Lesser General Public License (for the libraries), and GNU General Public License (for the tools). omniORB is largely CORBA 2.6 compliant";
-    homepage    = "http://omniorb.sourceforge.net/";
-    license     = licenses.gpl2Plus;
-    platforms   = platforms.unix;
+    homepage = "http://omniorb.sourceforge.net/";
+    license = licenses.gpl2Plus;
+    platforms = platforms.unix;
   };
 }

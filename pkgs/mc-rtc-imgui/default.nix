@@ -1,21 +1,30 @@
-{ stdenv, lib, fetchFromGitHub,
-cmake, jrl-cmakemodules,
-mc-rtc, imgui, implot
-, useLocal ? false, localWorkspace ? null
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  cmake,
+  jrl-cmakemodules,
+  mc-rtc,
+  imgui,
+  implot,
+  useLocal ? false,
+  localWorkspace ? null,
 }:
 
-stdenv.mkDerivation (finalAttrs: {
+stdenv.mkDerivation (_finalAttrs: {
   pname = "mc-rtc-imgui";
   version = "1.0.0";
 
   dontBuild = true;
 
-  src = if useLocal then
-      builtins.trace "Using local workspace for mc-rtc-imgui: ${localWorkspace}/mc_rtc-imgui"
-      (builtins.path {
-        path = "${localWorkspace}/mc_rtc-imgui";
-        name = "mc-rtc-imgui-src";
-      })
+  src =
+    if useLocal then
+      builtins.trace "Using local workspace for mc-rtc-imgui: ${localWorkspace}/mc_rtc-imgui" (
+        builtins.path {
+          path = "${localWorkspace}/mc_rtc-imgui";
+          name = "mc-rtc-imgui-src";
+        }
+      )
     else
       fetchFromGitHub {
         #owner = "mc-rtc";
@@ -28,13 +37,15 @@ stdenv.mkDerivation (finalAttrs: {
         hash = "sha256-J1oitwCXhtDGLW0vCnAN50BkUQeveuuruLz1TCOYe2Q=";
       };
 
-  nativeBuildInputs = [ cmake jrl-cmakemodules ];
-  propagatedBuildInputs =
-    [
-      mc-rtc
-      imgui
-      implot
-    ];
+  nativeBuildInputs = [
+    cmake
+    jrl-cmakemodules
+  ];
+  propagatedBuildInputs = [
+    mc-rtc
+    imgui
+    implot
+  ];
 
   cmakeFlags = [
     "-DMC_RTC_HONOR_INSTALL_PREFIX=ON"
@@ -44,8 +55,8 @@ stdenv.mkDerivation (finalAttrs: {
 
   meta = with lib; {
     description = "Base GUI client for mc_rtc using Dear ImGui";
-    homepage    = "https://github.com/mc-rtc/mc_rtc-imgui";
-    license     = licenses.bsd2; # FIXME set licence in repository
-    platforms   = platforms.all;
+    homepage = "https://github.com/mc-rtc/mc_rtc-imgui";
+    license = licenses.bsd2; # FIXME set licence in repository
+    platforms = platforms.all;
   };
 })

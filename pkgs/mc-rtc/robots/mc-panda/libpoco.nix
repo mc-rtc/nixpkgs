@@ -1,4 +1,14 @@
-{ stdenv, lib, fetchFromGitHub, cmake, pkg-config, openssl_1_1, zlib, pcre, expat }:
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  cmake,
+  pkg-config,
+  openssl_1_1,
+  zlib,
+  pcre,
+  expat,
+}:
 
 stdenv.mkDerivation rec {
   pname = "poco";
@@ -11,8 +21,16 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-60XBC2cAX/v33cNh9JRvhDXpMTSeVDN6dvFGYawrQpE=";
   };
 
-  nativeBuildInputs = [ cmake pkg-config ];
-  buildInputs = [ openssl_1_1 zlib pcre expat ];
+  nativeBuildInputs = [
+    cmake
+    pkg-config
+  ];
+  buildInputs = [
+    openssl_1_1
+    zlib
+    pcre
+    expat
+  ];
 
   cmakeFlags = [
     "-DENABLE_TESTS=OFF"
@@ -47,6 +65,6 @@ stdenv.mkDerivation rec {
     homepage = "https://pocoproject.org/";
     license = licenses.boost;
     platforms = platforms.unix;
-    maintainers = [];
+    maintainers = [ ];
   };
 }

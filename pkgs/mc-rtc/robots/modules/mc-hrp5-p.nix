@@ -1,10 +1,16 @@
-{ stdenv, lib, fetchgit, cmake, mc-rtc, hrp5-p-description } :
+{
+  stdenv,
+  lib,
+  cmake,
+  mc-rtc,
+  hrp5-p-description,
+}:
 
 let
 
-hrp5-p-description' = hrp5-p-description.override {
-  with-ros = mc-rtc.with-ros;
-};
+  hrp5-p-description' = hrp5-p-description.override {
+    with-ros = mc-rtc.with-ros;
+  };
 
 in
 
@@ -18,7 +24,10 @@ stdenv.mkDerivation {
   };
 
   nativeBuildInputs = [ cmake ];
-  propagatedBuildInputs = [ hrp5-p-description' mc-rtc ];
+  propagatedBuildInputs = [
+    hrp5-p-description'
+    mc-rtc
+  ];
 
   cmakeFlags = [
     "-DBUILD_TESTING=OFF"
@@ -30,8 +39,8 @@ stdenv.mkDerivation {
 
   meta = with lib; {
     description = "HRP5-P RobotModule for mc-rtc";
-    homepage    = "https://gite.lirmm.fr/mc-hrp5/mc-hrp5_p";
-    license     = licenses.bsd2;
-    platforms   = platforms.all;
+    homepage = "https://gite.lirmm.fr/mc-hrp5/mc-hrp5_p";
+    license = licenses.bsd2;
+    platforms = platforms.all;
   };
 }

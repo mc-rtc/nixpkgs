@@ -1,14 +1,16 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, fetchpatch
-, cmake
-, fmt
-, catch2_3
-, staticBuild ? stdenv.hostPlatform.isStatic
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  fetchpatch,
+  cmake,
+  fmt,
+  catch2_3,
+  staticBuild ? stdenv.hostPlatform.isStatic,
 
-# tests
-, bear, tiledb
+  # tests
+  bear,
+  tiledb,
 }:
 
 stdenv.mkDerivation rec {
@@ -17,9 +19,9 @@ stdenv.mkDerivation rec {
 
   src = fetchFromGitHub {
     owner = "gabime";
-    repo  = "spdlog";
-    rev   = "v${version}";
-    hash  = "sha256-cxTaOuLXHRU8xMz9gluYz0a93O0ez2xOxbloyc1m1ns=";
+    repo = "spdlog";
+    rev = "v${version}";
+    hash = "sha256-cxTaOuLXHRU8xMz9gluYz0a93O0ez2xOxbloyc1m1ns=";
   };
 
   patches = [
@@ -40,10 +42,14 @@ stdenv.mkDerivation rec {
     "-DSPDLOG_BUILD_EXAMPLE=OFF"
     "-DSPDLOG_BUILD_BENCH=OFF"
     "-DSPDLOG_BUILD_TESTS=OFF"
-    "-DSPDLOG_FMT_EXTERNAL=ON"
+    "-DSPDLOG_FMT_EXTERNAL=OFF"
   ];
 
-  outputs = [ "out" "doc" "dev" ] ;
+  outputs = [
+    "out"
+    "doc"
+    "dev"
+  ];
 
   postInstall = ''
     mkdir -p $out/share/doc/spdlog
@@ -57,10 +63,10 @@ stdenv.mkDerivation rec {
   };
 
   meta = with lib; {
-    description    = "Very fast, header only, C++ logging library";
-    homepage       = "https://github.com/gabime/spdlog";
-    license        = licenses.mit;
-    maintainers    = with maintainers; [ obadz ];
-    platforms      = platforms.all;
+    description = "Very fast, header only, C++ logging library";
+    homepage = "https://github.com/gabime/spdlog";
+    license = licenses.mit;
+    maintainers = with maintainers; [ obadz ];
+    platforms = platforms.all;
   };
 }

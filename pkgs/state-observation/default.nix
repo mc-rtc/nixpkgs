@@ -1,4 +1,11 @@
-{ stdenv, lib, cmake, boost, eigen, fetchurl }:
+{
+  stdenv,
+  lib,
+  cmake,
+  boost,
+  eigen,
+  fetchurl,
+}:
 
 stdenv.mkDerivation rec {
   pname = "state-observation";
@@ -10,7 +17,10 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [ cmake ];
-  propagatedBuildInputs = [ boost eigen ];
+  propagatedBuildInputs = [
+    boost
+    eigen
+  ];
 
   cmakeFlags = [
     "-DBUILD_TESTING=OFF"
@@ -23,8 +33,8 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     description = "Describes interfaces for state observers, and implements some observers (including linear and extended Kalman filters)";
-    homepage    = "https://github.com/jrl-umi3218/state-observation";
-    license     = licenses.bsd2;
-    platforms   = platforms.all;
+    homepage = "https://github.com/jrl-umi3218/state-observation";
+    license = licenses.bsd2;
+    platforms = platforms.all;
   };
 }

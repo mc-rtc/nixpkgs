@@ -1,31 +1,44 @@
 {
-stdenv, lib, fetchgit,
-makeWrapper,
-mc-mujoco-robots,
-cmake, jrl-cmakemodules,
-mc-rtc, mujoco, pugixml,
-libtorch-bin # for RL examples, should be an option
-# XXX see if all of these are really necessary
-,    libXrandr ,    libXinerama ,    libXcursor ,    libX11 ,    libXi ,    libXext
-,    glew
-,     glfw3
-, mc-rtc-imgui
-, imguizmo
-, useLocal ? false, localWorkspace ? null
+  stdenv,
+  lib,
+  fetchgit,
+  makeWrapper,
+  mc-mujoco-robots,
+  cmake,
+  jrl-cmakemodules,
+  mc-rtc,
+  mujoco,
+  pugixml,
+  libtorch-bin, # for RL examples, should be an option
+  # XXX see if all of these are really necessary
+  libXrandr,
+  libXinerama,
+  libXcursor,
+  libX11,
+  libXi,
+  libXext,
+  glew,
+  glfw3,
+  mc-rtc-imgui,
+  imguizmo,
+  useLocal ? false,
+  localWorkspace ? null,
 }:
 
-stdenv.mkDerivation (finalAttrs: {
+stdenv.mkDerivation (_finalAttrs: {
   pname = "mc-mujoco";
   version = "0.0.0";
 
   dontBuild = true;
 
-  src = if useLocal then
-      builtins.trace "Using local workspace for mc-mujoco: ${localWorkspace}/mc_mujoco"
-      (builtins.path {
-        path = "${localWorkspace}/mc_mujoco";
-        name = "mc-mujoco-src";
-      })
+  src =
+    if useLocal then
+      builtins.trace "Using local workspace for mc-mujoco: ${localWorkspace}/mc_mujoco" (
+        builtins.path {
+          path = "${localWorkspace}/mc_mujoco";
+          name = "mc-mujoco-src";
+        }
+      )
     else
       fetchgit {
         url = "https://github.com/arntanguy/mc_mujoco.git";
@@ -36,24 +49,27 @@ stdenv.mkDerivation (finalAttrs: {
         fetchSubmodules = true;
       };
 
-  nativeBuildInputs = [ cmake jrl-cmakemodules makeWrapper ];
-  propagatedBuildInputs =
-    [
-      mc-rtc
-      mc-rtc-imgui
-      imguizmo
-      mujoco
-      pugixml
-      libXrandr
-      libXinerama
-      libXcursor
-      libX11
-      libXi
-      libXext
-      glew
-      glfw3
-      libtorch-bin
-    ];
+  nativeBuildInputs = [
+    cmake
+    jrl-cmakemodules
+    makeWrapper
+  ];
+  propagatedBuildInputs = [
+    mc-rtc
+    mc-rtc-imgui
+    imguizmo
+    mujoco
+    pugixml
+    libXrandr
+    libXinerama
+    libXcursor
+    libX11
+    libXi
+    libXext
+    glew
+    glfw3
+    libtorch-bin
+  ];
 
   cmakeFlags = [
     "-DMC_RTC_HONOR_INSTALL_PREFIX=ON"
@@ -73,8 +89,8 @@ stdenv.mkDerivation (finalAttrs: {
   meta = with lib; {
     mainProgram = "mc_mujoco";
     description = "Plugin to update some parameters of a robot model live or from configuration ";
-    homepage    = "https://github.com/jrl-umi3218/mc_mujoco";
-    license     = licenses.bsd2;
-    platforms   = platforms.all;
+    homepage = "https://github.com/jrl-umi3218/mc_mujoco";
+    license = licenses.bsd2;
+    platforms = platforms.all;
   };
 })

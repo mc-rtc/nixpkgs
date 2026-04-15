@@ -1,13 +1,14 @@
-{ stdenv
-, lib
-, with-ros ? false
-, buildRosPackage
-, ament-cmake
-, mc-env-description
-, mc-int-obj-description
-, jvrc-description
-, writeTextFile
-, runCommand
+{
+  stdenv,
+  lib,
+  with-ros ? false,
+  buildRosPackage,
+  ament-cmake,
+  mc-env-description,
+  mc-int-obj-description,
+  jvrc-description,
+  writeTextFile,
+  runCommand,
 }:
 
 let
@@ -15,9 +16,18 @@ let
   pname = "mc-rtc-data";
 
   deps = [
-    { name = "mc_env_description"; drv = mc-env-description; }
-    { name = "mc_int_obj_description"; drv = mc-int-obj-description; }
-    { name = "jvrc_description"; drv = jvrc-description; }
+    {
+      name = "mc_env_description";
+      drv = mc-env-description;
+    }
+    {
+      name = "mc_int_obj_description";
+      drv = mc-int-obj-description;
+    }
+    {
+      name = "jvrc_description";
+      drv = jvrc-description;
+    }
   ];
 
   execDependsXml = lib.concatMapStrings (d: "<exec_depend>${d.name}</exec_depend>\n") deps;
@@ -69,9 +79,9 @@ if with-ros then
     nativeBuildInputs = [ ament-cmake ];
     meta = with lib; {
       description = "Metapackage for mc-rtc data (envs, objects, etc)";
-      homepage    = "https://github.com/jrl-umi3218/mc_rtc_data";
-      license     = licenses.bsd2;
-      platforms   = platforms.all;
+      homepage = "https://github.com/jrl-umi3218/mc_rtc_data";
+      license = licenses.bsd2;
+      platforms = platforms.all;
     };
   }
 else
@@ -79,15 +89,15 @@ else
     inherit pname version;
     src = null;
     propagatedBuildInputs = map (d: d.drv) deps;
-    buildInputs = [];
+    buildInputs = [ ];
     nativeBuildInputs = [ ];
     installPhase = ''
       mkdir -p $out
     '';
     meta = with lib; {
       description = "Metapackage for mc-rtc data (envs, objects, etc)";
-      homepage    = "https://github.com/jrl-umi3218/mc_rtc_data";
-      license     = licenses.bsd2;
-      platforms   = platforms.all;
+      homepage = "https://github.com/jrl-umi3218/mc_rtc_data";
+      license = licenses.bsd2;
+      platforms = platforms.all;
     };
   }

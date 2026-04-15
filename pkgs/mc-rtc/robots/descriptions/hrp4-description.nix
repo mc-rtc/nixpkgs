@@ -1,4 +1,11 @@
-{ stdenv, lib, cmake, with-ros ? false, ament-cmake, buildRosPackage }:
+{
+  stdenv,
+  lib,
+  cmake,
+  with-ros ? false,
+  ament-cmake,
+  buildRosPackage,
+}:
 
 (if with-ros then buildRosPackage else stdenv.mkDerivation) {
   pname = "hrp4-description";
@@ -13,16 +20,13 @@
 
   buildType = "ament_cmake";
   nativeBuildInputs = if with-ros then [ ament-cmake ] else [ cmake ];
-  propagatedBuildInputs = [];
+  propagatedBuildInputs = [ ];
 
   preConfigure = ''
     export ROS_VERSION=2
   '';
 
-  cmakeFlags = 
-  lib.optional (!with-ros) "-DDISABLE_ROS=ON"
-  ++
-  [
+  cmakeFlags = lib.optional (!with-ros) "-DDISABLE_ROS=ON" ++ [
     "-DBUILD_TESTING=OFF"
   ];
 
@@ -30,9 +34,8 @@
 
   meta = with lib; {
     description = "HRP4 urdf and data";
-    homepage    = "https://github.com/isri-aist/hrp4_description";
-    license     = licenses.bsd2;
-    platforms   = platforms.all;
+    homepage = "https://github.com/isri-aist/hrp4_description";
+    license = licenses.bsd2;
+    platforms = platforms.all;
   };
 }
-

@@ -23,13 +23,14 @@ Current status:
     - [x] UR5e
     - [ ] UR10
 - [ ] Controllers
-  - [x] Rolkneematics `panda-prosthesis`
+  - [x] Rolkneematics `panda-prosthesis` (through downstream flake in `panda-prosthesis` repository)
   - [ ] WIP: Hugo's polytopeController
 - [ ] `mc-mujoco`: building and running but some HiDPI scaling issues on Wayland with glfw 3.4
 - [ ] magnum packaging (external): in progress
   - [x] magnum
     - [x] SDL2Application: works
-    - [ ] GlfwApplication: HiDPI scaling issue on Wayland with GlfW 3.4, works otherwise
+    - [x] GlfwApplication:
+      - [ ]HiDPI scaling issue on Wayland with GlfW 3.4, works otherwise
   - [x] magnum-plugins (only those needed by `mc-rtc-magnum`/`mc-mujoco`
   - [x] magnum-integration
 

@@ -1,4 +1,10 @@
-{ stdenv, lib, fetchgit, cmake, mc-rtc }:
+{
+  stdenv,
+  lib,
+  fetchgit,
+  cmake,
+  mc-rtc,
+}:
 
 stdenv.mkDerivation {
   pname = "mc-udp";
@@ -6,12 +12,11 @@ stdenv.mkDerivation {
 
   # master branch as of 2025.24.13
   # TODO: do a proper 1.0.0 release
-  src = 
-    fetchgit {
-      url = "https://github.com/jrl-umi3218/mc_udp";
-      rev = "b6be9c9423b6c68a3b375641e99affed448cf825";
-      sha256 = "";
-    };
+  src = fetchgit {
+    url = "https://github.com/jrl-umi3218/mc_udp";
+    rev = "b6be9c9423b6c68a3b375641e99affed448cf825";
+    sha256 = "";
+  };
 
   nativeBuildInputs = [ cmake ];
   propagatedBuildInputs = [ mc-rtc ];
@@ -27,8 +32,8 @@ stdenv.mkDerivation {
 
   meta = with lib; {
     description = "UDP interface for mc_rtc";
-    homepage    = "https://github.com/jrl-umi3218/mc_udp";
-    license     = licenses.bsd2;
-    platforms   = platforms.all;
+    homepage = "https://github.com/jrl-umi3218/mc_udp";
+    license = licenses.bsd2;
+    platforms = platforms.all;
   };
 }

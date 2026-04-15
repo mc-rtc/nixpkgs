@@ -1,15 +1,15 @@
-{ stdenv, lib,
-makeWrapper,
-fetchgit,
-cmake,
-mc-rtc-imgui,
-corrade,
-magnum,
-magnum-integration,
-magnum-plugins,
-magnum-with-plugins,
-imguizmo,
-useLocal ? false, localWorkspace ? null }:
+{
+  stdenv,
+  lib,
+  makeWrapper,
+  fetchgit,
+  cmake,
+  mc-rtc-imgui,
+  magnum-with-plugins,
+  imguizmo,
+  useLocal ? false,
+  localWorkspace ? null,
+}:
 
 # TODO: modularize the build of mc_rtc-magnum instead of using submodules
 stdenv.mkDerivation {
@@ -24,29 +24,35 @@ stdenv.mkDerivation {
   #   sha256 = "sha256-6wwvyec7yfxjpa/njqsrw2k78kbsazy9+id+mp2je/8=";
   #   fetchsubmodules = true;
   # };
-  src = if useLocal then
-    builtins.trace "Using local workspace for mc_rtc-magnum: ${localWorkspace}/mc_rtc-magnum-standalone"
-    (builtins.path {
-      path = "${localWorkspace}/mc_rtc-magnum-standalone";
-      name = "mc_rtc-magnum-src";
-    })
-  else
-    fetchgit {
-      url = "https://github.com/mc-rtc/mc_rtc-magnum.git";
-      # NOTE
-      # topic/nix
-      # Use `nix` branch because it is hard to build against
-      # imgui/implot/imguizmo on non nix systems, and we need to keep
-      # supporting this: https://github.com/mc-rtc/mc_rtc-magnum/pull/4
-      # To be rebased on top of master on upgrade
-      rev = "97eb246eebda380b65b366e178a32107ad5a08d5";
-      sha256 = "sha256-Lek+JAQR6L2tgWXP1tsy077kVVh5roonuJqIDmWSNv4=";
-      fetchSubmodules = true;
-    };
+  src =
+    if useLocal then
+      builtins.trace "Using local workspace for mc_rtc-magnum: ${localWorkspace}/mc_rtc-magnum-standalone"
+        (
+          builtins.path {
+            path = "${localWorkspace}/mc_rtc-magnum-standalone";
+            name = "mc_rtc-magnum-src";
+          }
+        )
+    else
+      fetchgit {
+        url = "https://github.com/mc-rtc/mc_rtc-magnum.git";
+        # NOTE
+        # topic/nix
+        # Use `nix` branch because it is hard to build against
+        # imgui/implot/imguizmo on non nix systems, and we need to keep
+        # supporting this: https://github.com/mc-rtc/mc_rtc-magnum/pull/4
+        # To be rebased on top of master on upgrade
+        rev = "97eb246eebda380b65b366e178a32107ad5a08d5";
+        sha256 = "sha256-Lek+JAQR6L2tgWXP1tsy077kVVh5roonuJqIDmWSNv4=";
+        fetchSubmodules = true;
+      };
 
-  nativeBuildInputs = [ cmake makeWrapper ];
+  nativeBuildInputs = [
+    cmake
+    makeWrapper
+  ];
   dontBuild = true;
-  buildInputs = [ 
+  buildInputs = [
     mc-rtc-imgui
     # magnum
     # magnum-integration
@@ -73,7 +79,7 @@ stdenv.mkDerivation {
   meta = with lib; {
     description = "Magnum-based standalone viewer for mc-rtc";
     homepage = "https://github.com/mc-rtc/mc_rtc-magnum";
-    license     = licenses.bsd2;
+    license = licenses.bsd2;
     maintainers = [ ];
     platforms = platforms.all;
   };

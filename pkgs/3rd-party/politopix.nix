@@ -1,18 +1,25 @@
-{ stdenv, lib, fetchurl, fetchFromGitHub,
-cmake, boost,
-useLocal ? false, localWorkspace ? null
+{
+  stdenv,
+  lib,
+  fetchurl,
+  cmake,
+  boost,
+  useLocal ? false,
+  localWorkspace ? null,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "politopix";
   version = "1.0.0";
 
-  src = if useLocal then
-      builtins.trace "Using local workspace for politopix: ${localWorkspace}/politopix"
-      (builtins.path {
-        path = "${localWorkspace}/politopix";
-        name = "politopix-src";
-      })
+  src =
+    if useLocal then
+      builtins.trace "Using local workspace for politopix: ${localWorkspace}/politopix" (
+        builtins.path {
+          path = "${localWorkspace}/politopix";
+          name = "politopix-src";
+        }
+      )
     else
       # fetchFromGitHub {
       #   owner = "Hugo-L3174";
@@ -46,8 +53,8 @@ stdenv.mkDerivation (finalAttrs: {
 
   meta = with lib; {
     description = " Github port of I2S Bordeaux's politopix library ";
-    homepage    = "https://github.com/Hugo-L3174/politopix";
-    license     = lib.licenses.gpl3Plus;
-    platforms   = platforms.all;
+    homepage = "https://github.com/Hugo-L3174/politopix";
+    license = lib.licenses.gpl3Plus;
+    platforms = platforms.all;
   };
 })

@@ -1,4 +1,11 @@
-{ stdenv, lib, fetchurl, cmake, rbdyn, sch-core, eigen-qld }:
+{
+  stdenv,
+  lib,
+  cmake,
+  rbdyn,
+  sch-core,
+  eigen-qld,
+}:
 
 stdenv.mkDerivation rec {
   pname = "tasks";
@@ -10,7 +17,11 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [ cmake ];
-  propagatedBuildInputs = [ rbdyn sch-core eigen-qld ];
+  propagatedBuildInputs = [
+    rbdyn
+    sch-core
+    eigen-qld
+  ];
 
   cmakeFlags = [
     "-DBUILD_TESTING=OFF"
@@ -30,8 +41,8 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     description = "Real-time control for kinematics tree and list of kinematics tree";
-    homepage    = "https://github.com/jrl-umi3218/tasks";
-    license     = licenses.bsd2;
-    platforms   = platforms.all;
+    homepage = "https://github.com/jrl-umi3218/tasks";
+    license = licenses.bsd2;
+    platforms = platforms.all;
   };
 }

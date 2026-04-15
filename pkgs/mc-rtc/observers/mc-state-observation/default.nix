@@ -1,20 +1,31 @@
-{ stdenv, lib, fetchurl, cmake, mc-rtc, useLocal ? false, localWorkspace ? null, with-ros ? false } :
+{
+  stdenv,
+  lib,
+  fetchurl,
+  cmake,
+  mc-rtc,
+  useLocal ? false,
+  localWorkspace ? null,
+  with-ros ? false,
+}:
 
 stdenv.mkDerivation rec {
   pname = "mc-state-observation";
   version = "1.1.0";
 
-  src = if useLocal then
-    builtins.trace "Using local workspace for ${pname}: ${localWorkspace}/mc_state_obeservation"
-    (builtins.path {
-      path = "${localWorkspace}/mc_state_observation";
-      name = "mc_state_observation-src";
-    })
-  else
-    fetchurl {
-      url = "https://github.com/jrl-umi3218/mc_state_observation/releases/download/v${version}/mc_state_observation-v${version}.tar.gz";
-      sha256 = "sha256-F1LzhAK0MQM4mc5+dr0lK364J7f0nA1ZBe1RZlG3Pmo=";
-    };
+  src =
+    if useLocal then
+      builtins.trace "Using local workspace for ${pname}: ${localWorkspace}/mc_state_obeservation" (
+        builtins.path {
+          path = "${localWorkspace}/mc_state_observation";
+          name = "mc_state_observation-src";
+        }
+      )
+    else
+      fetchurl {
+        url = "https://github.com/jrl-umi3218/mc_state_observation/releases/download/v${version}/mc_state_observation-v${version}.tar.gz";
+        sha256 = "sha256-F1LzhAK0MQM4mc5+dr0lK364J7f0nA1ZBe1RZlG3Pmo=";
+      };
 
   nativeBuildInputs = [ cmake ];
   propagatedBuildInputs = [ mc-rtc ];
@@ -40,8 +51,8 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     description = "Extra mc_rtc observers";
-    homepage    = "https://github.com/jrl-umi3218/mc_state_observation";
-    license     = licenses.bsd2;
-    platforms   = platforms.all;
+    homepage = "https://github.com/jrl-umi3218/mc_state_observation";
+    license = licenses.bsd2;
+    platforms = platforms.all;
   };
 }

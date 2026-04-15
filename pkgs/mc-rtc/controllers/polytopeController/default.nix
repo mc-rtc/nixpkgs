@@ -1,19 +1,28 @@
 {
-stdenv, lib, fetchFromGitHub,
-cmake, mc-dynamic-polytopes, mc-force-shoe-plugin, dcm-vrptask,
-useLocal ? false, localWorkspace ? null
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  cmake,
+  mc-dynamic-polytopes,
+  mc-force-shoe-plugin,
+  dcm-vrptask,
+  useLocal ? false,
+  localWorkspace ? null,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "polytopeController";
   version = "1.0.0";
 
-  src = if useLocal then
+  src =
+    if useLocal then
       builtins.trace "Using local workspace for polytopeController: ${localWorkspace}/polytopeController"
-      (builtins.path {
-        path = "${localWorkspace}/polytopeController";
-        name = "polytopeController-src";
-      })
+        (
+          builtins.path {
+            path = "${localWorkspace}/polytopeController";
+            name = "polytopeController-src";
+          }
+        )
     else
       fetchFromGitHub {
         owner = "Hugo-L3174";
@@ -23,10 +32,11 @@ stdenv.mkDerivation (finalAttrs: {
       };
 
   nativeBuildInputs = [ cmake ];
-  propagatedBuildInputs =
-    [
-      mc-dynamic-polytopes mc-force-shoe-plugin dcm-vrptask
-    ];
+  propagatedBuildInputs = [
+    mc-dynamic-polytopes
+    mc-force-shoe-plugin
+    dcm-vrptask
+  ];
 
   cmakeFlags = [
     "-DMC_RTC_HONOR_INSTALL_PREFIX=ON"
@@ -37,8 +47,8 @@ stdenv.mkDerivation (finalAttrs: {
 
   meta = with lib; {
     description = "Controller to test dynamic stability approaches";
-    homepage    = "https://github.com/Hugo-L3174/polytopeController";
-    license     = licenses.bsd2;
-    platforms   = platforms.all;
+    homepage = "https://github.com/Hugo-L3174/polytopeController";
+    license = licenses.bsd2;
+    platforms = platforms.all;
   };
 })

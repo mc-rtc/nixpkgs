@@ -1,18 +1,29 @@
-{ stdenv, lib, fetchFromGitHub, fetchgit,
-cmake, mc-rtc, politopix, jrl-cmakemodules,
-useLocal ? false, localWorkspace ? null
+{
+  stdenv,
+  lib,
+  fetchgit,
+  cmake,
+  mc-rtc,
+  politopix,
+  jrl-cmakemodules,
+  useLocal ? false,
+  localWorkspace ? null,
 }:
 
-stdenv.mkDerivation (finalAttrs: {
+stdenv.mkDerivation (_finalAttrs: {
   pname = "mc-dynamic-polytopes";
   version = "1.0.1";
 
-  src = if useLocal then
-      builtins.trace "Using local workspace for mc-dynamic-polytopes: ${localWorkspace}/mc_dynamic_polytopes"
-      (builtins.path {
-        path = "${localWorkspace}/mc_dynamic_polytopes";
-        name = "mc-dynamic-polytopes-src";
-      })
+  src =
+    if useLocal then
+      builtins.trace
+        "Using local workspace for mc-dynamic-polytopes: ${localWorkspace}/mc_dynamic_polytopes"
+        (
+          builtins.path {
+            path = "${localWorkspace}/mc_dynamic_polytopes";
+            name = "mc-dynamic-polytopes-src";
+          }
+        )
     else
       # FIXME: The release archive is missing jrl-cmakemodules, we should use v2 anyways
       # fetchFromGitHub {
@@ -30,15 +41,19 @@ stdenv.mkDerivation (finalAttrs: {
       # https://github.com/Hugo-L3174/mc_dynamic_polytopes/pull/6 future v1.0.1
       fetchgit {
         url = "https://github.com/Hugo-L3174/mc_dynamic_polytopes.git";
-        rev = "75a0d1ca6dc703ba2ad8ed79d8ae647496682ca8"; # or a commit hash or branch name
+        # PR#6
+        rev = "35b98db7feb8d10e95737c419ec54ea30ef9780a"; # or a commit hash or branch name
         hash = "";
       };
 
-  nativeBuildInputs = [ cmake jrl-cmakemodules ];
-  propagatedBuildInputs =
-    [
-      mc-rtc politopix
-    ];
+  nativeBuildInputs = [
+    cmake
+    jrl-cmakemodules
+  ];
+  propagatedBuildInputs = [
+    mc-rtc
+    politopix
+  ];
 
   cmakeFlags = [
     "-DMC_RTC_HONOR_INSTALL_PREFIX=ON"
@@ -48,8 +63,8 @@ stdenv.mkDerivation (finalAttrs: {
 
   meta = with lib; {
     description = "mc_rtc library for dynamic balance polytopes computations using politopix";
-    homepage    = "https://github.com/Hugo-L3174/mc_dynamic_polytopes";
-    license     = licenses.bsd2;
-    platforms   = platforms.all;
+    homepage = "https://github.com/Hugo-L3174/mc_dynamic_polytopes";
+    license = licenses.bsd2;
+    platforms = platforms.all;
   };
 })

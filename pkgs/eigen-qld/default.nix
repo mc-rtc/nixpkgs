@@ -1,4 +1,11 @@
-{ stdenv, lib, fetchurl, cmake, gfortran, eigen }:
+{
+  stdenv,
+  lib,
+  fetchurl,
+  cmake,
+  gfortran,
+  eigen,
+}:
 
 stdenv.mkDerivation rec {
   pname = "eigen-qld";
@@ -9,7 +16,10 @@ stdenv.mkDerivation rec {
     sha256 = "835fca05e2274b7ae9dbe250db5f28b193e28318d55e10d354cf8d443c10fcaf";
   };
 
-  nativeBuildInputs = [ cmake gfortran ];
+  nativeBuildInputs = [
+    cmake
+    gfortran
+  ];
   propagatedBuildInputs = [ eigen ];
 
   cmakeFlags = [
@@ -22,8 +32,8 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     description = "eigen-qld allow to use the QLD QP solver with the Eigen3 library";
-    homepage    = "https://github.com/jrl-umi3218/eigen-qld";
-    license     = licenses.bsd2;
-    platforms   = platforms.all;
+    homepage = "https://github.com/jrl-umi3218/eigen-qld";
+    license = licenses.bsd2;
+    platforms = platforms.all;
   };
 }
