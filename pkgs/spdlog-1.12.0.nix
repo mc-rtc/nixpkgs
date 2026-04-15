@@ -42,7 +42,7 @@ stdenv.mkDerivation rec {
     "-DSPDLOG_BUILD_EXAMPLE=OFF"
     "-DSPDLOG_BUILD_BENCH=OFF"
     "-DSPDLOG_BUILD_TESTS=OFF"
-    "-DSPDLOG_FMT_EXTERNAL=ON"
+    "-DSPDLOG_FMT_EXTERNAL=OFF"
   ];
 
   outputs = [
