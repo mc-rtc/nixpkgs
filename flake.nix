@@ -35,6 +35,10 @@
           inherit (inputs) gepetto jrl-cmakemodulesv2;
           inherit enablePrivateOverlay;
         };
+        flakeModulePrivate = inputs.flake-parts.lib.importApply ./module.nix {
+          inherit (inputs) gepetto jrl-cmakemodulesv2;
+          enablePrivateOverlay = true;
+        };
       in
       {
         systems = import inputs.systems;
@@ -47,6 +51,7 @@
         ];
         flake = {
           inherit flakeModule;
+          inherit flakeModulePrivate;
           lib.mkFlakoboros =
             localInputs: module:
             inputs.flake-parts.lib.mkFlake { inputs = localInputs; } (args: {
