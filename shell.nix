@@ -99,6 +99,10 @@ pkgs.mkShell {
     done
     echo ""
     echo "mc_rtc will use the following configuration files $MC_RTC_CONTROLLER_CONFIG"
+
+    export MC_RTC_DISABLE_CONVEX_GENERATION_PATCH="ON"
+    echo "warning:"
+    echo "- MC_RTC_DISABLE_CONVEX_GENERATION_PATCH is set to ON, this will disable convex hull generation in mc_rtc"
     # only true for the symlink version, currently unused
     # echo ""
     # echo "All runtime components are symlinked in MC_RTC_PATH=${mc-rtc-superbuild}"
