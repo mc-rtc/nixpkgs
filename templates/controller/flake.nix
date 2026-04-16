@@ -17,7 +17,7 @@
   outputs =
     inputs:
     inputs.flake-parts.lib.mkFlake { inherit inputs; } (
-      { lib, ... }:
+      { ... }:
       {
         systems = import inputs.systems;
         imports = [
@@ -37,9 +37,9 @@
               # };
 
               # Define a custom superbuild configuration
-              # This will make all 
+              # This will make all
               overrides.mc-rtc-superbuild =
-                { pkgs-final, pkgs-prev, ... }:
+                { pkgs-prev, ... }:
                 let
                   cfg-prev = pkgs-prev.mc-rtc-superbuild.superbuildArgs;
                 in
