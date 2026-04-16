@@ -26,7 +26,7 @@ jobs:
         with:
           name: mc-rtc-nix
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-          extraPullNames: ros
+          extraPullNames: "ros,gepetto"
       - run: nix build -L ".#ros-${{ matrix.build }}"
   main:
     needs: distros
