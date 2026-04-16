@@ -2,7 +2,8 @@ name: update-flake-lock
 on:
   workflow_dispatch:
   schedule:
-    - cron: 'CHANGEME'
+    # runs at 2:00 AM on the 25th day of every month
+    - cron: '0 2 25 * *'
 jobs:
   update-flake-inputs:
     runs-on: ubuntu-slim
