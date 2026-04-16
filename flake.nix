@@ -61,6 +61,20 @@
                 { flakoboros = module args; }
               ];
             });
+          templates = {
+            default = {
+              path = ./templates/default;
+              description = "A template for use with mc-rtc/nixpkgs";
+            };
+            controller = {
+              path = ./templates/controller;
+              description = "A template with superbuild configuration for use with mc-rtc/nixpkgs";
+            };
+            ros = {
+              path = ./templates/ros;
+              description = "A template for use with mc-rtc/nixpkgs and ROS";
+            };
+          };
         };
         perSystem =
           {
