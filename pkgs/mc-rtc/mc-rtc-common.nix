@@ -1,15 +1,14 @@
 {
-  fetchgit,
+  fetchFromGitHub,
 }:
 
 let
   version = "2.14.1";
-  src = fetchgit {
-    url = "https://github.com/jrl-umi3218/mc_rtc";
-    # PR 495 merged (HONOR_INSTALL_PREFIX)
-    rev = "1d5f6da998110acba73c327831903ee933ac884f";
-    fetchSubmodules = true;
-    sha256 = "sha256-soiG0+SK9PmJCrPRpaJt3Ej1SSxUg9kT8UlMajwUfqg=";
+  src = fetchFromGitHub {
+    owner = "jrl-umi3218";
+    repo = "mc_rtc";
+    rev = "d09e062acd60bb07c8e76b74a50f460ba2a2e6ed";
+    hash = "sha256-W4Mx8DCYdEvaTFoXxkaT+9WKwd4be8tX8FJY7Gtfn84=";
   };
 in
 {
