@@ -224,7 +224,7 @@
       magnumPluginsWithStbImageImporter = true;
     };
     magnum-with-plugins = prev.callPackage ./pkgs/3rd-party/magnum/magnum-with-plugins.nix { };
-    mc-rtc-imgui = callWithLocal ./pkgs/mc-rtc-imgui {
+    mc-rtc-imgui = prev.callPackage ./pkgs/mc-rtc-imgui {
       jrl-cmakemodules = final.jrl-cmakemodulesv2;
     };
     # standlone version of mc-rtc-magnum, with independent packaging for magnum and its plugins

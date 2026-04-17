@@ -7,8 +7,6 @@
   mc-rtc,
   imgui,
   implot,
-  useLocal ? false,
-  localWorkspace ? null,
 }:
 
 stdenv.mkDerivation (_finalAttrs: {
@@ -18,24 +16,13 @@ stdenv.mkDerivation (_finalAttrs: {
   dontBuild = true;
 
   src =
-    if useLocal then
-      builtins.trace "Using local workspace for mc-rtc-imgui: ${localWorkspace}/mc_rtc-imgui" (
-        builtins.path {
-          path = "${localWorkspace}/mc_rtc-imgui";
-          name = "mc-rtc-imgui-src";
-        }
-      )
-    else
-      fetchFromGitHub {
-        #owner = "mc-rtc";
-        owner = "arntanguy";
-        repo = "mc_rtc-imgui";
-        # tag = "v${finalAttrs.version}";
-        # future v1.0.0 release from nix-standalone
-        # http://github.com/mc-rtc/mc_rtc-imgui/pull/25
-        rev = "44a4e51586ea3308457205b2973023fbc2f95485";
-        hash = "sha256-J1oitwCXhtDGLW0vCnAN50BkUQeveuuruLz1TCOYe2Q=";
-      };
+    # head of nix branch (for stanalone install)
+    fetchFromGitHub {
+      owner = "mc-rtc";
+      repo = "mc_rtc-imgui";
+      rev = "4ab4c6d7add120284f870f0ac51541802c18c461";
+      hash = "sha256-qKZmySycr/MSju71cTFpn1fcESxujvDtN1JRYJ78Ykg=";
+    };
 
   nativeBuildInputs = [
     cmake
@@ -45,10 +32,6 @@ stdenv.mkDerivation (_finalAttrs: {
     mc-rtc
     imgui
     implot
-  ];
-
-  cmakeFlags = [
-    "-DMC_RTC_HONOR_INSTALL_PREFIX=ON"
   ];
 
   doCheck = false;
