@@ -38,6 +38,7 @@
       rviz2
       nav-msgs
       tf2-ros
+      tf2-eigen
       visualization-msgs
       sensor-msgs
       rosidl-default-generators

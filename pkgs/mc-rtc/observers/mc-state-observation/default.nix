@@ -4,14 +4,20 @@
   fetchurl,
   cmake,
   mc-rtc,
+  tf2-eigen,
   useLocal ? false,
   localWorkspace ? null,
   with-ros ? false,
+  buildRosPackage,
 }:
 
-stdenv.mkDerivation rec {
+let
   pname = "mc-state-observation";
   version = "1.1.0";
+in
+
+(if with-ros then buildRosPackage else stdenv.mkDerivation) {
+  inherit pname version;
 
   src =
     if useLocal then
@@ -28,7 +34,7 @@ stdenv.mkDerivation rec {
       };
 
   nativeBuildInputs = [ cmake ];
-  propagatedBuildInputs = [ mc-rtc ];
+  propagatedBuildInputs = [ mc-rtc ] ++ lib.optional (with-ros && tf2-eigen != null) tf2-eigen;
 
   # This requirement implies < 2.0 but in fact it's fine for this one
   postPatch = ''
