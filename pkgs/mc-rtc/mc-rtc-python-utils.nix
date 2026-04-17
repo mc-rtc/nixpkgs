@@ -5,8 +5,6 @@
   cmake,
   python313Packages,
   mc-rtc,
-  useLocal ? false,
-  localWorkspace ? null,
   rosidl-default-generators,
   geometry-msgs,
   rosidl-default-runtime,
@@ -16,7 +14,7 @@
 }:
 
 let
-  common = import ./mc-rtc-common.nix { inherit useLocal localWorkspace fetchgit; };
+  common = import ./mc-rtc-common.nix { inherit fetchgit; };
 in
 
 #python313Packages.buildPythonPackage {

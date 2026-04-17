@@ -5,8 +5,6 @@
   with-ros ? false,
   ament-cmake,
   buildRosPackage,
-  useLocal ? false,
-  localWorkspace ? null,
 }:
 
 (if with-ros then buildRosPackage else stdenv.mkDerivation) {
@@ -14,20 +12,11 @@
   version = "1.0.0";
   separateDebugInfo = false;
 
-  src =
-    if useLocal then
-      builtins.trace "Using local workspace for rhps1-description: ${localWorkspace}/rhps1_description" (
-        builtins.path {
-          path = "${localWorkspace}/rhps1_description";
-          name = "rhps1-description-src";
-        }
-      )
-    else
-      builtins.fetchGit {
-        url = "git@github.com:isri-aist/rhps1_description";
-        # Release v1.0.0
-        rev = "fd50b0d3424a926b8ad78b983389573b0453c88a";
-      };
+  src = builtins.fetchGit {
+    url = "git@github.com:isri-aist/rhps1_description";
+    # Release v1.0.0
+    rev = "fd50b0d3424a926b8ad78b983389573b0453c88a";
+  };
 
   buildType = "ament_cmake";
   nativeBuildInputs = if with-ros then [ ament-cmake ] else [ cmake ];

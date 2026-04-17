@@ -7,8 +7,6 @@
   libfranka,
   franka-description,
   xacro,
-  useLocal ? false,
-  localWorkspace ? null,
   with-ros ? false,
 }:
 
@@ -17,21 +15,13 @@ stdenv.mkDerivation {
   version = "1.0.0";
 
   src =
-    if useLocal then
-      builtins.trace "Using local workspace for mc-panda: ${localWorkspace}/mc_panda" (
-        builtins.path {
-          path = "${localWorkspace}/mc_panda";
-          name = "mc-panda-src";
-        }
-      )
-    else
-      # TODO: release mc-panda
-      fetchgit {
-        url = "https://github.com/arntanguy/mc_panda";
-        # topic/nix
-        rev = "34933cdd9802493627f4a0470166b87580be43ae";
-        sha256 = "sha256-bj/wGDqYwmzMqJ5wziX1x/+gXamYsCXrhB2/anN0Gmk=";
-      };
+    # TODO: release mc-panda
+    fetchgit {
+      url = "https://github.com/arntanguy/mc_panda";
+      # topic/nix
+      rev = "34933cdd9802493627f4a0470166b87580be43ae";
+      sha256 = "sha256-bj/wGDqYwmzMqJ5wziX1x/+gXamYsCXrhB2/anN0Gmk=";
+    };
 
   nativeBuildInputs = [ cmake ];
   propagatedBuildInputs = builtins.trace "panda with-ros: ${toString with-ros}" (

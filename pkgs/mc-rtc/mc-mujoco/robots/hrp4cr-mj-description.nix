@@ -3,30 +3,18 @@
   lib,
   fetchFromGitHub,
   cmake,
-  useLocal ? false,
-  localWorkspace ? null,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   version = "1.0.0";
   pname = "hrp4cr-mj-description";
-  srcPath = if localWorkspace != null then "${localWorkspace}/hrp4cr_mj_description" else null;
 
-  src =
-    if useLocal then
-      builtins.trace "Using local workspace for ${finalAttrs.pname}: ${finalAttrs.srcPath}" (
-        builtins.path {
-          path = "${finalAttrs.srcPath}";
-          name = "${finalAttrs.pname}-src";
-        }
-      )
-    else
-      fetchFromGitHub {
-        owner = "isri-aist";
-        repo = "hrp4cr_mj_description";
-        tag = "v${finalAttrs.version}";
-        hash = "";
-      };
+  src = fetchFromGitHub {
+    owner = "isri-aist";
+    repo = "hrp4cr_mj_description";
+    tag = "v${finalAttrs.version}";
+    hash = "";
+  };
 
   nativeBuildInputs = [ cmake ];
 

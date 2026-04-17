@@ -4,33 +4,20 @@
   fetchFromGitHub,
   cmake,
   mc-rtc,
-  useLocal ? false,
-  localWorkspace ? null,
 }:
 
 stdenv.mkDerivation (_finalAttrs: {
   pname = "mc-robot-model-update";
   version = "2.0.0";
 
-  src =
-    if useLocal then
-      builtins.trace
-        "Using local workspace for mc-robot-model-update: ${localWorkspace}/mc_robot_model_update"
-        (
-          builtins.path {
-            path = "${localWorkspace}/mc_robot_model_update";
-            name = "mc-robot-model-update-src";
-          }
-        )
-    else
-      fetchFromGitHub {
-        owner = "jrl-umi3218";
-        repo = "mc_robot_model_update";
-        # tag = "v${finalAttrs.version}";
-        # future v2.0.0 version once https://github.com/jrl-umi3218/mc_robot_model_update/pull/2 is merged
-        rev = "e6e2aa61459020729891e93817c83e8199697b08";
-        hash = "sha256-/gvwqy73elA6gUppwd7OSp0jkojHZUDZGUJlAVnkodU=";
-      };
+  src = fetchFromGitHub {
+    owner = "jrl-umi3218";
+    repo = "mc_robot_model_update";
+    # tag = "v${finalAttrs.version}";
+    # future v2.0.0 version once https://github.com/jrl-umi3218/mc_robot_model_update/pull/2 is merged
+    rev = "e6e2aa61459020729891e93817c83e8199697b08";
+    hash = "sha256-/gvwqy73elA6gUppwd7OSp0jkojHZUDZGUJlAVnkodU=";
+  };
 
   nativeBuildInputs = [ cmake ];
   propagatedBuildInputs = [

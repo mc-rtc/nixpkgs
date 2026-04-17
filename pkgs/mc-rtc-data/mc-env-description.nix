@@ -6,8 +6,6 @@
   ament-cmake,
   with-ros ? false,
   buildRosPackage,
-  useLocal ? false,
-  localWorkspace ? null,
 }:
 
 let
@@ -20,15 +18,7 @@ in
 
   # TODO: remove ROSFree branch
   src =
-    if useLocal then
-      builtins.trace "Using local workspace for mc-env-description: ${localWorkspace}/mc_env_description"
-        (
-          builtins.path {
-            path = "${localWorkspace}/mc_env_description";
-            name = "${pname}-src";
-          }
-        )
-    else if with-ros then
+    if with-ros then
       builtins.trace "with-ros true: ${toString with-ros}" (fetchgit {
         # master
         url = "https://github.com/jrl-umi3218/mc_env_description";

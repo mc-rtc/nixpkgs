@@ -6,30 +6,18 @@
   mc-dynamic-polytopes,
   mc-force-shoe-plugin,
   dcm-vrptask,
-  useLocal ? false,
-  localWorkspace ? null,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "polytopeController";
   version = "1.0.0";
 
-  src =
-    if useLocal then
-      builtins.trace "Using local workspace for polytopeController: ${localWorkspace}/polytopeController"
-        (
-          builtins.path {
-            path = "${localWorkspace}/polytopeController";
-            name = "polytopeController-src";
-          }
-        )
-    else
-      fetchFromGitHub {
-        owner = "Hugo-L3174";
-        repo = "polytopeController";
-        tag = "v${finalAttrs.version}";
-        hash = "sha256-djFHb/S6wLg8dMR4sT2tqKx5aEZxwszC2iRRnc23yiM=";
-      };
+  src = fetchFromGitHub {
+    owner = "Hugo-L3174";
+    repo = "polytopeController";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-djFHb/S6wLg8dMR4sT2tqKx5aEZxwszC2iRRnc23yiM=";
+  };
 
   nativeBuildInputs = [ cmake ];
   propagatedBuildInputs = [

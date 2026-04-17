@@ -3,31 +3,18 @@
   lib,
   fetchFromGitHub,
   cmake,
-  useLocal ? false,
-  localWorkspace ? null,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   version = "1.0.0";
   pname = "hrp5p-mj-description";
 
-  src =
-    if useLocal then
-      builtins.trace
-        "Using local workspace for ${finalAttrs.pname}: ${localWorkspace}/hrp5p_mj_description"
-        (
-          builtins.path {
-            path = "${localWorkspace}/hrp5p_mj_description";
-            name = "${finalAttrs.pname}-src";
-          }
-        )
-    else
-      fetchFromGitHub {
-        owner = "isri-aist";
-        repo = "hrp5p_mj_description";
-        tag = "v${finalAttrs.version}";
-        hash = "sha256-uLrXuYI2w+fg5a/WOZfs8kj5QB3NT35sziN3YsDmRmg=";
-      };
+  src = fetchFromGitHub {
+    owner = "isri-aist";
+    repo = "hrp5p_mj_description";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-uLrXuYI2w+fg5a/WOZfs8kj5QB3NT35sziN3YsDmRmg=";
+  };
 
   nativeBuildInputs = [ cmake ];
 

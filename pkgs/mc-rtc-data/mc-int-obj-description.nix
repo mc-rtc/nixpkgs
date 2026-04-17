@@ -6,14 +6,11 @@
   ament-cmake,
   with-ros ? false,
   buildRosPackage,
-  useLocal ? false,
-  localWorkspace ? null,
 }:
 
 let
   version = "1.0.8"; # TODO release
   pname = "mc-int-obj-description";
-  srcPath = "${localWorkspace}/mc_int_obj_description";
 in
 (if with-ros then buildRosPackage else stdenv.mkDerivation) {
   pname = "${pname}";
@@ -21,22 +18,14 @@ in
   separateDebugInfo = false;
 
   src =
-    if useLocal then
-      builtins.trace "Using local workspace for mc-int-obj-description: ${srcPath}" (
-        builtins.path {
-          path = "${srcPath}";
-          name = "${pname}-src";
-        }
-      )
-    else
-      # TODO: release
-      fetchgit {
-        # master
-        url = "https://github.com/jrl-umi3218/mc_int_obj_description";
-        rev = "b5af6dc486ec9af3413399c815c0904635d6708a";
-        sha256 = "sha256-V/VxnReFTnJ5I9uJHwI1BQTDozqH2DEP01SQvkZs424=";
-        fetchSubmodules = true;
-      };
+    # TODO: release
+    fetchgit {
+      # master
+      url = "https://github.com/jrl-umi3218/mc_int_obj_description";
+      rev = "b5af6dc486ec9af3413399c815c0904635d6708a";
+      sha256 = "sha256-V/VxnReFTnJ5I9uJHwI1BQTDozqH2DEP01SQvkZs424=";
+      fetchSubmodules = true;
+    };
 
   buildType = "ament_cmake";
   nativeBuildInputs = if with-ros then [ ament-cmake ] else [ cmake ];

@@ -48,10 +48,7 @@ Usage
 
 ### Options
 
-Options are provided through env variables
-
-- `MC_RTC_WITH_ROS="1"`: build `mc-rtc` and depencencies (e.g robots) with ros support (ros2 humble) [default=1]
-- `MC_RTC_USE_LOCAL="1"`: for derivations in `overlay.nix` that are called with `useLocal = true` (using `callWithLocal ...`), use a cloned folder in `localWorkspace` folder. This is not intended to be kept long-term, mostly a convenient debugging option until this repo is stable.
+Options are provided through flakeModule to downstream packages
 
 ### Override the shell's environment for local development
 

@@ -8,8 +8,6 @@
   picocom,
   screen,
   minicom,
-  useLocal ? false,
-  localWorkspace ? null,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -17,23 +15,13 @@ stdenv.mkDerivation (finalAttrs: {
   version = "2.0.0";
 
   src =
-    if useLocal then
-      builtins.trace
-        "Using local workspace for mc-force-shoe-plugin: ${localWorkspace}/mc_force_shoe_plugin"
-        (
-          builtins.path {
-            path = "${localWorkspace}/mc_force_shoe_plugin";
-            name = "mc-force-shoe-plugin-src";
-          }
-        )
-    else
-      # TODO: ask Hugo to transfer it to jrl-umi3218
-      fetchFromGitHub {
-        owner = "Hugo-L3174";
-        repo = "mc_force_shoe_plugin";
-        tag = "v${finalAttrs.version}";
-        hash = "sha256-mgtuJ0rmFKSgtth+/uVnvIJvXY7Ij8veywQ7Fm1neyk=";
-      };
+    # TODO: ask Hugo to transfer it to jrl-umi3218
+    fetchFromGitHub {
+      owner = "Hugo-L3174";
+      repo = "mc_force_shoe_plugin";
+      tag = "v${finalAttrs.version}";
+      hash = "sha256-mgtuJ0rmFKSgtth+/uVnvIJvXY7Ij8veywQ7Fm1neyk=";
+    };
 
   nativeBuildInputs = [ cmake ];
   propagatedBuildInputs = [

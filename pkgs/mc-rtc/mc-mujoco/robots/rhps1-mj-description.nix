@@ -2,30 +2,17 @@
   stdenv,
   lib,
   cmake,
-  useLocal ? false,
-  localWorkspace ? null,
 }:
 
-stdenv.mkDerivation (finalAttrs: {
+stdenv.mkDerivation (_finalAttrs: {
   version = "1.0.0";
   pname = "rhps1-mj-description";
 
-  src =
-    if useLocal then
-      builtins.trace
-        "Using local workspace for ${finalAttrs.pname}: ${localWorkspace}/rhps1_mj_description"
-        (
-          builtins.path {
-            path = "${localWorkspace}/rhps1_mj_description";
-            name = "${finalAttrs.pname}-src";
-          }
-        )
-    else
-      builtins.fetchGit {
-        url = "git@github.com:isri-aist/rhps1_mj_description";
-        # Release v1.0.0
-        rev = "ac2d198b21b6f431fffc2c93ad03b04f98c4135a";
-      };
+  src = builtins.fetchGit {
+    url = "git@github.com:isri-aist/rhps1_mj_description";
+    # Release v1.0.0
+    rev = "ac2d198b21b6f431fffc2c93ad03b04f98c4135a";
+  };
 
   nativeBuildInputs = [ cmake ];
 

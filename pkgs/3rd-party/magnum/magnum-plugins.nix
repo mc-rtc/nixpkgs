@@ -4,8 +4,6 @@
   fetchFromGitHub,
   cmake,
   magnum,
-  useLocal ? false,
-  localWorkspace ? null,
   assimp,
   libz,
   # tested
@@ -46,21 +44,12 @@ stdenv.mkDerivation (_finalAttrs: {
 
   dontBuild = true;
 
-  src =
-    if useLocal then
-      builtins.trace "Using local workspace for magnum-plugins: ${localWorkspace}/magnum-plugins" (
-        builtins.path {
-          path = "${localWorkspace}/magnum-plugins";
-          name = "magnum-plugins-src";
-        }
-      )
-    else
-      fetchFromGitHub {
-        owner = "mosra";
-        repo = "magnum-plugins";
-        rev = "32e3270380ed9b261f0c03459d3c57ba485a461b";
-        hash = "sha256-lAj7XtapGKF4EVv57KNzU+WV9D0IqxbsBtJrU6fn9II=";
-      };
+  src = fetchFromGitHub {
+    owner = "mosra";
+    repo = "magnum-plugins";
+    rev = "32e3270380ed9b261f0c03459d3c57ba485a461b";
+    hash = "sha256-lAj7XtapGKF4EVv57KNzU+WV9D0IqxbsBtJrU6fn9II=";
+  };
 
   nativeBuildInputs = [ cmake ];
   propagatedBuildInputs = [

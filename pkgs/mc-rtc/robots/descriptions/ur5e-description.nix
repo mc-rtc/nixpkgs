@@ -8,8 +8,6 @@
   buildRosPackage,
   xacro,
   ur-description,
-  useLocal ? false,
-  localWorkspace ? null,
 }:
 
 (if with-ros then buildRosPackage else stdenv.mkDerivation) {
@@ -17,21 +15,12 @@
   version = "1.0.0";
   separateDebugInfo = false;
 
-  src =
-    if useLocal then
-      builtins.trace "Using local workspace for ur5e-description: ${localWorkspace}/mc_ur5e_description" (
-        builtins.path {
-          path = "${localWorkspace}/mc_ur5e_description";
-          name = "ur5e-description-src";
-        }
-      )
-    else
-      fetchFromGitHub {
-        owner = "isri-aist";
-        repo = "mc_ur5e_description";
-        rev = "4a3ee47d6eeb11e3f08a13f2cb5529c472244516";
-        hash = "sha256-I/NL1BnvAr6Apq6/ZduxjoJ/WiUOF4v3nASJBmvFmPA=";
-      };
+  src = fetchFromGitHub {
+    owner = "isri-aist";
+    repo = "mc_ur5e_description";
+    rev = "4a3ee47d6eeb11e3f08a13f2cb5529c472244516";
+    hash = "sha256-I/NL1BnvAr6Apq6/ZduxjoJ/WiUOF4v3nASJBmvFmPA=";
+  };
 
   buildType = "ament_cmake";
   nativeBuildInputs = if with-ros then [ ament-cmake ] else [ cmake ];

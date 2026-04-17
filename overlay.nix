@@ -6,24 +6,13 @@
     Use this to access and override existing packages, or to call functions from the underlying package set.
 */
 {
-  useLocal ? false,
-  localWorkspace ? null,
   with-ros ? false,
   ...
 }:
 (
   final: prev:
   let
-    callWithLocal =
-      pkg:
-      { ... }@args:
-      prev.callPackage pkg (
-        {
-          inherit useLocal localWorkspace;
-        }
-        // args
-      );
-    callWithRos = pkg: args: prev.callPackage pkg (args // { inherit with-ros; });
+    callWithRos = pkg: args: callWithRos pkg (args // { inherit with-ros; });
   in
   {
     inherit (prev.rosPackages.jazzy)
@@ -56,65 +45,65 @@
       '';
     });
 
-    spacevecalg = prev.callPackage ./pkgs/spacevecalg { };
-    rbdyn = prev.callPackage ./pkgs/rbdyn { };
-    eigen-qld = prev.callPackage ./pkgs/eigen-qld { };
-    eigen-quadprog = prev.callPackage ./pkgs/eigen-quadprog { };
-    sch-core = prev.callPackage ./pkgs/sch-core { };
-    #sch-visualization = prev.callPackage ./pkgs/sch-visualization {};
-    sch-visualization = callWithLocal ./pkgs/sch-visualization { };
-    tasks = prev.callPackage ./pkgs/tasks { };
-    # mc-rtc-data = prev.callPackage ./pkgs/mc-rtc-data { with-ros = false; };
+    spacevecalg = callWithRos ./pkgs/spacevecalg { };
+    rbdyn = callWithRos ./pkgs/rbdyn { };
+    eigen-qld = callWithRos ./pkgs/eigen-qld { };
+    eigen-quadprog = callWithRos ./pkgs/eigen-quadprog { };
+    sch-core = callWithRos ./pkgs/sch-core { };
+    #sch-visualization = callWithRos ./pkgs/sch-visualization {};
+    sch-visualization = callWithRos ./pkgs/sch-visualization { };
+    tasks = callWithRos ./pkgs/tasks { };
+    # mc-rtc-data = callWithRos ./pkgs/mc-rtc-data { with-ros = false; };
     mc-rtc-data = callWithRos ./pkgs/mc-rtc-data { };
-    state-observation = prev.callPackage ./pkgs/state-observation { };
-    mc-rbdyn-urdf = prev.callPackage ./pkgs/mc-rbdyn-urdf { };
-    tvm = prev.callPackage ./pkgs/tvm { };
-    copra = prev.callPackage ./pkgs/copra { };
+    state-observation = callWithRos ./pkgs/state-observation { };
+    mc-rbdyn-urdf = callWithRos ./pkgs/mc-rbdyn-urdf { };
+    tvm = callWithRos ./pkgs/tvm { };
+    copra = callWithRos ./pkgs/copra { };
     omniorb = prev.symlinkJoin {
       name = "omniorb";
       paths = [
         prev.omniorb.out
-        (prev.callPackage ./pkgs/omniorb-python {
+        (callWithRos ./pkgs/omniorb-python {
           omniorb = prev.omniorb;
           buildPythonPackage = prev.python2Packages.buildPythonPackage;
         }).out
       ];
     };
-    openrtm-aist = prev.callPackage ./pkgs/openrtm-aist { };
-    openrtm-aist-python = prev.callPackage ./pkgs/openrtm-aist-python {
+    openrtm-aist = callWithRos ./pkgs/openrtm-aist { };
+    openrtm-aist-python = callWithRos ./pkgs/openrtm-aist-python {
       buildPythonPackage = prev.python2Packages.buildPythonPackage;
     };
-    # mc-state-observation = callWithLocal ./pkgs/mc-rtc/observers/mc-state-observation;
-    mc-state-observation = prev.callPackage ./pkgs/mc-rtc/observers/mc-state-observation { };
-    #lipm-walking-controller = prev.callPackage ./pkgs/mc-rtc/controllers/lipm-walking-controller {};
-    # lipm-walking-controller = callWithLocal ./pkgs/mc-rtc/controllers/lipm-walking-controller {};
-    #mc-rtc-raylib = prev.callPackage ./pkgs/mc-rtc-raylib {};
-    mc-rtc-msgs = prev.callPackage ./pkgs/mc-rtc-msgs { };
-    mc-udp = prev.callPackage ./pkgs/mc-udp { };
+    # mc-state-observation = callWithRos ./pkgs/mc-rtc/observers/mc-state-observation;
+    mc-state-observation = callWithRos ./pkgs/mc-rtc/observers/mc-state-observation { };
+    #lipm-walking-controller = callWithRos ./pkgs/mc-rtc/controllers/lipm-walking-controller {};
+    # lipm-walking-controller = callWithRos ./pkgs/mc-rtc/controllers/lipm-walking-controller {};
+    #mc-rtc-raylib = callWithRos ./pkgs/mc-rtc-raylib {};
+    mc-rtc-msgs = callWithRos ./pkgs/mc-rtc-msgs { };
+    mc-udp = callWithRos ./pkgs/mc-udp { };
 
     ## Robot description packages
-    franka-description = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/franka-description.nix { };
+    franka-description = callWithRos ./pkgs/mc-rtc/robots/mc-panda/franka-description.nix { };
     g1-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/g1-description.nix { };
     h1-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/h1-description.nix { };
-    ur-description = prev.callPackage ./pkgs/mc-rtc/robots/descriptions/ur-description.nix { };
+    ur-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/ur-description.nix { };
     ur5e-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/ur5e-description.nix { };
     jvrc-description = callWithRos ./pkgs/mc-rtc-data/jvrc-description.nix { };
     mc-env-description = callWithRos ./pkgs/mc-rtc-data/mc-env-description.nix { };
     mc-int-obj-description = callWithRos ./pkgs/mc-rtc-data/mc-int-obj-description.nix { };
 
     # Robot modules
-    mc-g1 = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-g1.nix { };
-    mc-h1 = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-h1.nix { };
-    mc-ur5e = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-ur5e.nix { };
-    mc-panda = callWithLocal ./pkgs/mc-rtc/robots/mc-panda { };
-    mc-panda-lirmm = callWithLocal ./pkgs/mc-rtc/robots/mc-panda/mc-panda-lirmm.nix { };
+    mc-g1 = callWithRos ./pkgs/mc-rtc/robots/modules/mc-g1.nix { };
+    mc-h1 = callWithRos ./pkgs/mc-rtc/robots/modules/mc-h1.nix { };
+    mc-ur5e = callWithRos ./pkgs/mc-rtc/robots/modules/mc-ur5e.nix { };
+    mc-panda = callWithRos ./pkgs/mc-rtc/robots/mc-panda { };
+    mc-panda-lirmm = callWithRos ./pkgs/mc-rtc/robots/mc-panda/mc-panda-lirmm.nix { };
 
-    libfranka = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/libfranka.nix { };
-    # mc-franka = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/mc-franka.nix {};
-    mc-franka = callWithLocal ./pkgs/mc-rtc/robots/mc-panda/mc-franka.nix { };
-    poco = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/libpoco.nix { };
-    mesh-sampling = prev.callPackage ./pkgs/mesh-sampling { };
-    # mesh-sampling = callWithLocal ./pkgs/mesh-sampling {};
+    libfranka = callWithRos ./pkgs/mc-rtc/robots/mc-panda/libfranka.nix { };
+    # mc-franka = callWithRos ./pkgs/mc-rtc/robots/mc-panda/mc-franka.nix {};
+    mc-franka = callWithRos ./pkgs/mc-rtc/robots/mc-panda/mc-franka.nix { };
+    poco = callWithRos ./pkgs/mc-rtc/robots/mc-panda/libpoco.nix { };
+    mesh-sampling = callWithRos ./pkgs/mesh-sampling { };
+    # mesh-sampling = callWithRos ./pkgs/mesh-sampling {};
 
     # XXX
     # The current nixpkgs input uses fmt_12
@@ -124,20 +113,17 @@
     # this might cause some headache down the line.
     # TODO: patch mc-rtc and eigen-fmt with fmt_12 support
     mc-rtc = callWithRos ./pkgs/mc-rtc/mc-rtc.nix {
-      spdlog = prev.callPackage ./pkgs/spdlog-1.12.0.nix {
+      spdlog = callWithRos ./pkgs/spdlog-1.12.0.nix {
         fmt = final.fmt_9;
       };
     };
-    mc-rtc-python-utils = callWithLocal ./pkgs/mc-rtc/mc-rtc-python-utils.nix { };
+    mc-rtc-python-utils = callWithRos ./pkgs/mc-rtc/mc-rtc-python-utils.nix { };
     #mc-rtc = callWithRos ./pkgs/mc-rtc/mc-rtc.nix {};
-    # mc-rtc-rviz-panel = prev.libsForQt5.callPackage ./pkgs/mc-rtc/ros/mc-rtc-rviz-panel.nix { inherit useLocal; inherit localWorkspace; };
-    mc-rtc-rviz-panel = prev.libsForQt5.callPackage ./pkgs/mc-rtc/ros/mc-rtc-rviz-panel.nix { };
-    # mc-rtc-ticker = callWithLocal ./pkgs/mc-rtc/ros/mc-rtc-ticker.nix {};
-    mc-rtc-ticker = prev.callPackage ./pkgs/mc-rtc/ros/mc-rtc-ticker.nix { };
-    # mc-rtc = callWithLocal ./pkgs/mc-rtc/mc-rtc.nix { with-ros = true; };
-    # mc-rtc = prev.callPackage ./pkgs/mc-rtc/mc-rtc.nix { };
-    # mc-rtc-magnum = prev.callPackage ./pkgs/mc-rtc-magnum {};
-    gram-savitzky-golay = prev.callPackage ./pkgs/gram-savitzky-golay { };
+    mc-rtc-rviz-panel = prev.libsForQt5.callPackage ./pkgs/mc-rtc/ros/mc-rtc-rviz-panel.nix {
+      inherit with-ros;
+    };
+    mc-rtc-ticker = callWithRos ./pkgs/mc-rtc/ros/mc-rtc-ticker.nix { };
+    gram-savitzky-golay = callWithRos ./pkgs/gram-savitzky-golay { };
 
     # Hugo's dependencies
     # FIXME: { won't build as-is here as it requires a branch of mc-rtc for now
@@ -145,16 +131,16 @@
     # As they are currently not in the flake.nix's package set, this is probably ok to
     # have non-building versions in the overlay (?)
     mc-dynamic-polytopes =
-      prev.callPackage ./pkgs/mc-rtc/controllers/polytopeController/mc-dynamic-polytopes.nix
+      callWithRos ./pkgs/mc-rtc/controllers/polytopeController/mc-dynamic-polytopes.nix
         {
           jrl-cmakemodules = final.jrl-cmakemodulesv2;
           # mc-rtc = final.mc-rtc-hugo;
         };
-    dcm-vrptask = callWithLocal ./pkgs/mc-rtc/controllers/polytopeController/dcm-vrptask.nix {
+    dcm-vrptask = callWithRos ./pkgs/mc-rtc/controllers/polytopeController/dcm-vrptask.nix {
       # mc-rtc = final.mc-rtc-hugo;
       jrl-cmakemodules = final.jrl-cmakemodulesv2;
     };
-    polytopeController = prev.callPackage ./pkgs/mc-rtc/controllers/polytopeController/default.nix {
+    polytopeController = callWithRos ./pkgs/mc-rtc/controllers/polytopeController/default.nix {
       # mc-rtc = final.mc-rtc-hugo;
     };
     # End of Hugo's dependencies
@@ -167,22 +153,22 @@
       propagatedBuildInputs = (old.propagatedBuildInputs or [ ]) ++ [ final.libGL ];
     });
 
-    jvrc1-mj-description = callWithLocal ./pkgs/mc-rtc/mc-mujoco/robots/jvrc1-mj-description.nix { };
-    g1-mj-description = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/g1-mj-description.nix { };
-    h1-mj-description = callWithLocal ./pkgs/mc-rtc/mc-mujoco/robots/h1-mj-description.nix { };
-    ur5e-mj-description = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/ur5e-mj-description.nix { };
+    jvrc1-mj-description = callWithRos ./pkgs/mc-rtc/mc-mujoco/robots/jvrc1-mj-description.nix { };
+    g1-mj-description = callWithRos ./pkgs/mc-rtc/mc-mujoco/robots/g1-mj-description.nix { };
+    h1-mj-description = callWithRos ./pkgs/mc-rtc/mc-mujoco/robots/h1-mj-description.nix { };
+    ur5e-mj-description = callWithRos ./pkgs/mc-rtc/mc-mujoco/robots/ur5e-mj-description.nix { };
 
-    env-mj-description = callWithLocal ./pkgs/mc-rtc/mc-mujoco/robots/env-mj-description.nix { };
+    env-mj-description = callWithRos ./pkgs/mc-rtc/mc-mujoco/robots/env-mj-description.nix { };
 
     # symlinkJoin all robots
     # FIXME: this triggers a full rebuild of mc-mujoco
-    mc-mujoco = callWithLocal ./pkgs/mc-rtc/mc-mujoco {
+    mc-mujoco = callWithRos ./pkgs/mc-rtc/mc-mujoco {
       jrl-cmakemodules = final.jrl-cmakemodulesv2;
     };
 
-    mc-mujoco-robots = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/default.nix { };
+    mc-mujoco-robots = callWithRos ./pkgs/mc-rtc/mc-mujoco/robots/default.nix { };
     # mc-mujoco with all public robots
-    mc-mujoco-robots-public = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/default.nix {
+    mc-mujoco-robots-public = callWithRos ./pkgs/mc-rtc/mc-mujoco/robots/default.nix {
       robots = [
         final.g1-mj-description
         final.h1-mj-description
@@ -193,44 +179,44 @@
     ###############
     # CONTROLLERS #
     ###############
-    panda-prosthesis = callWithLocal ./pkgs/mc-rtc/controllers/panda-prosthesis { };
-    # panda-prosthesis = prev.callPackage ./pkgs/mc-rtc/controllers/panda-prosthesis {};
+    panda-prosthesis = callWithRos ./pkgs/mc-rtc/controllers/panda-prosthesis { };
+    # panda-prosthesis = callWithRos ./pkgs/mc-rtc/controllers/panda-prosthesis {};
 
     ###########
     # PLUGINS #
     ###########
-    mc-force-shoe-plugin = callWithLocal ./pkgs/mc-rtc/plugins/mc-force-shoe-plugin.nix { };
-    mc-robot-model-update = callWithLocal ./pkgs/mc-rtc/plugins/mc-robot-model-update.nix { };
+    mc-force-shoe-plugin = callWithRos ./pkgs/mc-rtc/plugins/mc-force-shoe-plugin.nix { };
+    mc-robot-model-update = callWithRos ./pkgs/mc-rtc/plugins/mc-robot-model-update.nix { };
 
     #############
     # 3rd-party #
     #############
-    eigen-fmt = prev.callPackage ./pkgs/3rd-party/eigen-fmt {
+    eigen-fmt = callWithRos ./pkgs/3rd-party/eigen-fmt {
       fmt = prev.fmt_10;
     };
-    politopix = prev.callPackage ./pkgs/3rd-party/politopix.nix {
+    politopix = callWithRos ./pkgs/3rd-party/politopix.nix {
       fetchurl = final.stdenv.fetchurlBoot;
     };
 
-    imguizmo = callWithLocal ./pkgs/3rd-party/imguizmo.nix {
+    imguizmo = callWithRos ./pkgs/3rd-party/imguizmo.nix {
       jrl-cmakemodules = final.jrl-cmakemodulesv2;
     };
-    corrade = prev.callPackage ./pkgs/3rd-party/magnum/corrade.nix { };
-    magnum = prev.callPackage ./pkgs/3rd-party/magnum/magnum.nix { };
-    magnum-integration = callWithLocal ./pkgs/3rd-party/magnum/magnum-integration.nix {
+    corrade = callWithRos ./pkgs/3rd-party/magnum/corrade.nix { };
+    magnum = callWithRos ./pkgs/3rd-party/magnum/magnum.nix { };
+    magnum-integration = callWithRos ./pkgs/3rd-party/magnum/magnum-integration.nix {
       with-imguiintegration = true;
     };
-    magnum-plugins = callWithLocal ./pkgs/3rd-party/magnum/magnum-plugins.nix {
+    magnum-plugins = callWithRos ./pkgs/3rd-party/magnum/magnum-plugins.nix {
       magnumPluginsWithAssimpImporter = true;
       magnumPluginsWithStbImageImporter = true;
     };
-    magnum-with-plugins = prev.callPackage ./pkgs/3rd-party/magnum/magnum-with-plugins.nix { };
-    mc-rtc-imgui = prev.callPackage ./pkgs/mc-rtc-imgui {
+    magnum-with-plugins = callWithRos ./pkgs/3rd-party/magnum/magnum-with-plugins.nix { };
+    mc-rtc-imgui = callWithRos ./pkgs/mc-rtc-imgui {
       jrl-cmakemodules = final.jrl-cmakemodulesv2;
     };
     # standlone version of mc-rtc-magnum, with independent packaging for magnum and its plugins
     # and a standalone mc-rtc-imgui version
-    mc-rtc-magnum = prev.callPackage ./pkgs/mc-rtc-magnum/standalone.nix { };
+    mc-rtc-magnum = callWithRos ./pkgs/mc-rtc-magnum/standalone.nix { };
 
     #####################
     # mc-rtc-superbuild #
@@ -252,10 +238,10 @@
     # This is not per-say recomended, but it can drastically reduce build time for these components, and also allow for seamless LSP integration in your editor.
     #
     # TODO: investigate use of ccacheStdenv
-    # mc-rtc-superbuild = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-symlinkjoin.nix.nix {
+    # mc-rtc-superbuild = callWithRos ./pkgs/mc-rtc/mc-rtc-superbuild-symlinkjoin.nix.nix {
 
     # minimal superbuild environment (jvrc1, mc_rtc_ticker)
-    mc-rtc-superbuild-minimal = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix {
+    mc-rtc-superbuild-minimal = callWithRos ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix {
       superbuildArgs = {
         pname = "mc-rtc-superbuild-minimal";
         observers = [ final.mc-state-observation ];
@@ -263,7 +249,7 @@
     };
 
     # default superbuild environment (jvrc1 robot, with gui apps and mujoco simulation)
-    mc-rtc-superbuild = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix {
+    mc-rtc-superbuild = callWithRos ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix {
       superbuildArgs = final.mc-rtc-superbuild-minimal.superbuildArgs // {
         pname = "mc-rtc-superbuild";
         apps = [
@@ -275,21 +261,19 @@
     };
 
     # default superbuild environment with all public robots (jvrc1, g1, h1, ur5e), with gui apps
-    mc-rtc-superbuild-all-public-robots =
-      prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix
-        {
-          superbuildArgs = final.mc-rtc-superbuild.superbuildArgs // {
-            pname = "mc-rtc-superbuild-all-public-robots";
-            robots = final.mc-rtc-superbuild.superbuildArgs.robots ++ [
-              final.mc-g1
-              final.mc-h1
-              final.mc-ur5e
-            ];
-          };
-        };
+    mc-rtc-superbuild-all-public-robots = callWithRos ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix {
+      superbuildArgs = final.mc-rtc-superbuild.superbuildArgs // {
+        pname = "mc-rtc-superbuild-all-public-robots";
+        robots = final.mc-rtc-superbuild.superbuildArgs.robots ++ [
+          final.mc-g1
+          final.mc-h1
+          final.mc-ur5e
+        ];
+      };
+    };
 
     # full superbuild environment (all public robots, all default controllers, gui apps, mujoco)
-    mc-rtc-superbuild-full = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix {
+    mc-rtc-superbuild-full = callWithRos ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix {
       superbuildArgs = final.mc-rtc-superbuild-all-public-robots.superbuildArgs // {
         pname = "mc-rtc-superbuild-full";
       };
