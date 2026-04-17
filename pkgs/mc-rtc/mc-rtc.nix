@@ -5,8 +5,9 @@
   lib,
   buildRosPackage,
   stdenv,
-  fetchgit,
+  fetchFromGitHub,
   cmake,
+  jrl-cmakemodules,
   pkg-config,
   tasks,
   tvm,
@@ -39,9 +40,7 @@
 
 let
   common = import ./mc-rtc-common.nix {
-    inherit
-      fetchgit
-      ;
+    inherit fetchFromGitHub;
   };
 in
 
@@ -59,6 +58,7 @@ in
 
   nativeBuildInputs = [
     cmake
+    jrl-cmakemodules
     qt5.wrapQtAppsHook
   ];
   propagatedBuildInputs = [
