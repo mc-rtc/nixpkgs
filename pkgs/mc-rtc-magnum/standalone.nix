@@ -18,8 +18,8 @@ stdenv.mkDerivation {
   src = fetchFromGitHub {
     owner = "mc-rtc";
     repo = "mc_rtc-magnum";
-    rev = "734821ad335ad9b489e6db4ed60e248d5a02b9ca";
-    hash = "sha256-2cRQUHJv3PhLYcvy2/Q2JApAY7cwtzEB4xHzXqf5+5g=";
+    rev = "e3cb734";
+    hash = "sha256-4XiyBZl+ZqHKcStjYu33fYHgVD1umfVzgbdaN7RDm5Q=";
   };
 
   nativeBuildInputs = [
