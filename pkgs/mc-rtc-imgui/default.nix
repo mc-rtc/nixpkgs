@@ -20,8 +20,8 @@ stdenv.mkDerivation (_finalAttrs: {
     fetchFromGitHub {
       owner = "mc-rtc";
       repo = "mc_rtc-imgui";
-      rev = "4ab4c6d7add120284f870f0ac51541802c18c461";
-      hash = "sha256-qKZmySycr/MSju71cTFpn1fcESxujvDtN1JRYJ78Ykg=";
+      rev = "3e6c1617a5e622795019b2bccd2ba259df18026f";
+      hash = "sha256-KmcF5e0O2bQheTArjxaDeBQlxf3cywaFtNlxleHYsL8=";
     };
 
   nativeBuildInputs = [
