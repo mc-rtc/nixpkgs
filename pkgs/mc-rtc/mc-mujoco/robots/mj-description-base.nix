@@ -3,8 +3,6 @@
   lib,
   fetchFromGitHub,
   cmake,
-  useLocal ? false,
-  localWorkspace ? null,
   pname,
   owner ? "isri-aist",
   repo,
@@ -16,23 +14,13 @@
 stdenv.mkDerivation (finalAttrs: {
   version = version;
   pname = pname;
-  srcPath = if localWorkspace != null then "${localWorkspace}/${repo}" else null;
 
-  src =
-    if useLocal then
-      builtins.trace "Using local workspace for ${finalAttrs.pname}: ${finalAttrs.srcPath}" (
-        builtins.path {
-          path = "${finalAttrs.srcPath}";
-          name = "${finalAttrs.pname}-src";
-        }
-      )
-    else
-      fetchFromGitHub {
-        owner = owner;
-        repo = repo;
-        tag = "v${finalAttrs.version}";
-        hash = hash;
-      };
+  src = fetchFromGitHub {
+    owner = owner;
+    repo = repo;
+    tag = "v${finalAttrs.version}";
+    hash = hash;
+  };
 
   nativeBuildInputs = [ cmake ];
 

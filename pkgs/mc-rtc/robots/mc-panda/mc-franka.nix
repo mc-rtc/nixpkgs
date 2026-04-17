@@ -8,8 +8,6 @@
   mc-panda,
   sudo,
   libcap,
-  useLocal ? false,
-  localWorkspace ? null,
 }:
 
 stdenv.mkDerivation {
@@ -17,21 +15,13 @@ stdenv.mkDerivation {
   version = "1.0.0";
 
   src =
-    if useLocal then
-      builtins.trace "Using local workspace for mc-franka: ${localWorkspace}/mc_franka" (
-        builtins.path {
-          path = "${localWorkspace}/mc_franka";
-          name = "mc-franka-src";
-        }
-      )
-    else
-      # TODO: release mc-franka
-      fetchgit {
-        url = "https://github.com/jrl-umi3218/mc_franka";
-        # topic/nix
-        rev = "a1ee4100b489d50f1c9cbe7e5913183939678ef3";
-        sha256 = "sha256-CXh2wCVIC3FxZ+bBmHXNGXYGqiqFStITFj9NRgGT5EU=";
-      };
+    # TODO: release mc-franka
+    fetchgit {
+      url = "https://github.com/jrl-umi3218/mc_franka";
+      # topic/nix
+      rev = "a1ee4100b489d50f1c9cbe7e5913183939678ef3";
+      sha256 = "sha256-CXh2wCVIC3FxZ+bBmHXNGXYGqiqFStITFj9NRgGT5EU=";
+    };
 
   nativeBuildInputs = [
     cmake

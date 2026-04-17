@@ -3,8 +3,6 @@
   lib,
   fetchFromGitHub,
   cmake,
-  useLocal ? false,
-  localWorkspace ? null,
 }:
 
 import ./mj-description-base.nix {
@@ -13,8 +11,6 @@ import ./mj-description-base.nix {
     lib
     fetchFromGitHub
     cmake
-    useLocal
-    localWorkspace
     ;
   pname = "g1-mj-description";
   repo = "g1_mj_description";

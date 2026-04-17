@@ -34,15 +34,12 @@
   tf2-ros ? null,
   rosbag2 ? null,
   mc-rtc-msgs ? null,
-  useLocal ? false,
-  localWorkspace ? null,
+  ament-cmake ? null,
 }:
 
 let
   common = import ./mc-rtc-common.nix {
     inherit
-      useLocal
-      localWorkspace
       fetchgit
       ;
   };
@@ -96,7 +93,9 @@ in
   ++ lib.optional (with-ros && sensor-msgs != null) sensor-msgs
   ++ lib.optional (with-ros && tf2-ros != null) tf2-ros
   ++ lib.optional (with-ros && rosbag2 != null) rosbag2
-  ++ lib.optional (with-ros && mc-rtc-msgs != null) mc-rtc-msgs;
+  ++ lib.optional (with-ros && mc-rtc-msgs != null) mc-rtc-msgs
+  ++ lib.optional with-ros ament-cmake
+  ++ lib.optional with-ros pkg-config;
 
   preConfigure = ''
     export ROS_VERSION=2

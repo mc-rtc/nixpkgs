@@ -5,8 +5,6 @@
   cmake,
   mc-rtc,
   tf2-eigen,
-  useLocal ? false,
-  localWorkspace ? null,
   with-ros ? false,
   buildRosPackage,
 }:
@@ -19,19 +17,10 @@ in
 (if with-ros then buildRosPackage else stdenv.mkDerivation) {
   inherit pname version;
 
-  src =
-    if useLocal then
-      builtins.trace "Using local workspace for ${pname}: ${localWorkspace}/mc_state_obeservation" (
-        builtins.path {
-          path = "${localWorkspace}/mc_state_observation";
-          name = "mc_state_observation-src";
-        }
-      )
-    else
-      fetchurl {
-        url = "https://github.com/jrl-umi3218/mc_state_observation/releases/download/v${version}/mc_state_observation-v${version}.tar.gz";
-        sha256 = "sha256-F1LzhAK0MQM4mc5+dr0lK364J7f0nA1ZBe1RZlG3Pmo=";
-      };
+  src = fetchurl {
+    url = "https://github.com/jrl-umi3218/mc_state_observation/releases/download/v${version}/mc_state_observation-v${version}.tar.gz";
+    sha256 = "sha256-F1LzhAK0MQM4mc5+dr0lK364J7f0nA1ZBe1RZlG3Pmo=";
+  };
 
   nativeBuildInputs = [ cmake ];
   propagatedBuildInputs = [ mc-rtc ] ++ lib.optional (with-ros && tf2-eigen != null) tf2-eigen;

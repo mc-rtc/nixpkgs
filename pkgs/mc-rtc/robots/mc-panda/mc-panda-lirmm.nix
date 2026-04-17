@@ -4,34 +4,23 @@
   fetchgit,
   mc-panda,
   cmake,
-  useLocal ? false,
-  localWorkspace ? null,
 }:
 
 let
   version = "1.0.0";
-  localFolder = "mc_panda_lirmm";
 in
 stdenv.mkDerivation {
   pname = "mc-panda-lirmm";
   version = "${version}";
 
   src =
-    if useLocal then
-      builtins.trace "Using local workspace for mc-panda: ${localWorkspace}/${localFolder}" (
-        builtins.path {
-          path = "${localWorkspace}/${localFolder}";
-          name = "mc-panda-lirmm-src";
-        }
-      )
-    else
-      # TODO: release mc-panda-lirmm
-      fetchgit {
-        url = "https://github.com/arntanguy/mc_panda_lirmm";
-        # topic/ConnectModules
-        rev = "bbc682cd18f01ee6a058971268f8d5b46bffa84f";
-        sha256 = "sha256-lEt27kzOaeN2gMFz2p2f2v7Kq97RW/JG12YbinTr2IE=";
-      };
+    # TODO: release mc-panda-lirmm
+    fetchgit {
+      url = "https://github.com/arntanguy/mc_panda_lirmm";
+      # topic/ConnectModules
+      rev = "bbc682cd18f01ee6a058971268f8d5b46bffa84f";
+      sha256 = "sha256-lEt27kzOaeN2gMFz2p2f2v7Kq97RW/JG12YbinTr2IE=";
+    };
 
   nativeBuildInputs = [ cmake ];
   propagatedBuildInputs = [ mc-panda ];

@@ -6,23 +6,12 @@
     Use this to access and override existing packages, or to call functions from the underlying package set.
 */
 {
-  useLocal ? false,
-  localWorkspace ? null,
   with-ros ? false,
   ...
 }:
 (
   final: prev:
   let
-    callWithLocal =
-      pkg:
-      { ... }@args:
-      prev.callPackage pkg (
-        {
-          inherit useLocal localWorkspace;
-        }
-        // args
-      );
     callWithRos = pkg: args: prev.callPackage pkg (args // { inherit with-ros; });
   in
   {
@@ -62,7 +51,7 @@
     eigen-quadprog = prev.callPackage ./pkgs/eigen-quadprog { };
     sch-core = prev.callPackage ./pkgs/sch-core { };
     #sch-visualization = prev.callPackage ./pkgs/sch-visualization {};
-    sch-visualization = callWithLocal ./pkgs/sch-visualization { };
+    sch-visualization = prev.callPackage ./pkgs/sch-visualization { };
     tasks = prev.callPackage ./pkgs/tasks { };
     # mc-rtc-data = prev.callPackage ./pkgs/mc-rtc-data { with-ros = false; };
     mc-rtc-data = callWithRos ./pkgs/mc-rtc-data { };
@@ -84,10 +73,10 @@
     openrtm-aist-python = prev.callPackage ./pkgs/openrtm-aist-python {
       buildPythonPackage = prev.python2Packages.buildPythonPackage;
     };
-    # mc-state-observation = callWithLocal ./pkgs/mc-rtc/observers/mc-state-observation;
+    # mc-state-observation = prev.callPackage ./pkgs/mc-rtc/observers/mc-state-observation;
     mc-state-observation = prev.callPackage ./pkgs/mc-rtc/observers/mc-state-observation { };
     #lipm-walking-controller = prev.callPackage ./pkgs/mc-rtc/controllers/lipm-walking-controller {};
-    # lipm-walking-controller = callWithLocal ./pkgs/mc-rtc/controllers/lipm-walking-controller {};
+    # lipm-walking-controller = prev.callPackage ./pkgs/mc-rtc/controllers/lipm-walking-controller {};
     #mc-rtc-raylib = prev.callPackage ./pkgs/mc-rtc-raylib {};
     mc-rtc-msgs = prev.callPackage ./pkgs/mc-rtc-msgs { };
     mc-udp = prev.callPackage ./pkgs/mc-udp { };
@@ -106,15 +95,15 @@
     mc-g1 = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-g1.nix { };
     mc-h1 = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-h1.nix { };
     mc-ur5e = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-ur5e.nix { };
-    mc-panda = callWithLocal ./pkgs/mc-rtc/robots/mc-panda { };
-    mc-panda-lirmm = callWithLocal ./pkgs/mc-rtc/robots/mc-panda/mc-panda-lirmm.nix { };
+    mc-panda = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda { };
+    mc-panda-lirmm = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/mc-panda-lirmm.nix { };
 
     libfranka = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/libfranka.nix { };
     # mc-franka = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/mc-franka.nix {};
-    mc-franka = callWithLocal ./pkgs/mc-rtc/robots/mc-panda/mc-franka.nix { };
+    mc-franka = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/mc-franka.nix { };
     poco = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/libpoco.nix { };
     mesh-sampling = prev.callPackage ./pkgs/mesh-sampling { };
-    # mesh-sampling = callWithLocal ./pkgs/mesh-sampling {};
+    # mesh-sampling = prev.callPackage ./pkgs/mesh-sampling {};
 
     # XXX
     # The current nixpkgs input uses fmt_12
@@ -128,13 +117,13 @@
         fmt = final.fmt_9;
       };
     };
-    mc-rtc-python-utils = callWithLocal ./pkgs/mc-rtc/mc-rtc-python-utils.nix { };
+    mc-rtc-python-utils = prev.callPackage ./pkgs/mc-rtc/mc-rtc-python-utils.nix { };
     #mc-rtc = callWithRos ./pkgs/mc-rtc/mc-rtc.nix {};
     # mc-rtc-rviz-panel = prev.libsForQt5.callPackage ./pkgs/mc-rtc/ros/mc-rtc-rviz-panel.nix { inherit useLocal; inherit localWorkspace; };
     mc-rtc-rviz-panel = prev.libsForQt5.callPackage ./pkgs/mc-rtc/ros/mc-rtc-rviz-panel.nix { };
-    # mc-rtc-ticker = callWithLocal ./pkgs/mc-rtc/ros/mc-rtc-ticker.nix {};
+    # mc-rtc-ticker = prev.callPackage ./pkgs/mc-rtc/ros/mc-rtc-ticker.nix {};
     mc-rtc-ticker = prev.callPackage ./pkgs/mc-rtc/ros/mc-rtc-ticker.nix { };
-    # mc-rtc = callWithLocal ./pkgs/mc-rtc/mc-rtc.nix { with-ros = true; };
+    # mc-rtc = prev.callPackage ./pkgs/mc-rtc/mc-rtc.nix { with-ros = true; };
     # mc-rtc = prev.callPackage ./pkgs/mc-rtc/mc-rtc.nix { };
     # mc-rtc-magnum = prev.callPackage ./pkgs/mc-rtc-magnum {};
     gram-savitzky-golay = prev.callPackage ./pkgs/gram-savitzky-golay { };
@@ -150,7 +139,7 @@
           jrl-cmakemodules = final.jrl-cmakemodulesv2;
           # mc-rtc = final.mc-rtc-hugo;
         };
-    dcm-vrptask = callWithLocal ./pkgs/mc-rtc/controllers/polytopeController/dcm-vrptask.nix {
+    dcm-vrptask = prev.callPackage ./pkgs/mc-rtc/controllers/polytopeController/dcm-vrptask.nix {
       # mc-rtc = final.mc-rtc-hugo;
       jrl-cmakemodules = final.jrl-cmakemodulesv2;
     };
@@ -167,16 +156,16 @@
       propagatedBuildInputs = (old.propagatedBuildInputs or [ ]) ++ [ final.libGL ];
     });
 
-    jvrc1-mj-description = callWithLocal ./pkgs/mc-rtc/mc-mujoco/robots/jvrc1-mj-description.nix { };
+    jvrc1-mj-description = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/jvrc1-mj-description.nix { };
     g1-mj-description = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/g1-mj-description.nix { };
-    h1-mj-description = callWithLocal ./pkgs/mc-rtc/mc-mujoco/robots/h1-mj-description.nix { };
+    h1-mj-description = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/h1-mj-description.nix { };
     ur5e-mj-description = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/ur5e-mj-description.nix { };
 
-    env-mj-description = callWithLocal ./pkgs/mc-rtc/mc-mujoco/robots/env-mj-description.nix { };
+    env-mj-description = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/env-mj-description.nix { };
 
     # symlinkJoin all robots
     # FIXME: this triggers a full rebuild of mc-mujoco
-    mc-mujoco = callWithLocal ./pkgs/mc-rtc/mc-mujoco {
+    mc-mujoco = prev.callPackage ./pkgs/mc-rtc/mc-mujoco {
       jrl-cmakemodules = final.jrl-cmakemodulesv2;
     };
 
@@ -193,14 +182,14 @@
     ###############
     # CONTROLLERS #
     ###############
-    panda-prosthesis = callWithLocal ./pkgs/mc-rtc/controllers/panda-prosthesis { };
+    panda-prosthesis = prev.callPackage ./pkgs/mc-rtc/controllers/panda-prosthesis { };
     # panda-prosthesis = prev.callPackage ./pkgs/mc-rtc/controllers/panda-prosthesis {};
 
     ###########
     # PLUGINS #
     ###########
-    mc-force-shoe-plugin = callWithLocal ./pkgs/mc-rtc/plugins/mc-force-shoe-plugin.nix { };
-    mc-robot-model-update = callWithLocal ./pkgs/mc-rtc/plugins/mc-robot-model-update.nix { };
+    mc-force-shoe-plugin = prev.callPackage ./pkgs/mc-rtc/plugins/mc-force-shoe-plugin.nix { };
+    mc-robot-model-update = prev.callPackage ./pkgs/mc-rtc/plugins/mc-robot-model-update.nix { };
 
     #############
     # 3rd-party #
@@ -212,15 +201,15 @@
       fetchurl = final.stdenv.fetchurlBoot;
     };
 
-    imguizmo = callWithLocal ./pkgs/3rd-party/imguizmo.nix {
+    imguizmo = prev.callPackage ./pkgs/3rd-party/imguizmo.nix {
       jrl-cmakemodules = final.jrl-cmakemodulesv2;
     };
     corrade = prev.callPackage ./pkgs/3rd-party/magnum/corrade.nix { };
     magnum = prev.callPackage ./pkgs/3rd-party/magnum/magnum.nix { };
-    magnum-integration = callWithLocal ./pkgs/3rd-party/magnum/magnum-integration.nix {
+    magnum-integration = prev.callPackage ./pkgs/3rd-party/magnum/magnum-integration.nix {
       with-imguiintegration = true;
     };
-    magnum-plugins = callWithLocal ./pkgs/3rd-party/magnum/magnum-plugins.nix {
+    magnum-plugins = prev.callPackage ./pkgs/3rd-party/magnum/magnum-plugins.nix {
       magnumPluginsWithAssimpImporter = true;
       magnumPluginsWithStbImageImporter = true;
     };

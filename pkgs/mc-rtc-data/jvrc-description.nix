@@ -6,8 +6,6 @@
   ament-cmake,
   with-ros ? false,
   buildRosPackage,
-  useLocal ? false,
-  localWorkspace ? null,
 }:
 
 let
@@ -19,22 +17,14 @@ in
   version = "${version}";
 
   src =
-    if useLocal then
-      builtins.trace "Using local workspace for ${pname}: ${localWorkspace}/jvrc_description" (
-        builtins.path {
-          path = "${localWorkspace}/jvrc_description";
-          name = "${pname}-src";
-        }
-      )
-    else
-      # TODO: release
-      fetchgit {
-        # master
-        url = "https://github.com/jrl-umi3218/jvrc_description";
-        rev = "80a2aacca2dc1e3aa3d590bbe991a4ef14d54e56";
-        sha256 = "sha256-/CNO8GTDVUkrj8VsezEGEMGodwQISgIa1XVhfiziy5w=";
-        fetchSubmodules = true;
-      };
+    # TODO: release
+    fetchgit {
+      # master
+      url = "https://github.com/jrl-umi3218/jvrc_description";
+      rev = "80a2aacca2dc1e3aa3d590bbe991a4ef14d54e56";
+      sha256 = "sha256-/CNO8GTDVUkrj8VsezEGEMGodwQISgIa1XVhfiziy5w=";
+      fetchSubmodules = true;
+    };
 
   buildType = "ament_cmake";
   nativeBuildInputs = if with-ros then [ ament-cmake ] else [ cmake ];

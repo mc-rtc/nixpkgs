@@ -21,8 +21,6 @@
   glfw3,
   mc-rtc-imgui,
   imguizmo,
-  useLocal ? false,
-  localWorkspace ? null,
 }:
 
 stdenv.mkDerivation (_finalAttrs: {
@@ -31,23 +29,14 @@ stdenv.mkDerivation (_finalAttrs: {
 
   dontBuild = true;
 
-  src =
-    if useLocal then
-      builtins.trace "Using local workspace for mc-mujoco: ${localWorkspace}/mc_mujoco" (
-        builtins.path {
-          path = "${localWorkspace}/mc_mujoco";
-          name = "mc-mujoco-src";
-        }
-      )
-    else
-      fetchgit {
-        url = "https://github.com/arntanguy/mc_mujoco.git";
-        # tag = "v${finalAttrs.version}";
-        # future v2.0.0 version once https://github.com/rohanpsingh/mc_mujoco/pull/98 is merged
-        rev = "a43b2af02fced68914f5e619da03d87c8c51e792";
-        sha256 = "sha256-6doLp+Kcbam+XnPwGLprLZYm5b3AtBrZpLg5yZfvE98=";
-        fetchSubmodules = true;
-      };
+  src = fetchgit {
+    url = "https://github.com/arntanguy/mc_mujoco.git";
+    # tag = "v${finalAttrs.version}";
+    # future v2.0.0 version once https://github.com/rohanpsingh/mc_mujoco/pull/98 is merged
+    rev = "a43b2af02fced68914f5e619da03d87c8c51e792";
+    sha256 = "sha256-6doLp+Kcbam+XnPwGLprLZYm5b3AtBrZpLg5yZfvE98=";
+    fetchSubmodules = true;
+  };
 
   nativeBuildInputs = [
     cmake

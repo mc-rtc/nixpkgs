@@ -8,8 +8,6 @@
   cli11,
   eigen,
   libz,
-  useLocal ? false,
-  localWorkspace ? null,
 }:
 
 stdenv.mkDerivation {
@@ -17,21 +15,13 @@ stdenv.mkDerivation {
   version = "1.0.0";
 
   src =
-    if useLocal then
-      builtins.trace "Using local workspace for mesh-sampling: ${localWorkspace}/mesh_sampling" (
-        builtins.path {
-          path = "${localWorkspace}/mesh_sampling";
-          name = "mesh-sampling-src";
-        }
-      )
-    else
-      # TODO: release mesh-sampling
-      fetchgit {
-        url = "https://github.com/jrl-umi3218/mesh_sampling";
-        # master
-        rev = "466064a4e9b7718b0b90922122c6aedd4867724a";
-        sha256 = "sha256-2e1Ctq/2lj2BNyxPH3VD+owYlURyIUq82D74y4nKPeg=";
-      };
+    # TODO: release mesh-sampling
+    fetchgit {
+      url = "https://github.com/jrl-umi3218/mesh_sampling";
+      # master
+      rev = "466064a4e9b7718b0b90922122c6aedd4867724a";
+      sha256 = "sha256-2e1Ctq/2lj2BNyxPH3VD+owYlURyIUq82D74y4nKPeg=";
+    };
 
   nativeBuildInputs = [
     cmake

@@ -4,8 +4,6 @@
   cmake,
   mc-rtc,
   hrp4-description,
-  useLocal ? false,
-  localWorkspace ? null,
 }:
 
 let
@@ -20,20 +18,11 @@ stdenv.mkDerivation {
   pname = "mc-hrp4";
   version = "1.0.0";
 
-  src =
-    if useLocal then
-      builtins.trace "Using local workspace for mc-hrp4: ${localWorkspace}/mc-hrp4" (
-        builtins.path {
-          path = "${localWorkspace}/mc-hrp4";
-          name = "mc-hrp4-src";
-        }
-      )
-    else
-      builtins.fetchGit {
-        url = "git@github.com:isri-aist/mc-hrp4";
-        # Release v1.0.0
-        rev = "52f03f0f06392eee669d84a995c2f4b797246bd7";
-      };
+  src = builtins.fetchGit {
+    url = "git@github.com:isri-aist/mc-hrp4";
+    # Release v1.0.0
+    rev = "52f03f0f06392eee669d84a995c2f4b797246bd7";
+  };
 
   nativeBuildInputs = [ cmake ];
   propagatedBuildInputs = [

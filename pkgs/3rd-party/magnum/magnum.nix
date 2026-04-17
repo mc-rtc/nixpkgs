@@ -10,8 +10,6 @@
   openal,
   glfw,
   SDL2,
-  useLocal ? false,
-  localWorkspace ? null,
   magnumWithGlfwApplication ? true,
   magnumWithSDL2Application ? true,
   magnumWithAnyImageImporter ? true,
@@ -27,25 +25,16 @@ stdenv.mkDerivation (_finalAttrs: {
 
   dontBuild = true;
 
-  src =
-    if useLocal then
-      builtins.trace "Using local workspace for magnum: ${localWorkspace}/magnum" (
-        builtins.path {
-          path = "${localWorkspace}/magnum-standalone";
-          name = "magnum-src";
-        }
-      )
-    else
-      fetchFromGitHub {
-        owner = "mosra";
-        repo = "magnum";
-        # up-to-date
-        rev = "2a3acc0f22f42026c04553a73c1549e577c54e2f";
-        hash = "sha256-C9WxwC02J21SMPR2wtVZfgFaCRuZceyIAEjg0oiWkH4=";
-        # orginal from mc-rtc-magnum
-        # rev = "440653dbb8815ba28fd20203acae711dbb8b14b4";
-        # hash = "sha256-65Pa7NqUMHJX80oLoJ+WpB9tj00XQSFjJIuBahrlZtg=";
-      };
+  src = fetchFromGitHub {
+    owner = "mosra";
+    repo = "magnum";
+    # up-to-date
+    rev = "2a3acc0f22f42026c04553a73c1549e577c54e2f";
+    hash = "sha256-C9WxwC02J21SMPR2wtVZfgFaCRuZceyIAEjg0oiWkH4=";
+    # orginal from mc-rtc-magnum
+    # rev = "440653dbb8815ba28fd20203acae711dbb8b14b4";
+    # hash = "sha256-65Pa7NqUMHJX80oLoJ+WpB9tj00XQSFjJIuBahrlZtg=";
+  };
 
   nativeBuildInputs = [ cmake ];
   propagatedBuildInputs = [

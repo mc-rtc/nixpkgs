@@ -9,8 +9,6 @@
   screen,
   minicom,
   mc-panda-lirmm,
-  useLocal ? false,
-  localWorkspace ? null,
 }:
 
 stdenv.mkDerivation {
@@ -18,30 +16,20 @@ stdenv.mkDerivation {
   version = "1.0.0";
 
   src =
-    if useLocal then
-      builtins.trace
-        "Using local workspace for panda-prosthesis: ${localWorkspace}/panda_prosthesis_rolkneematics"
-        (
-          builtins.path {
-            path = "${localWorkspace}/panda_prosthesis_rolkneematics";
-            name = "panda-prosthesis-src";
-          }
-        )
-    else
-      # TODO: release panda-prosthesis
-      # fetchgit {
-      #   #url = "https://github.com/ROLKNEEMATICS/panda_prosthesis";
-      #   url = "https://github.com/arntanguy/panda_prosthesis_rolkneematics";
-      #   # topic/ConnectModules
-      #   rev = "edef20d6a4b05ba5868e399d63984f18da64bac4";
-      #   sha256 = "sha256-yzIjxDpD0ry6j9+a5n6y+PAgYmtrtwUeZDFC0/M7aR4=";
-      # };
-      fetchFromGitHub {
-        owner = "arntanguy";
-        repo = "panda_prosthesis_rolkneematics";
-        rev = "734a0a3496042a33ba1ec74cb771c6fa17415e6e";
-        hash = "sha256-w3o5mYrwPic1/9ZkNPpwCtQ958L1e8vNoOBPx34+CxI=";
-      };
+    # TODO: release panda-prosthesis
+    # fetchgit {
+    #   #url = "https://github.com/ROLKNEEMATICS/panda_prosthesis";
+    #   url = "https://github.com/arntanguy/panda_prosthesis_rolkneematics";
+    #   # topic/ConnectModules
+    #   rev = "edef20d6a4b05ba5868e399d63984f18da64bac4";
+    #   sha256 = "sha256-yzIjxDpD0ry6j9+a5n6y+PAgYmtrtwUeZDFC0/M7aR4=";
+    # };
+    fetchFromGitHub {
+      owner = "arntanguy";
+      repo = "panda_prosthesis_rolkneematics";
+      rev = "734a0a3496042a33ba1ec74cb771c6fa17415e6e";
+      hash = "sha256-w3o5mYrwPic1/9ZkNPpwCtQ958L1e8vNoOBPx34+CxI=";
+    };
 
   nativeBuildInputs = [ cmake ];
   propagatedBuildInputs = [
