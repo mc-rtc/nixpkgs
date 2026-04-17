@@ -1,36 +1,25 @@
 {
   stdenv,
   lib,
-  fetchgit,
+  fetchFromGitHub,
   cmake,
   pkg-config,
   eigen,
   poco,
   tinyxml-2,
   # , doxygen, graphviz
-  useLocal ? false,
-  localWorkspace ? null,
 }:
 
 stdenv.mkDerivation {
   pname = "libfranka";
   version = "0.9.2";
 
-  src =
-    if useLocal then
-      builtins.trace "Using local workspace for libfranka: ${localWorkspace}/libfranka" (
-        builtins.path {
-          path = "${localWorkspace}/libfranka";
-          name = "libfranka-src";
-        }
-      )
-    else
-      fetchgit {
-        url = "https://github.com/frankarobotics/libfranka";
-        rev = "f3b8d775a9c847cab32684c8a316f67867761674";
-        sha256 = "sha256-xPzzJ4YlRz7MVRgcZaV3QhlOrUFlajJLaArchBylCQM=";
-        fetchSubmodules = true;
-      };
+  src = fetchFromGitHub {
+    owner = "jrl-umi3218";
+    repo = "libfranka";
+    rev = "2695c2626d53655175b180a5bc2d9b448e8c427f";
+    hash = "sha256-xkpV/m1HqGOiOmurAVCeP9JkdPTopfI0/Sg/SbrU0mY=";
+  };
 
   nativeBuildInputs = [
     cmake
@@ -63,7 +52,7 @@ stdenv.mkDerivation {
   doCheck = false;
 
   meta = with lib; {
-    description = "C++ library for Franka Robotics research robots";
+    description = "C++ library for Franka Robotics research robots for version 0.9.2 (jrl-umi3218 fork)";
     homepage = "https://github.com/frankarobotics/libfranka";
     license = licenses.asl20;
     platforms = platforms.linux;
