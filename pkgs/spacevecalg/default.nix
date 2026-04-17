@@ -5,16 +5,21 @@
   jrl-cmakemodules,
   eigen,
   boost,
-  fetchurl,
+  fetchFromGitHub,
 }:
 
+let
+  version = "1.2.9";
+in
 stdenv.mkDerivation rec {
   pname = "spacevecalg";
-  version = "1.2.8";
+  inherit version;
 
-  src = fetchurl {
-    url = "https://github.com/jrl-umi3218/SpaceVecAlg/releases/download/v${version}/SpaceVecAlg-v${version}.tar.gz";
-    sha256 = "b3ea28efb99cb9197e56bb49bf5c4a40006b0f03e8fbf4f22ad4969573be1c0d";
+  src = fetchFromGitHub {
+    owner = "jrl-umi3218";
+    repo = "SpaceVecAlg";
+    rev = "cfe9af9068829f5e57fa8fe48f48852ceff52f03";
+    hash = "sha256-Mvl7/venZgaqVo7BLJwk8nfl+Ng9lhHewZc8v1X8u00=";
   };
 
   nativeBuildInputs = [ cmake ];
