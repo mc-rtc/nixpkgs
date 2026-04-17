@@ -2,6 +2,7 @@
   stdenv,
   lib,
   cmake,
+  jrl-cmakemodules,
   eigen-qld,
   eigen-quadprog,
   boost,
@@ -20,7 +21,10 @@ stdenv.mkDerivation {
     hash = "sha256-aWv1KLiY4TJ6lplRt/YZQVGxxPcy61MLJi+TppKmmZU=";
   };
 
-  nativeBuildInputs = [ cmake ];
+  nativeBuildInputs = [
+    cmake
+    jrl-cmakemodules
+  ];
   propagatedBuildInputs = [
     eigen-qld
     eigen-quadprog
