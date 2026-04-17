@@ -105,12 +105,12 @@
     mc-g1 = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-g1.nix { };
     mc-h1 = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-h1.nix { };
     mc-ur5e = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-ur5e.nix { };
-    mc-panda = callWithLocal ./pkgs/mc-rtc/robots/mc-panda { };
-    mc-panda-lirmm = callWithLocal ./pkgs/mc-rtc/robots/mc-panda/mc-panda-lirmm.nix { };
+    mc-panda = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda { };
+    mc-panda-lirmm = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/mc-panda-lirmm.nix { };
 
     libfranka = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/libfranka.nix { };
     # mc-franka = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/mc-franka.nix {};
-    mc-franka = callWithLocal ./pkgs/mc-rtc/robots/mc-panda/mc-franka.nix { };
+    mc-franka = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/mc-franka.nix { };
     poco = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/libpoco.nix { };
     mesh-sampling = prev.callPackage ./pkgs/mesh-sampling { };
     # mesh-sampling = callWithLocal ./pkgs/mesh-sampling {};
