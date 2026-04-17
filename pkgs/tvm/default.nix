@@ -6,7 +6,7 @@
   eigen-qld,
   eigen-quadprog,
   boost,
-  fetchFromGitHub,
+  fetchgit,
 }:
 
 stdenv.mkDerivation {
@@ -14,11 +14,10 @@ stdenv.mkDerivation {
   version = "0.9.2";
 
   # master
-  src = fetchFromGitHub {
-    owner = "jrl-umi3218";
-    repo = "tvm";
+  src = fetchgit {
+    url = "https://github.com/jrl-umi3218/tvm";
     rev = "538f367bfab8621d0a315c6bca58a7186fda2832";
-    hash = "sha256-aWv1KLiY4TJ6lplRt/YZQVGxxPcy61MLJi+TppKmmZU=";
+    sha256 = "sha256-qse7emorGWqoWlmzaHNdbDiHFXrVOo3oz8Fah4AYmL8=";
   };
 
   nativeBuildInputs = [
