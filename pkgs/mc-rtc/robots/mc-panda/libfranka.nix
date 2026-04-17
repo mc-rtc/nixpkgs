@@ -38,8 +38,6 @@ stdenv.mkDerivation {
   # Optional: enable documentation if you want
   # nativeBuildInputs = nativeBuildInputs ++ [ doxygen graphviz ];
 
-  patches = [ ./libfranka-cmake-version.patch ];
-
   cmakeFlags = [
     "-DCMAKE_CXX_STANDARD=14"
     "-DBUILD_EXAMPLES=ON"
