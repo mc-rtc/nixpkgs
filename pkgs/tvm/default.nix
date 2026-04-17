@@ -5,23 +5,19 @@
   eigen-qld,
   eigen-quadprog,
   boost,
-  fetchgit,
+  fetchFromGitHub,
 }:
 
 stdenv.mkDerivation {
   pname = "tvm";
   version = "0.9.2";
 
-  # master as of 2021.01.21
-  # src = fetchurl {
-  #   url = "https://github.com/jrl-umi3218/tvm/releases/download/v0.9.2/tvm-v0.9.2.tar.gz";
-  #   sha256 = "0s9sixkz1jns6yisrdzvsm6anz6b1f1h1xp0bbi81acb0r6ss9cv";
-  # };
-  # master as of 21/13/2025, Release 0.9.3
-  src = fetchgit {
-    url = "https://github.com/arntanguy/tvm";
-    rev = "67d09664e34db3dc8ce3d03ed77449eb552124ff";
-    sha256 = "mZ40sjGG56PNgeXcXpHzyNJqmX7yProgFQ09WC1sUSs=";
+  # master
+  src = fetchFromGitHub {
+    owner = "jrl-umi3218";
+    repo = "tvm";
+    rev = "538f367bfab8621d0a315c6bca58a7186fda2832";
+    hash = "sha256-aWv1KLiY4TJ6lplRt/YZQVGxxPcy61MLJi+TppKmmZU=";
   };
 
   nativeBuildInputs = [ cmake ];
