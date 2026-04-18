@@ -50,21 +50,5 @@
         ];
       };
     };
-
-    # TODO move to Hugo's
-    mc-rtc-superbuild-hugo = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix {
-      superbuildArgs = prev.mc-rtc-superbuild-full.superbuildArgs // {
-        pname = "mc-rtc-superbuild-hugo";
-        robots = [ final.mc-rhps1 ];
-        # observers = [mc-state-observation]; # FIXME missing Attitude observer from mc_state_observation
-        controllers = [ final.polytopeController ];
-        configs = [ "${final.polytopeController}/lib/mc_controller/etc/mc_rtc.yaml" ];
-        plugins = [ final.mc-force-shoe-plugin-hugo ];
-        apps = [
-          final.mc-rtc-magnum-hugo
-          final.mc-mujoco-hugo
-        ];
-      };
-    };
   }
 )
