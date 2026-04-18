@@ -5,6 +5,7 @@ queue_rules:
     update_method: rebase
     queue_conditions:
       - check-success = "check-macos-linux-nix"
+      - check-success = "check-macos-linux-nix-private"
       - check-success = "pre-commit.ci - pr"
       - or:
           - approved-reviews-by = arntanguy
