@@ -16,7 +16,7 @@ jobs:
       matrix:
         os: [ubuntu-24.04]
         # test with mc-hrp2 for now
-        build: ["mc-hrp2"]
+        build: [ "mc-hrp2", "mc-rtc-superbuild-private" ]
     steps:
       - uses: actions/checkout@v6
       # Configures ssh-agent if SSH_KEY secret exists
@@ -37,7 +37,7 @@ jobs:
           endpoint: https://attic.arntanguy.fr
           cache: mc-rtc-nix-private
           token: ${{ secrets.ATTIC_TOKEN }}
-      - run: nix build -L "./private#${{ matrix.build }}" --cores 4
+      - run: nix build "./private#${{ matrix.build }}" --cores 4
   complete:
     needs: populate-cache
     name: "complete ${{ matrix.os }}"
@@ -60,7 +60,7 @@ jobs:
           name: mc-rtc-nix
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
           extraPullNames: "ros,gepetto"
-      - run: nix flake check -L ./private
+      - run: nix flake check ./private
   fallback:
     needs: complete
     if: always() && needs.complete.result == 'failure'
