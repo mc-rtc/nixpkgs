@@ -8,6 +8,7 @@
     callWithRos = pkg: args: prev.callPackage pkg (args // { inherit with-ros; });
   in
   {
+    eigen-lssol = prev.callPackage ./pkgs/eigen-lssol/default.nix { };
     hrp2-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/hrp2-description.nix { };
     hrp4-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/hrp4-description.nix { };
     hrp5-p-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/hrp5-p-description.nix { };
@@ -21,6 +22,17 @@
     hrp4-mj-description = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/hrp4-mj-description.nix { };
     hrp5p-mj-description = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/hrp5p-mj-description.nix { };
     # TODO: hrp2-mj-description does not exist
+
+    tasks-lssol = prev.callPackage ./pkgs/tasks {
+      with-lssol = true;
+    };
+    # make tasks with lssol the new default
+    tasks = final.tasks-lssol;
+
+    # mc-rtc with lssol
+    mc-rtc = prev.mc-rtc.override {
+      tasks = final.tasks-lssol;
+    };
 
     # mc-mujoco with private robots
     mc-mujoco-robots-private = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/default.nix {

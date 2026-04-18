@@ -5,10 +5,12 @@
   rbdyn,
   sch-core,
   eigen-qld,
+  with-lssol ? false,
+  eigen-lssol ? null,
 }:
 
 stdenv.mkDerivation rec {
-  pname = "tasks";
+  pname = if (with-lssol && eigen-lssol != null) then "tasks-lssol" else "tasks-qld";
   version = "v1.8.2";
 
   src = fetchTarball {
@@ -21,10 +23,10 @@ stdenv.mkDerivation rec {
     rbdyn
     sch-core
     eigen-qld
-  ];
+  ]
+  ++ lib.optional (with-lssol && eigen-lssol != null) eigen-lssol;
 
   cmakeFlags = [
-    "-DBUILD_TESTING=OFF"
     "-DPYTHON_BINDING=OFF"
     "-DINSTALL_DOCUMENTATION=OFF"
   ];

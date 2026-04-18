@@ -14,6 +14,7 @@
       rbdyn = pkgs.rbdyn;
       sch-core = pkgs.sch-core;
       tasks = pkgs.tasks;
+      tasks-qld = pkgs.tasks-qld;
       tvm = pkgs.tvm;
       eigen-quadprog = pkgs.eigen-quadprog;
       eigen-qld = pkgs.eigen-qld;
