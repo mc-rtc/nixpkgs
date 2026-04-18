@@ -52,7 +52,8 @@
     sch-core = prev.callPackage ./pkgs/sch-core { };
     #sch-visualization = prev.callPackage ./pkgs/sch-visualization {};
     sch-visualization = prev.callPackage ./pkgs/sch-visualization { };
-    tasks = prev.callPackage ./pkgs/tasks { };
+    tasks-qld = prev.callPackage ./pkgs/tasks { };
+    tasks = final.tasks-qld;
     # mc-rtc-data = prev.callPackage ./pkgs/mc-rtc-data { with-ros = false; };
     mc-rtc-data = callWithRos ./pkgs/mc-rtc-data { };
     state-observation = prev.callPackage ./pkgs/state-observation { };

@@ -19,8 +19,7 @@ stdenv.mkDerivation {
   pname = "mc-g1";
   version = "1.0.0";
 
-  src = 
-  fetchFromGitHub {
+  src = fetchFromGitHub {
     owner = "isri-aist";
     repo = "mc_g1";
     rev = "7e35e3fc0e3e0d9e2edbabbac2c5ca7b79e93bac";

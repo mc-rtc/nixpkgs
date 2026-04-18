@@ -85,9 +85,10 @@ in
     python313Packages.matplotlib
   ]
   ++ [
+    # for documentation
     doxygen
     bundler
-  ] # for documentation
+  ]
   ++ lib.optional (with-ros && rclcpp != null) rclcpp
   ++ lib.optional (with-ros && nav-msgs != null) nav-msgs
   ++ lib.optional (with-ros && sensor-msgs != null) sensor-msgs

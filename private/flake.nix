@@ -51,6 +51,7 @@
               mc-hrp4 = pkgs.mc-hrp4;
               mc-hrp5-p = pkgs.mc-hrp5-p;
               mc-rhps1 = pkgs.mc-rhps1;
+              tasks-lssol = pkgs.tasks-lssol;
               # Superbuild configurations needing at least one private package
               mc-rtc-superbuild-private = pkgs.mc-rtc-superbuild-private;
             };
