@@ -19,11 +19,12 @@ stdenv.mkDerivation {
   pname = "mc-g1";
   version = "1.0.0";
 
-  src = fetchFromGitHub {
+  src = 
+  fetchFromGitHub {
     owner = "isri-aist";
     repo = "mc_g1";
-    rev = "d30edab21f5ec00ef737e55d56ba5e2afc89460e";
-    hash = "sha256-Ispz48omVbcgCpCHwZ3XhUF0UcCc2hQllprGGB0O01Y=";
+    rev = "7e35e3fc0e3e0d9e2edbabbac2c5ca7b79e93bac";
+    hash = "sha256-k3A52LUzA44C/b8/ztvtbpJ4lh20f7Nzk1rOfufJrKc=";
   };
 
   nativeBuildInputs = [ cmake ];
