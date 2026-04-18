@@ -37,7 +37,7 @@ jobs:
           endpoint: https://attic.arntanguy.fr
           cache: mc-rtc-nix-private
           token: ${{ secrets.ATTIC_TOKEN }}
-      - run: nix build "./private#${{ matrix.build }}" --cores 4
+      - run: nix build -L "./private#${{ matrix.build }}" --cores 4
   complete:
     needs: populate-cache
     name: "complete ${{ matrix.os }}"
@@ -60,7 +60,7 @@ jobs:
           name: mc-rtc-nix
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
           extraPullNames: "ros,gepetto"
-      - run: nix flake check ./private
+      - run: nix flake check -L ./private
   fallback:
     needs: complete
     if: always() && needs.complete.result == 'failure'
