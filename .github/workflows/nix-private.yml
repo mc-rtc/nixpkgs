@@ -19,6 +19,18 @@ jobs:
         build: ["mc-hrp2"]
     steps:
       - uses: actions/checkout@v6
+      # Configures ssh-agent if SSH_KEY secret exists
+      - name: Configure ssh-agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+
+      - name: Check ssh-agent
+        shell: bash
+        run: |
+            echo "SSH_AUTH_SOCK = ${{ env.SSH_AUTH_SOCK }}"
+            ssh-add -l
+
       - uses: cachix/install-nix-action@v31
       # read-only cache
       - uses: cachix/cachix-action@v17
