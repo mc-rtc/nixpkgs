@@ -24,6 +24,9 @@ jobs:
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
+      - name: Add gite.lirmm.fr to known_hosts
+        run: |
+          ssh-keyscan gite.lirmm.fr >> ~/.ssh/known_hosts
       - uses: cachix/install-nix-action@v31
       # read-only cache
       - uses: cachix/cachix-action@v17
@@ -53,6 +56,9 @@ jobs:
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
+      - name: Add gite.lirmm.fr to known_hosts
+        run: |
+          ssh-keyscan gite.lirmm.fr >> ~/.ssh/known_hosts
       - uses: actions/checkout@v6
       - uses: cachix/install-nix-action@v31
       - uses: cachix/cachix-action@v17
