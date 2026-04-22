@@ -58,11 +58,17 @@ in
 
   nativeBuildInputs = [
     cmake
+    pkg-config
     jrl-cmakemodules
     qt5.wrapQtAppsHook
+  ]
+  ++ [
+    # for documentation
+    doxygen
+    bundler
   ];
+
   propagatedBuildInputs = [
-    pkg-config
     tasks
     eigen-quadprog
     libtool
@@ -84,10 +90,6 @@ in
     python313Packages.pyqt5
     python313Packages.matplotlib
   ]
-  ++ [
-    doxygen
-    bundler
-  ] # for documentation
   ++ lib.optional (with-ros && rclcpp != null) rclcpp
   ++ lib.optional (with-ros && nav-msgs != null) nav-msgs
   ++ lib.optional (with-ros && sensor-msgs != null) sensor-msgs
