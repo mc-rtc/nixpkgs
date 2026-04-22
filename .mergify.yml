@@ -1,14 +1,18 @@
-queue_rules:
-  - name: default
-    autoqueue: true
-    merge_method: rebase
-    update_method: rebase
-    queue_conditions:
+pull_request_rules:
+  - name: merge [bot] PRs when CI pass
+    conditions:
       - check-success = "check-macos-linux-nix"
-      - check-success = "pre-commit.ci - pr"
       - or:
-          - approved-reviews-by = arntanguy
           - author = dependabot[bot]
+          - author = gepetto-flake-updater[bot]
           - author = mc-rtc-nixpkgs-flake-updater[bot]
           - author = github-actions[bot]
-          - author = pre-commit-ci[bot]
+    actions:
+      merge:
+
+  - name: queue PRs with merge-queue label when all CI checks pass
+    conditions:
+      - check-success = "check-macos-linux-nix"
+      - label = queued
+    actions:
+      queue:
