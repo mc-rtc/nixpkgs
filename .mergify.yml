@@ -1,6 +1,5 @@
 queue_rules:
   - name: default
-    autoqueue: true
     merge_method: rebase
     update_method: rebase
     queue_conditions:
@@ -12,3 +11,5 @@ queue_rules:
           - author = mc-rtc-nixpkgs-flake-updater[bot]
           - author = github-actions[bot]
           - author = pre-commit-ci[bot]
+merge_protections_settings:
+  auto_merge: true
