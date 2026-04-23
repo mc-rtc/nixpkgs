@@ -3,12 +3,16 @@ on:
   push:
     branches:
       - main
-      - private-attic
   pull_request:
     branches:
       - main
 jobs:
   populate-cache:
+    # - This condition allows the job to run if:
+    #   - The workflow is not triggered by a pull request (`github.event_name != 'pull_request'`), or
+    #   - The PR's source repo is the same as the base repo.
+    # This is done to make sure that the required secrets are available to the CI
+    if: github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name || github.event_name != 'pull_request'
     name: "${{ matrix.build }} on ${{ matrix.os }}"
     runs-on: "${{ matrix.os }}"
     strategy:
@@ -42,6 +46,7 @@ jobs:
           token: ${{ secrets.ATTIC_TOKEN }}
       - run: nix build -L "./private#${{ matrix.build }}" --cores 4
   complete:
+    if: github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name || github.event_name != 'pull_request'
     needs: populate-cache
     name: "complete ${{ matrix.os }}"
     runs-on: "${{ matrix.os }}-latest"
@@ -68,6 +73,7 @@ jobs:
           extraPullNames: "ros,gepetto"
       - run: nix flake check -L ./private
   fallback:
+    if: github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name || github.event_name != 'pull_request'
     needs: complete
     if: always() && needs.complete.result == 'failure'
     name: "fallback ${{ matrix.os }}"
