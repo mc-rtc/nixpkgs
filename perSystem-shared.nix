@@ -38,7 +38,6 @@
       mc-rtc-superbuild-full = pkgs.mc-rtc-superbuild-full;
       # Main controllers
       panda-prosthesis = pkgs.panda-prosthesis;
-      polytopeController = pkgs.polytopeController;
 
       # Main plugins
       mc-force-shoe-plugin = pkgs.mc-force-shoe-plugin;

@@ -34,7 +34,28 @@
       tasks = final.tasks-lssol;
     };
     # TODO ask I2S Bordeaux to make it public
-    politopix = prev.callPackage ./pkgs/3rd-party/politopix.nix {};
+    # Hugo's dependencies
+    politopix = prev.callPackage ./pkgs/3rd-party/politopix.nix { };
+
+    # FIXME: { won't build as-is here as it requires a branch of mc-rtc for now
+    # See https://github.com/Hugo-L3174/polytopeController's flake.nix
+    # As they are currently not in the flake.nix's package set, this is probably ok to
+    # have non-building versions in the overlay (?)
+    mc-dynamic-polytopes =
+      prev.callPackage ./pkgs/mc-rtc/controllers/polytopeController/mc-dynamic-polytopes.nix
+        {
+          jrl-cmakemodules = final.jrl-cmakemodulesv2;
+          # mc-rtc = final.mc-rtc-hugo;
+        };
+    dcm-vrptask = prev.callPackage ./pkgs/mc-rtc/controllers/polytopeController/dcm-vrptask.nix {
+      # mc-rtc = final.mc-rtc-hugo;
+      jrl-cmakemodules = final.jrl-cmakemodulesv2;
+    };
+    polytopeController = prev.callPackage ./pkgs/mc-rtc/controllers/polytopeController/default.nix {
+      # mc-rtc = final.mc-rtc-hugo;
+    };
+    # End of Hugo's dependencies
+    # } end of FIXME
 
     # mc-mujoco with private robots
     mc-mujoco-robots-private = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/default.nix {

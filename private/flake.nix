@@ -53,6 +53,9 @@
               mc-rhps1 = pkgs.mc-rhps1;
               tasks-lssol = pkgs.tasks-lssol;
               politopix = pkgs.politopix;
+              mc-dynamic-polytopes = pkgs.mc-dynamic-polytopes;
+              dcm-vrptask = pkgs.dcm-vrptask;
+              polytopeController = pkgs.polytopeController;
               # Superbuild configurations needing at least one private package
               mc-rtc-superbuild-private = pkgs.mc-rtc-superbuild-private;
             };
