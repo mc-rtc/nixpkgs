@@ -52,7 +52,8 @@
     sch-core = prev.callPackage ./pkgs/sch-core { };
     #sch-visualization = prev.callPackage ./pkgs/sch-visualization {};
     sch-visualization = prev.callPackage ./pkgs/sch-visualization { };
-    tasks = prev.callPackage ./pkgs/tasks { };
+    tasks-qld = prev.callPackage ./pkgs/tasks { };
+    tasks = final.tasks-qld;
     # mc-rtc-data = prev.callPackage ./pkgs/mc-rtc-data { with-ros = false; };
     mc-rtc-data = callWithRos ./pkgs/mc-rtc-data { };
     state-observation = prev.callPackage ./pkgs/state-observation { };
@@ -128,27 +129,6 @@
     # mc-rtc-magnum = prev.callPackage ./pkgs/mc-rtc-magnum {};
     gram-savitzky-golay = prev.callPackage ./pkgs/gram-savitzky-golay { };
 
-    # Hugo's dependencies
-    # FIXME: { won't build as-is here as it requires a branch of mc-rtc for now
-    # See https://github.com/Hugo-L3174/polytopeController's flake.nix
-    # As they are currently not in the flake.nix's package set, this is probably ok to
-    # have non-building versions in the overlay (?)
-    mc-dynamic-polytopes =
-      prev.callPackage ./pkgs/mc-rtc/controllers/polytopeController/mc-dynamic-polytopes.nix
-        {
-          jrl-cmakemodules = final.jrl-cmakemodulesv2;
-          # mc-rtc = final.mc-rtc-hugo;
-        };
-    dcm-vrptask = prev.callPackage ./pkgs/mc-rtc/controllers/polytopeController/dcm-vrptask.nix {
-      # mc-rtc = final.mc-rtc-hugo;
-      jrl-cmakemodules = final.jrl-cmakemodulesv2;
-    };
-    polytopeController = prev.callPackage ./pkgs/mc-rtc/controllers/polytopeController/default.nix {
-      # mc-rtc = final.mc-rtc-hugo;
-    };
-    # End of Hugo's dependencies
-    # } end of FIXME
-
     ##########
     #  Apps  #
     ##########
@@ -196,9 +176,6 @@
     #############
     eigen-fmt = prev.callPackage ./pkgs/3rd-party/eigen-fmt {
       fmt = prev.fmt_10;
-    };
-    politopix = prev.callPackage ./pkgs/3rd-party/politopix.nix {
-      fetchurl = final.stdenv.fetchurlBoot;
     };
 
     imguizmo = prev.callPackage ./pkgs/3rd-party/imguizmo.nix {

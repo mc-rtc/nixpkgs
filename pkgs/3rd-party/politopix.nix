@@ -1,36 +1,23 @@
 {
   stdenv,
   lib,
-  fetchurl,
   cmake,
   boost,
 }:
 
-stdenv.mkDerivation (finalAttrs: {
+stdenv.mkDerivation (_finalAttrs: {
   pname = "politopix";
   version = "1.0.0";
 
+  # XXX: this is built from a private github repository
   src =
-    # fetchFromGitHub {
-    #   owner = "Hugo-L3174";
-    #   repo = "politopix";
-    #   tag = "v${finalAttrs.version}";
-    #   hash = "";
-    # };
-
-    # XXX: this is built from a private github repository
-    # TODO: provide documentation
-    # To make it work we need to setup a netrc file in /etc/nix/netrc and configure nix
-    # sandbox to use it
-    # see: https://nixos.wiki/wiki/Enterprise and https://discourse.nixos.org/t/how-to-fetchurl-with-credentials/11994/5
-    # and my own nixos configuration here: https://github.com/arntanguy/nixos-dotfiles/commit/9ae45cb3cd73b0428382e64641b1345565fdeb12
-    fetchurl {
-      url = "https://github.com/Hugo-L3174/politopix/archive/refs/tags/v${finalAttrs.version}.tar.gz";
-      # To get the hash:
-      # - download release from github
-      # - nix hash file <release>.tar.gz
-      sha256 = "sha256-xAlIXz3yviOKN0AjF2kGP06TJ4HEymMNdjbRdOkbi6I=";
-    };
+    builtins.trace "politopix is currently a private repository, ask I2S Bordeaux to make it public"
+      (
+        builtins.fetchGit {
+          url = "git@github.com:Hugo-L3174/politopix";
+          rev = "f625b42de4404eea16aabcf720f2cee19dfdc406";
+        }
+      );
 
   nativeBuildInputs = [ cmake ];
   propagatedBuildInputs = [ boost ];

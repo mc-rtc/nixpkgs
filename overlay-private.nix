@@ -8,6 +8,7 @@
     callWithRos = pkg: args: prev.callPackage pkg (args // { inherit with-ros; });
   in
   {
+    eigen-lssol = prev.callPackage ./pkgs/eigen-lssol/default.nix { };
     hrp2-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/hrp2-description.nix { };
     hrp4-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/hrp4-description.nix { };
     hrp5-p-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/hrp5-p-description.nix { };
@@ -21,6 +22,40 @@
     hrp4-mj-description = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/hrp4-mj-description.nix { };
     hrp5p-mj-description = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/hrp5p-mj-description.nix { };
     # TODO: hrp2-mj-description does not exist
+
+    tasks-lssol = prev.callPackage ./pkgs/tasks {
+      with-lssol = true;
+    };
+    # make tasks with lssol the new default
+    tasks = final.tasks-lssol;
+
+    # mc-rtc with lssol
+    mc-rtc = prev.mc-rtc.override {
+      tasks = final.tasks-lssol;
+    };
+    # TODO ask I2S Bordeaux to make it public
+    # Hugo's dependencies
+    politopix = prev.callPackage ./pkgs/3rd-party/politopix.nix { };
+
+    # FIXME: { won't build as-is here as it requires a branch of mc-rtc for now
+    # See https://github.com/Hugo-L3174/polytopeController's flake.nix
+    # As they are currently not in the flake.nix's package set, this is probably ok to
+    # have non-building versions in the overlay (?)
+    mc-dynamic-polytopes =
+      prev.callPackage ./pkgs/mc-rtc/controllers/polytopeController/mc-dynamic-polytopes.nix
+        {
+          jrl-cmakemodules = final.jrl-cmakemodulesv2;
+          # mc-rtc = final.mc-rtc-hugo;
+        };
+    dcm-vrptask = prev.callPackage ./pkgs/mc-rtc/controllers/polytopeController/dcm-vrptask.nix {
+      # mc-rtc = final.mc-rtc-hugo;
+      jrl-cmakemodules = final.jrl-cmakemodulesv2;
+    };
+    polytopeController = prev.callPackage ./pkgs/mc-rtc/controllers/polytopeController/default.nix {
+      # mc-rtc = final.mc-rtc-hugo;
+    };
+    # End of Hugo's dependencies
+    # } end of FIXME
 
     # mc-mujoco with private robots
     mc-mujoco-robots-private = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/default.nix {
@@ -47,22 +82,6 @@
           final.mc-hrp4
           final.mc-hrp5-p
           # final.mc-rhps1
-        ];
-      };
-    };
-
-    # TODO move to Hugo's
-    mc-rtc-superbuild-hugo = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix {
-      superbuildArgs = prev.mc-rtc-superbuild-full.superbuildArgs // {
-        pname = "mc-rtc-superbuild-hugo";
-        robots = [ final.mc-rhps1 ];
-        # observers = [mc-state-observation]; # FIXME missing Attitude observer from mc_state_observation
-        controllers = [ final.polytopeController ];
-        configs = [ "${final.polytopeController}/lib/mc_controller/etc/mc_rtc.yaml" ];
-        plugins = [ final.mc-force-shoe-plugin-hugo ];
-        apps = [
-          final.mc-rtc-magnum-hugo
-          final.mc-mujoco-hugo
         ];
       };
     };
