@@ -198,9 +198,6 @@
     eigen-fmt = prev.callPackage ./pkgs/3rd-party/eigen-fmt {
       fmt = prev.fmt_10;
     };
-    politopix = prev.callPackage ./pkgs/3rd-party/politopix.nix {
-      fetchurl = final.stdenv.fetchurlBoot;
-    };
 
     imguizmo = prev.callPackage ./pkgs/3rd-party/imguizmo.nix {
       jrl-cmakemodules = final.jrl-cmakemodulesv2;

@@ -52,6 +52,7 @@
               mc-hrp5-p = pkgs.mc-hrp5-p;
               mc-rhps1 = pkgs.mc-rhps1;
               tasks-lssol = pkgs.tasks-lssol;
+              politopix = pkgs.politopix;
               # Superbuild configurations needing at least one private package
               mc-rtc-superbuild-private = pkgs.mc-rtc-superbuild-private;
             };

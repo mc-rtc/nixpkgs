@@ -33,6 +33,8 @@
     mc-rtc = prev.mc-rtc.override {
       tasks = final.tasks-lssol;
     };
+    # TODO ask I2S Bordeaux to make it public
+    politopix = prev.callPackage ./pkgs/3rd-party/politopix.nix {};
 
     # mc-mujoco with private robots
     mc-mujoco-robots-private = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/default.nix {
