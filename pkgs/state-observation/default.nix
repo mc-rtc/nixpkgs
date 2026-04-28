@@ -2,21 +2,27 @@
   stdenv,
   lib,
   cmake,
+  jrl-cmakemodules,
   boost,
   eigen,
-  fetchurl,
+  fetchFromGitHub,
 }:
 
 stdenv.mkDerivation rec {
   pname = "state-observation";
   version = "1.7.0";
 
-  src = fetchurl {
-    url = "https://github.com/jrl-umi3218/state-observation/releases/download/v${version}/state-observation-v${version}.tar.gz";
-    sha256 = "317603aebde3343c90a9ca2f4a8e9a249eaef25e156773a6eb7eab078fcc0191";
+  src = fetchFromGitHub {
+    owner = "jrl-umi3218";
+    repo = "state-observation";
+    rev = "826249a";
+    hash = "sha256-q3QeX8RkfYR6cLFinMPpgI8MaCsx+H6UMGziqYkhW5Y=";
   };
 
-  nativeBuildInputs = [ cmake ];
+  nativeBuildInputs = [
+    cmake
+    jrl-cmakemodules
+  ];
   propagatedBuildInputs = [
     boost
     eigen
