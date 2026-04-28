@@ -1,3 +1,4 @@
+# mergify rules
 pull_request_rules:
   # automatically queues when a bot pr succeeds (see queue_rules)
   - name: queue [bot] PRs when CI pass
