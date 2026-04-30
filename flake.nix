@@ -53,22 +53,45 @@
           inputs.flake-parts.lib.importApply ./module.nix (
             {
               inherit (inputs) gepetto jrl-cmakemodulesv2;
+              lib = inputs.nixpkgs.lib;
             }
             // attrs
           );
         # Convenience module that enables the private overlay
         flakeModulePrivate = flakeModule { enablePrivateOverlay = true; };
+
+        # mkFlakoboros
+        #   Usage: mkFlakoboros { localInputs, localFlakeModule ? flakeModule } flakoborosModule
+        #   - localInputs:        Flake inputs set.
+        #   - localFlakeModule:   (Optional) Flake module to use (defaults to flakeModule).
+        #   - flakoborosModule:   Flake-parts module (function of args).
+        #                         See: https://gepetto.github.io/flakoboros/index.html
+        #
+        #   Example:
+        #     outputs = inputs:
+        #       mkFlakoboros { localInputs = inputs; } ({ lib, ... }: {
+        #         config = { };
+        #       })
+        #
+        #     # With custom flake module:
+        #     outputs = inputs:
+        #       mkFlakoboros {
+        #         localInputs = inputs;
+        #         localFlakeModule = flakeModule { with-ros = false; };
+        #       } ({ lib, ... }: {
+        #         config = { };
+        #       })
         mkFlakoboros =
           {
             localInputs,
             localFlakeModule ? flakeModule,
           }:
-          module:
+          flakoborosModule:
           inputs.flake-parts.lib.mkFlake { inputs = localInputs; } (args: {
             systems = import inputs.systems;
             imports = [
               localFlakeModule
-              { flakoboros = builtins.trace "called" (module args); }
+              { flakoboros = flakoborosModule args; }
             ];
           });
       in
@@ -86,28 +109,32 @@
           #   Description: Creates a flake using the default flakeModule (public, with-ros).
           #   Arguments:
           #     - localInputs: The flake inputs set.
-          #     - module: The flake-parts module to use.
-          lib.mkFlakoboros = localInputs: module: mkFlakoboros { inherit localInputs; } module;
+          #     - flakoborosModule: The flake-parts module to use.
+          #                         See https://gepetto.github.io/flakoboros/index.html
+          lib.mkFlakoboros =
+            localInputs: flakoborosModule: mkFlakoboros { inherit localInputs; } flakoborosModule;
 
           # lib.mkFlakoborosPrivate
           #   Usage: lib.mkFlakoborosPrivate localInputs module
           #   Description: Creates a flake using the private flakeModulePrivate (private, with-ros).
           #   Arguments:
           #     - localInputs: The flake inputs set.
-          #     - module: The flake-parts module to use.
+          #     - flakoborosModule: The flake-parts module to use.
+          #                         See https://gepetto.github.io/flakoboros/index.html
           lib.mkFlakoborosPrivate =
-            localInputs: module:
+            localInputs: flakoborosModule:
             mkFlakoboros {
               inherit localInputs;
               localFlakeModule = flakeModulePrivate;
-            } module;
+            } flakoborosModule;
           # lib.mkFlakoborosCustom
           #   Usage: lib.mkFlakoborosCustom localInputs localFlakeModule module
           #   Description: Creates a flake using a custom flake module (pass arguments to mc-rtc's nixpkgs flake module).
           #   Arguments:
           #     - localInputs: The flake inputs set.
           #     - localFlakeModule: The flake module to use.
-          #     - module: The flake-parts module to use.
+          #     - flakoborosModule: The flake-parts module to use.
+          #                         See https://gepetto.github.io/flakoboros/index.html
           # Example:
           # outputs = inputs:
           #   inputs.mc-rtc-nix.lib.mkFlakoborosCustom
@@ -120,8 +147,8 @@
           #       }
           #     })
           lib.mkFlakoborosCustom =
-            localInputs: localFlakeModule: module:
-            mkFlakoboros { inherit localInputs localFlakeModule; } module;
+            localInputs: localFlakeModule: flakoborosModule:
+            mkFlakoboros { inherit localInputs localFlakeModule; } flakoborosModule;
 
           templates = {
             default = {
