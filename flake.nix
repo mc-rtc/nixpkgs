@@ -30,31 +30,99 @@
     inputs.flake-parts.lib.mkFlake { inherit inputs; } (
       { ... }:
       let
-        flakeModule = inputs.flake-parts.lib.importApply ./module.nix {
-          inherit (inputs) gepetto jrl-cmakemodulesv2;
-        };
+        # flakeModule = inputs.flake-parts.lib.importApply ./module.nix {
+        #   inherit (inputs) gepetto jrl-cmakemodulesv2;
+        # };
+        # flakeModule = {enablePrivateOverlay ? false} :
+        #   inputs.flake-parts.lib.importApply ./module.nix {
+        #     inherit (inputs) gepetto jrl-cmakemodulesv2 enablePrivateOverlay;
+        #   };
 
+        # exports a flakeModule to be imported in other flakes
+        # arg: can either be:
+        #   - nothing: default arguments (public flake, with ros)
+        #   - or an attribute set with:
+        #       enablePrivateOverlay: whether to enable the private overlay (default: false)
+        #       with-ros: whether to build the packages in the overlay with ROS support (default: true)
+        #                 e.g that is robot description packages, mc-rtc, etc
+        flakeModule =
+          arg:
+          let
+            attrs = if builtins.isAttrs arg then arg else { };
+          in
+          inputs.flake-parts.lib.importApply ./module.nix (
+            {
+              inherit (inputs) gepetto jrl-cmakemodulesv2;
+            }
+            // attrs
+          );
+        # Convenience module that enables the private overlay
+        flakeModulePrivate = flakeModule { enablePrivateOverlay = true; };
+        mkFlakoboros =
+          {
+            localInputs,
+            localFlakeModule ? flakeModule,
+          }:
+          module:
+          inputs.flake-parts.lib.mkFlake { inputs = localInputs; } (args: {
+            systems = import inputs.systems;
+            imports = [
+              localFlakeModule
+              { flakoboros = builtins.trace "called" (module args); }
+            ];
+          });
       in
       {
         systems = import inputs.systems;
-        # systems =
-        # [
-        #   "x86_64-linux"
-        # ];
         imports = [
-          flakeModule
+          (flakeModule { })
         ];
         flake = {
           inherit flakeModule;
-          lib.mkFlakoboros =
+          inherit flakeModulePrivate;
+
+          # lib.mkFlakoboros
+          #   Usage: lib.mkFlakoboros localInputs module
+          #   Description: Creates a flake using the default flakeModule (public, with-ros).
+          #   Arguments:
+          #     - localInputs: The flake inputs set.
+          #     - module: The flake-parts module to use.
+          lib.mkFlakoboros = localInputs: module: mkFlakoboros { inherit localInputs; } module;
+
+          # lib.mkFlakoborosPrivate
+          #   Usage: lib.mkFlakoborosPrivate localInputs module
+          #   Description: Creates a flake using the private flakeModulePrivate (private, with-ros).
+          #   Arguments:
+          #     - localInputs: The flake inputs set.
+          #     - module: The flake-parts module to use.
+          lib.mkFlakoborosPrivate =
             localInputs: module:
-            inputs.flake-parts.lib.mkFlake { inputs = localInputs; } (args: {
-              systems = import inputs.systems;
-              imports = [
-                flakeModule
-                { flakoboros = module args; }
-              ];
-            });
+            mkFlakoboros {
+              inherit localInputs;
+              localFlakeModule = flakeModulePrivate;
+            } module;
+          # lib.mkFlakoborosCustom
+          #   Usage: lib.mkFlakoborosCustom localInputs localFlakeModule module
+          #   Description: Creates a flake using a custom flake module (pass arguments to mc-rtc's nixpkgs flake module).
+          #   Arguments:
+          #     - localInputs: The flake inputs set.
+          #     - localFlakeModule: The flake module to use.
+          #     - module: The flake-parts module to use.
+          # Example:
+          # outputs = inputs:
+          #   inputs.mc-rtc-nix.lib.mkFlakoborosCustom
+          #     inputs
+          #     (flakeModule { with-ros = false; })
+          #     ({ lib, ... }: {
+          #       # your flakoboros module here
+          #       overrideAttrs.package = {
+          #         src = lib.cleanSource ./.;
+          #       }
+          #     })
+          lib.mkFlakoborosCustom =
+            localInputs: localFlakeModule: module:
+            mkFlakoboros { inherit localInputs localFlakeModule; } module;
+
           templates = {
             default = {
               path = ./templates/default;

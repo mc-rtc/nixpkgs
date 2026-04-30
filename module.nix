@@ -2,17 +2,19 @@
   gepetto,
   jrl-cmakemodulesv2,
   enablePrivateOverlay ? false,
+  with-ros ? true,
   ...
 }:
 {
-  lib,
   self,
   ...
 }:
 let
   privateOverlay =
     if enablePrivateOverlay then
-      builtins.trace "Enabling private overlay" (final: prev: import ./overlay-private.nix { } final prev)
+      builtins.trace "Enabling private overlay" (
+        final: prev: import ./overlay-private.nix { inherit with-ros; } final prev
+      )
     else
       (_: _: { });
 in
@@ -21,9 +23,7 @@ in
 
   config = {
     flake.overlays.mc-rtc-pkgs = import ./overlay.nix {
-      inherit lib;
-      inherit jrl-cmakemodulesv2;
-      with-ros = true;
+      inherit with-ros;
     };
     flake.overlays.mc-rtc-private = privateOverlay;
     flakoboros.overlays = [
