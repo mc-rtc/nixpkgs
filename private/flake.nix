@@ -33,6 +33,7 @@
       let
         flakeModulePrivate = inputs.flake-parts.lib.importApply ../module.nix {
           inherit (inputs) gepetto jrl-cmakemodulesv2;
+          lib = inputs.nixpkgs.lib;
           enablePrivateOverlay = true;
         };
       in
