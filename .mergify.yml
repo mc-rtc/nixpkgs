@@ -4,11 +4,11 @@ pull_request_rules:
   - name: queue [bot] PRs when CI pass
     conditions:
       - or:
-        - author = dependabot[bot]
-        - author = gepetto-flake-updater[bot]
-        - author = mc-rtc-nixpkgs-flake-updater[bot]
-        - author = github-actions[bot]
-        - author = pre-commit-ci[bot]
+          - author = dependabot[bot]
+          - author = gepetto-flake-updater[bot]
+          - author = mc-rtc-nixpkgs-flake-updater[bot]
+          - author = github-actions[bot]
+          - author = pre-commit-ci[bot]
     actions:
       queue:
 
@@ -22,6 +22,6 @@ pull_request_rules:
 # ensure that required CI jobs suceed
 queue_rules:
   - name: default
-    conditions:
+    merge_conditions:
       - check-success = "check-macos-linux-nix"
       - check-success = "check-macos-linux-nix-private"
