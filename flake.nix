@@ -57,8 +57,13 @@
             }
             // attrs
           );
+        flakeModuleCcache = flakeModule { enableCcacheOverlay = true; };
         # Convenience module that enables the private overlay
         flakeModulePrivate = flakeModule { enablePrivateOverlay = true; };
+        flakeModulePrivateCcache = flakeModule {
+          enablePrivateOverlay = true;
+          enableCcacheOverlay = true;
+        };
 
         # mkFlakoboros
         #   Usage: mkFlakoboros { localInputs, localFlakeModule ? flakeModule } flakoborosModule
@@ -106,6 +111,8 @@
           lib = {
             inherit flakeModule;
             inherit flakeModulePrivate;
+            inherit flakeModuleCcache;
+            inherit flakeModulePrivateCcache;
           };
 
           # lib.mkFlakoboros

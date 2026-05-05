@@ -3,6 +3,7 @@
   gepetto,
   jrl-cmakemodulesv2,
   enablePrivateOverlay ? false,
+  enableCcacheOverlay ? false,
   with-ros ? true,
   ...
 }:
@@ -19,6 +20,14 @@ let
     else
       null;
 
+  ccacheOverlay =
+    if enableCcacheOverlay then
+      builtins.trace "mc-rtc-nix: importing ccache overlay" (
+        final: prev: import ./overlay-ccache.nix { } final prev
+      )
+    else
+      null;
+
   overlaysList = [
     (builtins.trace "mc-rtc-nix: importing overlay mc-rtc-pkgs" self.overlays.mc-rtc-pkgs)
   ]
@@ -29,7 +38,10 @@ let
     (builtins.trace "mc-rtc-nix: importing overlay for jrl-cmakemodulesv2" (
       _final: prev: { jrl-cmakemodulesv2 = jrl-cmakemodulesv2.packages.${prev.system}.default; }
     ))
-  ];
+  ]
+  ++ (lib.optional enableCcacheOverlay (
+    builtins.trace "mc-rtc-nix: importing overlay ccache (enableCcacheOverlay: ${lib.boolToString enableCcacheOverlay})" self.overlays.mc-rtc-ccache
+  ));
 
   flakeOverlays = {
     mc-rtc-pkgs = import ./overlay.nix (
@@ -40,6 +52,9 @@ let
   }
   // lib.optionalAttrs enablePrivateOverlay {
     mc-rtc-private = privateOverlay;
+  }
+  // lib.optionalAttrs enableCcacheOverlay {
+    mc-rtc-ccache = ccacheOverlay;
   };
 in
 {
