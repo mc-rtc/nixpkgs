@@ -102,7 +102,11 @@
         ];
         flake = {
           inherit flakeModule;
-          inherit flakeModulePrivate;
+
+          lib = {
+            inherit flakeModule;
+            inherit flakeModulePrivate;
+          };
 
           # lib.mkFlakoboros
           #   Usage: lib.mkFlakoboros localInputs module
