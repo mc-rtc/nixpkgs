@@ -174,7 +174,7 @@
             })
           ];
         });
-        privateCcache = inputs.flake-parts.lib.mkFlake { inherit inputs; } ({
+        private-ccache = inputs.flake-parts.lib.mkFlake { inherit inputs; } ({
           systems = import inputs.systems;
           imports = [
             (mkModule {
