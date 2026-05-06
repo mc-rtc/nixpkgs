@@ -91,6 +91,8 @@ in
             # Control interfaces
             mc-franka = pkgs.mc-franka;
 
+            inherit (pkgs) h1-mj-description;
+
             # Main superbuild configurations
             mc-rtc-superbuild = pkgs.mc-rtc-superbuild;
             mc-rtc-superbuild-full = pkgs.mc-rtc-superbuild-full;
@@ -109,17 +111,22 @@ in
           }
           // lib.optionalAttrs enablePrivateOverlay {
             # Private robots
-            mc-hrp2 = pkgs.mc-hrp2;
-            mc-hrp4 = pkgs.mc-hrp4;
-            mc-hrp5-p = pkgs.mc-hrp5-p;
-            mc-rhps1 = pkgs.mc-rhps1;
-            tasks-lssol = pkgs.tasks-lssol;
-            politopix = pkgs.politopix;
-            mc-dynamic-polytopes = pkgs.mc-dynamic-polytopes;
-            dcm-vrptask = pkgs.dcm-vrptask;
-            polytopeController = pkgs.polytopeController;
+            inherit (pkgs)
+              mc-hrp2
+              mc-hrp4
+              mc-hrp5-p
+              mc-rhps1
+              ;
+            inherit (pkgs) tasks-lssol;
+            # Hugo's demo
+            inherit (pkgs)
+              politopix
+              mc-dynamic-polytopes
+              dcm-vrptask
+              polytopeController
+              ;
             # Superbuild configurations needing at least one private package
-            mc-rtc-superbuild-private = pkgs.mc-rtc-superbuild-private;
+            inherit (pkgs) mc-rtc-superbuild-private mc-mujoco-full;
           };
 
         devShells =

@@ -70,7 +70,7 @@
     mc-mujoco-full = prev.callPackage ./pkgs/mc-rtc/mc-mujoco {
       jrl-cmakemodules = final.jrl-cmakemodulesv2;
       mc-mujoco-robots = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/default.nix {
-        robots = final.mc-mujoco-robots-public ++ final.mc-mujoco-robots-private;
+        robots = final.mc-mujoco-robots-public.robots ++ final.mc-mujoco-robots-private.robots;
       };
     };
 
