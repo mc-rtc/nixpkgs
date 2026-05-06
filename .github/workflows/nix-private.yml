@@ -1,11 +1,11 @@
 name: "CI - Nix - Private"
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+# on:
+#   push:
+#     branches:
+#       - main
+#   pull_request:
+#     branches:
+#       - main
 jobs:
   populate-cache:
     # - This condition allows the job to run if:

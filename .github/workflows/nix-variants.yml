@@ -19,8 +19,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-24.04]
-        # test with mc-hrp2 for now
-        build: [ "mc-rtc-superbuild-private" ]
+        variant: [ "private", "private-ccache" ]
+        build: [ "mc-mujoco-full", "mc-rtc-superbuild-private" ]
     steps:
       - uses: actions/checkout@v6
       # Configures ssh-agent if SSH_KEY secret exists
@@ -44,7 +44,7 @@ jobs:
           endpoint: https://attic.arntanguy.fr
           cache: mc-rtc-nix-private
           token: ${{ secrets.ATTIC_TOKEN }}
-      - run: nix build -L ".#variants.private.packages.x86_64-linux.${{ matrix.build }}" --cores 4
+      - run: nix build -L ".#variants.${{ matrix.variant }}.packages.x86_64-linux.${{ matrix.build }}" --cores 4
   fallback:
     needs: populate-cache
     if: always() && needs.populate-cache.result == 'failure'
@@ -71,7 +71,7 @@ jobs:
           name: mc-rtc-nix
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
           extraPullNames: "ros,gepetto"
-      - run: nix build -L ".#variants.private.packages.x86_64-linux.${{ matrix.build }}" --cores 4
+      - run: nix build -L ".#variants.${{ matrix.variant }}.packages.x86_64-linux.${{ matrix.build }}" --cores 1
   check:
     if: always()
     name: check-macos-linux-nix-private
