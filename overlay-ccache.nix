@@ -16,7 +16,7 @@ in
   ccacheWrapper = prev.ccacheWrapper.override {
     extraConfig = ''
       export CCACHE_COMPRESS=1
-      export CCACHE_DIR="/var/cache/ccache"
+      export CCACHE_DIR="/nix/var/cache/ccache"
       export CCACHE_UMASK=007
       # export CCACHE_SLOPPINESS=random_seed
       export CCACHE_SLOPPINESS=time_macros,include_file_mtime,file_macro,locale,pch_defines,random_seed
