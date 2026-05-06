@@ -70,5 +70,5 @@ in
   "mc_rtc-imgui"
 
   # "mc-rtc-rviz-panel" # how to make it work for buildRosPackage?
-  # "mc-rtc"
+  "mc-rtc"
 ]

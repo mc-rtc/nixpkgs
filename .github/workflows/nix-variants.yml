@@ -13,7 +13,7 @@ jobs:
     #   - The PR's source repo is the same as the base repo.
     # This is done to make sure that the required secrets are available to the CI
     if: github.event_name != 'pull_request' || github.repository == github.event.pull_request.head.repo.full_name
-    name: "${{ matrix.build }} on ${{ matrix.os }}"
+    name: "${{matrix.variant}}: ${{ matrix.build }} on ${{ matrix.os }}"
     runs-on: "${{ matrix.os }}"
     strategy:
       fail-fast: false
@@ -44,6 +44,14 @@ jobs:
           endpoint: https://attic.arntanguy.fr
           cache: mc-rtc-nix-private
           token: ${{ secrets.ATTIC_TOKEN }}
+      - name: Setup ccache environment
+        run: |
+          sudo mkdir -m0770 -p '/var/cache/ccache'
+          sudo chown --reference=/nix/store '/var/cache/ccache'
+          mkdir -p ~/.config/nix
+          echo 'extra-sandbox-paths = /nix/cache/ccache' >> ~/.config/nix/nix.conf
+          sudo systemctl restart nix-daemon.service
+          sudo ls -ll /var/cache | grep ccache
       - run: nix build -L ".#variants.${{ matrix.variant }}.packages.x86_64-linux.${{ matrix.build }}" --cores 4
   fallback:
     needs: populate-cache
