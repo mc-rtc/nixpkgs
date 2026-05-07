@@ -1,4 +1,8 @@
-name: "CI - Nix - Variants Private"
+# build variants.private and variants.private-ccache
+# push cache to mc-rtc-nix-private attic
+# TODO we cannot use nix flake check to ensure that everything is built
+# so currently we build the largest meta-packages available (mc-rtc-superbuild-private, mc-mujoco-full, etc)
+name: "CI - Nix - Private"
 on:
   push:
     branches:

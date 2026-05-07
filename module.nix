@@ -68,46 +68,63 @@ in
           inputs'.gepetto.packages
           // {
             # Main dependencies
-            spacevecalg = pkgs.spacevecalg;
-            rbdyn = pkgs.rbdyn;
-            sch-core = pkgs.sch-core;
-            tasks = pkgs.tasks;
-            tasks-qld = pkgs.tasks-qld;
-            tvm = pkgs.tvm;
-            eigen-quadprog = pkgs.eigen-quadprog;
-            eigen-qld = pkgs.eigen-qld;
-            state-observation = pkgs.state-observation;
-            mesh-sampling = pkgs.mesh-sampling;
-            eigen-fmt = pkgs.eigen-fmt;
+            inherit (pkgs)
+              spacevecalg
+              rbdyn
+              sch-core
+              tasks
+              tasks-qld
+              tvm
+              eigen-quadprog
+              eigen-qld
+              state-observation
+              mesh-sampling
+              eigen-fmt
+              ;
 
             # mc-rtc
-            mc-rtc-data = pkgs.mc-rtc-data;
-            mc-rtc = pkgs.mc-rtc;
+            inherit (pkgs)
+              mc-rtc-data
+              mc-rtc
+              ;
 
             # Main GUIs and applications
-            mc-rtc-magnum = pkgs.mc-rtc-magnum;
-            mc-mujoco = pkgs.mc-mujoco;
-            mc-rtc-ticker = pkgs.mc-rtc-ticker;
-            # Control interfaces
-            mc-franka = pkgs.mc-franka;
-
-            inherit (pkgs) h1-mj-description;
-
-            # Main superbuild configurations
-            mc-rtc-superbuild = pkgs.mc-rtc-superbuild;
-            mc-rtc-superbuild-full = pkgs.mc-rtc-superbuild-full;
-            # Main controllers
-            panda-prosthesis = pkgs.panda-prosthesis;
-
-            # Main plugins
-            mc-force-shoe-plugin = pkgs.mc-force-shoe-plugin;
+            inherit (pkgs)
+              mc-rtc-magnum
+              mc-rtc-ticker
+              # Control interfaces
+              mc-franka
+              ;
 
             # Main robots
-            mc-g1 = pkgs.mc-g1;
-            mc-h1 = pkgs.mc-h1;
-            mc-ur5e = pkgs.mc-ur5e;
-            mc-panda = pkgs.mc-panda;
-            mc-panda-lirmm = pkgs.mc-panda-lirmm;
+            inherit (pkgs)
+              mc-g1
+              mc-h1
+              mc-ur5e
+              mc-panda
+              mc-panda-lirmm
+              ;
+
+            # MuJoCo Robots
+            inherit (pkgs)
+              h1-mj-description
+              jvrc1-mj-description
+              g1-mj-description
+              ur5e-mj-description
+              env-mj-description
+              ;
+            # MuJoCo
+            inherit (pkgs) mc-mujoco mc-mujoco-full;
+
+            # Main superbuild configurations
+            inherit (pkgs) mc-rtc-superbuild mc-rtc-superbuild-full;
+
+            # Main controllers
+            inherit (pkgs) panda-prosthesis;
+
+            # Main plugins
+            inherit (pkgs) mc-force-shoe-plugin;
+
           }
           // lib.optionalAttrs enablePrivateOverlay {
             # Private robots
@@ -126,7 +143,7 @@ in
               polytopeController
               ;
             # Superbuild configurations needing at least one private package
-            inherit (pkgs) mc-rtc-superbuild-private mc-mujoco-full;
+            inherit (pkgs) mc-rtc-superbuild-private;
           };
 
         devShells =
