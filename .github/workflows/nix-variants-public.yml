@@ -1,0 +1,75 @@
+# build variants.ccache
+# push cache to cachix
+# TODO we cannot use nix flake check to ensure that everything is built
+# so currently we build the largest meta-packages available (mc-rtc-superbuild-private, mc-mujoco-full, etc)
+name: "CI - Nix - ccache"
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  populate-cache:
+    # - This condition allows the job to run if:
+    #   - The workflow is not triggered by a pull request (`github.event_name != 'pull_request'`), or
+    #   - The PR's source repo is the same as the base repo.
+    # This is done to make sure that the required secrets are available to the CI
+    if: github.event_name != 'pull_request' || github.repository == github.event.pull_request.head.repo.full_name
+    name: "${{matrix.variant}}: ${{ matrix.build }} on ${{ matrix.os }}"
+    runs-on: "${{ matrix.os }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04]
+        variant: [ "ccache" ]
+        build: [ "mc-mujoco-full", "mc-rtc-superbuild-full" ]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: cachix/install-nix-action@v31
+      - &cachix-step
+        uses: cachix/cachix-action@v17
+        with:
+          name: mc-rtc-nix
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+          extraPullNames: "ros,gepetto"
+      - &setup-ccache
+        name: Setup ccache environment
+        run: |
+          sudo mkdir -m0770 -p '/var/cache/ccache'
+          sudo chown --reference=/nix/store '/var/cache/ccache'
+          mkdir -p ~/.config/nix
+          echo 'extra-sandbox-paths = /var/cache/ccache' | sudo tee -a /etc/nix/nix.conf
+          sudo systemctl restart nix-daemon.service
+          sudo ls -ld /var/cache/ccache
+      - run: nix build -L ".#variants.${{ matrix.variant }}.packages.x86_64-linux.${{ matrix.build }}" --cores 4
+  fallback:
+    needs: populate-cache
+    if: always() && needs.populate-cache.result == 'failure'
+    name: "fallback ${{ matrix.os }}"
+    runs-on: "${{ matrix.os }}-latest"
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu] # TODO: macos
+    steps:
+      - uses: jlumbroso/free-disk-space@main
+        if: ${{ matrix.os == 'ubuntu' }}
+      - uses: actions/checkout@v6
+      - uses: cachix/install-nix-action@v31
+      - <<: *cachix-step
+      - <<: *setup-ccache
+      - run: nix build -L ".#variants.${{ matrix.variant }}.packages.x86_64-linux.${{ matrix.build }}" --cores 1
+  check:
+    if: always()
+    name: check-macos-linux-nix-private
+    runs-on: ubuntu-latest
+    needs:
+      - fallback
+    steps:
+      - uses: re-actors/alls-green@release/v1
+        with:
+          allowed-skips: fallback
+          jobs: ${{ toJSON(needs) }}
+
