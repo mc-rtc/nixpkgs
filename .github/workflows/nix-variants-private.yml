@@ -50,12 +50,12 @@ jobs:
           token: ${{ secrets.ATTIC_TOKEN }}
       - name: Setup ccache environment
         run: |
-          sudo mkdir -m0770 -p '/nix/var/cache/ccache'
-          sudo chown --reference=/nix/store '/nix/var/cache/ccache'
+          sudo mkdir -m0770 -p '/var/cache/ccache'
+          sudo chown --reference=/nix/store '/var/cache/ccache'
           mkdir -p ~/.config/nix
-          echo 'extra-sandbox-paths = /nix/var/cache/ccache' | sudo tee -a /etc/nix/nix.conf
+          echo 'extra-sandbox-paths = /var/cache/ccache' | sudo tee -a /etc/nix/nix.conf
           sudo systemctl restart nix-daemon.service
-          sudo ls -ld /nix/var/cache/ccache
+          sudo ls -ld /var/cache/ccache
       - run: nix build -L ".#variants.${{ matrix.variant }}.packages.x86_64-linux.${{ matrix.build }}" --cores 4
   fallback:
     needs: populate-cache

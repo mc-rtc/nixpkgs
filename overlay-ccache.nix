@@ -16,7 +16,7 @@ in
   ccacheWrapper = prev.ccacheWrapper.override {
     extraConfig = ''
       export CCACHE_COMPRESS=1
-      export CCACHE_DIR="/nix/var/cache/ccache"
+      export CCACHE_DIR="/var/cache/ccache"
       export CCACHE_UMASK=007
       # export CCACHE_SLOPPINESS=random_seed
       export CCACHE_SLOPPINESS=time_macros,include_file_mtime,file_macro,locale,pch_defines,random_seed
@@ -30,8 +30,12 @@ in
         echo "====="
         echo "Directory '$CCACHE_DIR' does not exist"
         echo "Please create it with:"
-        echo "  sudo mkdir -m0770 '$CCACHE_DIR'"
+        echo "  sudo mkdir -m0770 -p '$CCACHE_DIR'"
         echo "  sudo chown root:nixbld '$CCACHE_DIR'"
+        echo ""
+        echo "You should also add the path to the derivation sandbox by adding extra-sandbox-paths to nix.conf"
+        echo "  echo 'extra-sandbox-paths = /var/cache/ccache' >> ~/.config/nix/nix.conf"
+        echo "  sudo systemctl restart nix-daemon.service"
         echo "====="
         exit 1
       fi
