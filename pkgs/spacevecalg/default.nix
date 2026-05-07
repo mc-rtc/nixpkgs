@@ -22,11 +22,13 @@ stdenv.mkDerivation rec {
     hash = "sha256-Mvl7/venZgaqVo7BLJwk8nfl+Ng9lhHewZc8v1X8u00=";
   };
 
-  nativeBuildInputs = [ cmake ];
+  nativeBuildInputs = [
+    cmake
+    jrl-cmakemodules
+  ];
   propagatedBuildInputs = [
     eigen
     boost
-    jrl-cmakemodules
   ];
 
   cmakeFlags = [

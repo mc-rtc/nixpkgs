@@ -30,8 +30,12 @@ in
         echo "====="
         echo "Directory '$CCACHE_DIR' does not exist"
         echo "Please create it with:"
-        echo "  sudo mkdir -m0770 '$CCACHE_DIR'"
+        echo "  sudo mkdir -m0770 -p '$CCACHE_DIR'"
         echo "  sudo chown root:nixbld '$CCACHE_DIR'"
+        echo ""
+        echo "You should also add the path to the derivation sandbox by adding extra-sandbox-paths to nix.conf"
+        echo "  echo 'extra-sandbox-paths = /var/cache/ccache' >> ~/.config/nix/nix.conf"
+        echo "  sudo systemctl restart nix-daemon.service"
         echo "====="
         exit 1
       fi
@@ -70,5 +74,5 @@ in
   "mc_rtc-imgui"
 
   # "mc-rtc-rviz-panel" # how to make it work for buildRosPackage?
-  # "mc-rtc"
+  "mc-rtc"
 ]
