@@ -6,12 +6,10 @@
     flake-parts.follows = "mc-rtc-nix/flake-parts";
     systems.follows = "mc-rtc-nix/systems";
 
-    # To override dependencies according to a commit/pull request, add them to inputs
-    # For example:
-    # mc-force-shoe-plugin.url = "github:Hugo-L3174/mc_force_shoe_plugin/pull/16/head";
-    # or use pull/N/merge to get the version merged with master, assuming there are no conflicts
-    # mc-force-shoe-plugin.flake = false;
-    # use true if the repository has a flake
+    # You can override dependencies from a commit/pull request by:
+    # Adding it as input
+    # your-repository.url = "github:username/repository/pull/ID/head";
+    # your-repository.flake = true; # use false if the repository does not have a flake
   };
 
   outputs =
@@ -21,20 +19,17 @@
       {
         systems = import inputs.systems;
         imports = [
-          inputs.mc-rtc-nix.flakeModulePrivate
-          # or inputs.mc-rtc-nix.flakeModule if you don't need private repositories
+          # available flakeModules modules are:
+          # - flakeModule : default module, with overlays for all public repositories in mc-rtc ecosystem
+          # - flakeModules.default : same as flakeModule
+          # - flakeModules.ccache : same as default but built with ccache
+          # - flakeModules.private : private module, with overlays for all public and private repositories in mc-rtc ecosystem.
+          #   Please note that some repositories and the private cache require permission
+          #   If you have sufficient access, this is provided with through your SSH key / binary cache token
+          # - flakeModules.private-ccache : same as private, but with ccache support
+          inputs.mc-rtc-nix.flakeModule
           {
             flakoboros = {
-              extraPackages = [ "ninja" ];
-
-              # Override all dependencies
-              # They are locked in flake.lock to the latest commit available at the time
-              # To update to all inputs' latest commit, use
-              # nix flake update
-              # overrideAttrs.mc-force-shoe-plugin = {
-              #   # src = lib.cleanSource /home/arnaud/devel/mc-rtc-nix/workspace/mc_force_shoe_plugin;
-              #   src = inputs.mc-force-shoe-plugin;
-              # };
 
               # Define a custom superbuild configuration
               # This will make all
@@ -46,7 +41,7 @@
                 {
                   superbuildArgs = cfg-prev // {
                     pname = "mc-rtc-superbuild-override";
-                    # for example, override any runtime dependency (robots, controllers, etc)
+                    # # for example, override any runtime dependency (robots, controllers, etc)
                     # # extend robots
                     # robots = cfg-prev.robots ++ [ pkgs-final.mc-hrp4 ];
                     # # override controllers
@@ -58,15 +53,22 @@
                   };
                 };
 
+              # # Override all dependencies
+              # # They are locked in flake.lock to the latest commit available at the time
+              # # To update to all inputs' latest commit, use
+              # # nix flake update
+              # overrideAttrs.your-repository = {
+              #   src = inputs.your-repository;
+              # };
             };
           }
         ];
         perSystem =
           { pkgs, ... }:
           {
-            # define a devShell called local-superbuild with the superbuild configuration above
+            # define a default devShell called with the superbuild configuration above
             # you can also override attributes to add additional shell functionality
-            devShells.local-superbuild =
+            devShells.default =
               (pkgs.callPackage "${inputs.mc-rtc-nix}/shell.nix" {
                 inherit (pkgs) mc-rtc-superbuild;
               }).overrideAttrs
@@ -74,7 +76,7 @@
                   shellHook = ''
                     ${old.shellHook or ""}
 
-                    echo "Welcome to the local-superbuild devShell with the overridden mc-rtc-superbuild configuration!"
+                    echo "Welcome to the ${pkgs.mc-rtc-superbuild.pname} devShell with the overridden mc-rtc-superbuild configuration!"
                   '';
                 });
           };

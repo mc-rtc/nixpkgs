@@ -1,3 +1,7 @@
+# build variants.private and variants.private-ccache
+# push cache to mc-rtc-nix-private attic
+# TODO we cannot use nix flake check to ensure that everything is built
+# so currently we build the largest meta-packages available (mc-rtc-superbuild-private, mc-mujoco-full, etc)
 name: "CI - Nix - Private"
 on:
   push:
@@ -13,14 +17,14 @@ jobs:
     #   - The PR's source repo is the same as the base repo.
     # This is done to make sure that the required secrets are available to the CI
     if: github.event_name != 'pull_request' || github.repository == github.event.pull_request.head.repo.full_name
-    name: "${{ matrix.build }} on ${{ matrix.os }}"
+    name: "${{matrix.variant}}: ${{ matrix.build }} on ${{ matrix.os }}"
     runs-on: "${{ matrix.os }}"
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-24.04]
-        # test with mc-hrp2 for now
-        build: [ "mc-hrp2", "mc-rtc-superbuild-private" ]
+        variant: [ "private", "private-ccache" ]
+        build: [ "mc-mujoco-full", "mc-rtc-superbuild-private" ]
     steps:
       - uses: actions/checkout@v6
       # Configures ssh-agent if SSH_KEY secret exists
@@ -44,37 +48,18 @@ jobs:
           endpoint: https://attic.arntanguy.fr
           cache: mc-rtc-nix-private
           token: ${{ secrets.ATTIC_TOKEN }}
-      - run: nix build -L "./private#${{ matrix.build }}" --cores 4
-  complete:
-    if: github.event_name != 'pull_request' || github.repository == github.event.pull_request.head.repo.full_name
-    needs: populate-cache
-    name: "complete ${{ matrix.os }}"
-    runs-on: "${{ matrix.os }}-latest"
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu] # TODO: macos
-    steps:
-      - uses: jlumbroso/free-disk-space@main
-        if: ${{ matrix.os == 'ubuntu' }}
-      - name: Configure ssh-agent
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_KEY }}
-      - name: Add gite.lirmm.fr to known_hosts
+      - name: Setup ccache environment
         run: |
-          ssh-keyscan gite.lirmm.fr >> ~/.ssh/known_hosts
-      - uses: actions/checkout@v6
-      - uses: cachix/install-nix-action@v31
-      - uses: cachix/cachix-action@v17
-        with:
-          name: mc-rtc-nix
-          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-          extraPullNames: "ros,gepetto"
-      - run: nix flake check -L ./private
+          sudo mkdir -m0770 -p '/var/cache/ccache'
+          sudo chown --reference=/nix/store '/var/cache/ccache'
+          mkdir -p ~/.config/nix
+          echo 'extra-sandbox-paths = /var/cache/ccache' | sudo tee -a /etc/nix/nix.conf
+          sudo systemctl restart nix-daemon.service
+          sudo ls -ld /var/cache/ccache
+      - run: nix build -L ".#variants.${{ matrix.variant }}.packages.x86_64-linux.${{ matrix.build }}" --cores 4
   fallback:
-    needs: complete
-    if: always() && needs.complete.result == 'failure'
+    needs: populate-cache
+    if: always() && needs.populate-cache.result == 'failure'
     name: "fallback ${{ matrix.os }}"
     runs-on: "${{ matrix.os }}-latest"
     strategy:
@@ -98,36 +83,13 @@ jobs:
           name: mc-rtc-nix
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
           extraPullNames: "ros,gepetto"
-      - run: nix flake check -L -j 1 --cores 1
-  # system:
-  #   runs-on: "ubuntu-latest"
-  #   steps:
-  #     - uses: actions/checkout@v6
-  #     - uses: cachix/install-nix-action@v31
-  #     - uses: cachix/cachix-action@v17
-  #       with:
-  #         name: mc-rtc-nix
-  #         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-  #         extraPullNames: ros
-  #     - run: nix build -L .#systemConfigs.default
-  # home:
-  #   runs-on: "ubuntu-latest"
-  #   steps:
-  #     - uses: actions/checkout@v6
-  #     - uses: cachix/install-nix-action@v31
-  #     - uses: cachix/cachix-action@v17
-  #       with:
-  #         name: mc-rtc-nix
-  #         extraPullNames: "ros,gepetto"
-  #     - run: nix build -L .#homeConfigurations.cpene.activationPackage
+      - run: nix build -L ".#variants.${{ matrix.variant }}.packages.x86_64-linux.${{ matrix.build }}" --cores 1
   check:
     if: always()
     name: check-macos-linux-nix-private
     runs-on: ubuntu-latest
     needs:
       - fallback
-      # - system
-      # - home
     steps:
       - uses: re-actors/alls-green@release/v1
         with:
