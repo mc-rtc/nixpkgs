@@ -264,6 +264,6 @@
       };
     };
 
-    sphinx-cmake = prev.callPackage ./pkgs/sphinx-cmake.nix {};
+    sphinx-cmake = prev.callPackage ./pkgs/sphinx-cmake.nix { };
   }
 )
