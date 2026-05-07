@@ -125,6 +125,7 @@ in
             # Main plugins
             inherit (pkgs) mc-force-shoe-plugin;
 
+            inherit (pkgs) sphinx-cmake;
           }
           // lib.optionalAttrs enablePrivateOverlay {
             # Private robots
