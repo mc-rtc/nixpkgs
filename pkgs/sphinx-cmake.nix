@@ -29,13 +29,13 @@ stdenv.mkDerivation {
   '';
 
   postFixup = ''
-      mkdir -p $out/nix-support
-      cat > $out/nix-support/setup-hook <<EOF
-      add_sphinx_to_cmake_flags() {
-        # This appends the module path to the actual flags passed to the cmake command
-        export cmakeFlags="\$cmakeFlags -DCMAKE_MODULE_PATH=$out/lib/cmake/sphinx-cmake"
-      }
-      addEnvHooks "\$hostOffset" add_sphinx_to_cmake_flags
+        mkdir -p $out/nix-support
+        cat > $out/nix-support/setup-hook <<EOF
+        add_sphinx_to_cmake_flags() {
+          # Use \''${cmakeFlags:-} to avoid "unbound variable" errors
+          export cmakeFlags="\''${cmakeFlags:-} -DCMAKE_MODULE_PATH=$out/lib/cmake/sphinx-cmake"
+        }
+        addEnvHooks "\$hostOffset" add_sphinx_to_cmake_flags
     EOF
   '';
 }
