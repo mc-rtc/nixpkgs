@@ -52,6 +52,7 @@
     eigen-qld = prev.callPackage ./pkgs/eigen-qld { };
     eigen-quadprog = prev.callPackage ./pkgs/eigen-quadprog { };
     sch-core = prev.callPackage ./pkgs/sch-core { };
+    sch-core-python = prev.callPackage ./pkgs/sch-core-python { };
     #sch-visualization = prev.callPackage ./pkgs/sch-visualization {};
     sch-visualization = prev.callPackage ./pkgs/sch-visualization { };
     tasks-qld = prev.callPackage ./pkgs/tasks { };

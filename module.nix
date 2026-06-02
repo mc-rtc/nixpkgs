@@ -73,6 +73,7 @@ in
               spacevecalg
               rbdyn
               sch-core
+              sch-core-python
               tasks
               tasks-qld
               tvm
