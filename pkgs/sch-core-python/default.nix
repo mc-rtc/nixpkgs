@@ -45,8 +45,6 @@ stdenv.mkDerivation rec {
     local targetDir="$out/${python3Packages.python.sitePackages}/sch"
     mkdir -p "$targetDir"
 
-    ls -lR
-
     # 2. Copy your built files from the build tree to the target store path
     # (Adjust 'build/python/Release/eigen/' path if your build folder structure differs slightly)
     cp -r python/Release/sch/* "$targetDir"
