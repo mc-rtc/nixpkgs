@@ -6,7 +6,7 @@
   doxygen,
   boost,
   fetchgit,
-  jrl-cmakemodules
+  jrl-cmakemodules,
 }:
 
 stdenv.mkDerivation {
