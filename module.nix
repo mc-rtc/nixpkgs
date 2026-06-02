@@ -14,7 +14,7 @@ let
   rawOverlays = [
     {
       name = "mc-rtc-pkgs";
-      value = import ./overlay.nix { inherit with-ros; };
+      value = import ./overlay.nix { inherit lib with-ros; };
     }
   ]
   ++ (lib.optional enablePrivateOverlay {
@@ -69,6 +69,7 @@ in
           // {
             # Main dependencies
             inherit (pkgs)
+              eigen3-to-python
               spacevecalg
               rbdyn
               sch-core

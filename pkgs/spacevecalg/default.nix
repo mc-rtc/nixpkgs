@@ -2,18 +2,18 @@
   stdenv,
   lib,
   cmake,
+  pkg-config,
   jrl-cmakemodules,
+  doxygen,
   eigen,
   boost,
   fetchFromGitHub,
+  python3Packages,
 }:
 
-let
-  version = "1.2.9";
-in
-stdenv.mkDerivation rec {
+stdenv.mkDerivation {
   pname = "spacevecalg";
-  inherit version;
+  version = "1.2.9";
 
   src = fetchFromGitHub {
     owner = "jrl-umi3218";
@@ -25,17 +25,25 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [
     cmake
     jrl-cmakemodules
+    pkg-config
+    doxygen
+    python3Packages.cython
+    python3Packages.python
+    python3Packages.distutils
+    python3Packages.pytest
   ];
+
   propagatedBuildInputs = [
     eigen
     boost
+    python3Packages.numpy
+    python3Packages.eigen3-to-python
   ];
 
-  cmakeFlags = [
-    "-DBUILD_TESTING=OFF"
-    "-DPYTHON_BINDING=OFF"
-    "-DINSTALL_DOCUMENTATION=OFF"
-  ];
+  # cmakeFlags = [
+  #   "-DBUILD_TESTING=OFF"
+  #   "-DINSTALL_DOCUMENTATION=OFF"
+  # ];
 
   doCheck = true;
 

@@ -10,7 +10,7 @@ Current status:
       Allows to build mc-rtc and configure its runtime dependencies (`robots`, `controllers`, `observers`, `plugins`)
 - [x] Run `MCFrankaControl` with real Panda robots
 - [x] `mc-rtc-magnum` support (with older `glfw/imgui/implot` as submodules, as done in `mc-rtc-superbuild`)
-- [ ] Robots - all most commonly used robots are supported:
+- [x] Robots - all most commonly used robots are supported:
   - [x] JVRC1
   - [x] HRP-2Kai
   - [x] HRP-4
@@ -24,9 +24,9 @@ Current status:
     - [ ] UR10
 - [ ] Controllers
   - [x] Rolkneematics `panda-prosthesis` (through downstream flake in `panda-prosthesis` repository)
-  - [ ] WIP: Hugo's polytopeController
+  - [x] Hugo's polytopeController
 - [ ] `mc-mujoco`: building and running but some HiDPI scaling issues on Wayland with glfw 3.4
-- [ ] magnum packaging (external): in progress
+- [x] magnum packaging
   - [x] magnum
     - [x] SDL2Application: works
     - [x] GlfwApplication:

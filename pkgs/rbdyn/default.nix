@@ -7,6 +7,7 @@
   tinyxml-2,
   boost,
   fetchurl,
+  python3Packages,
 }:
 
 stdenv.mkDerivation rec {
@@ -18,21 +19,19 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-IFqX4z8r2JTwgNnPB35/vZKwgWoPO78ebnUvPdNOnjY=";
   };
 
-  nativeBuildInputs = [ cmake ];
+  nativeBuildInputs = [
+    cmake
+    python3Packages.cython
+    python3Packages.python
+  ];
+
   propagatedBuildInputs = [
     spacevecalg
     yaml-cpp
     tinyxml-2
     boost
+    python3Packages.spacevecalg
   ]; # Add other dependencies here
-
-  postPatch = ''
-    # Remove the include from the main CMakeLists.txt
-    sed -i '/include(cmake\/cython\/cython.cmake)/d' CMakeLists.txt
-
-    # Add the include to the top of the python binding CMakeLists.txt
-    sed -i '1i include(cmake/cython/cython.cmake)' binding/python/CMakeLists.txt
-  '';
 
   doCheck = true;
 
