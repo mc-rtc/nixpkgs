@@ -23,6 +23,8 @@ stdenv.mkDerivation rec {
     cmake
     python3Packages.cython
     python3Packages.python
+    python3Packages.distutils
+    python3Packages.pytest
   ];
 
   propagatedBuildInputs = [
@@ -32,6 +34,12 @@ stdenv.mkDerivation rec {
     boost
     python3Packages.spacevecalg
   ]; # Add other dependencies here
+
+  # XXX: Without this fixupPhase fails due to RPATHS references to /build/
+  preFixup = ''
+    patchelf --shrink-rpath --allowed-rpath-prefixes "$NIX_STORE" $out/${python3Packages.python.sitePackages}/rbdyn/rbdyn.so
+    patchelf --shrink-rpath --allowed-rpath-prefixes "$NIX_STORE" $out/${python3Packages.python.sitePackages}/rbdyn/parsers/parsers.so
+  '';
 
   doCheck = true;
 
