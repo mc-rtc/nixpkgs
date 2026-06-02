@@ -12,12 +12,11 @@ stdenv.mkDerivation {
   pname = "eigen3-to-python";
   version = "1.0.7";
 
-  # pr 35
   src = fetchFromGitHub {
-    owner = "Kooolkimooov";
+    owner = "jrl-umi3218";
     repo = "Eigen3ToPython";
-    rev = "a1dfb35c204b2732d0b60d4d2bb6edb4c6941f59";
-    hash = "sha256-zNaMmaexyDBD2frMkO4z+Qj/AKtIxt6sRdwYcwoNJh8=";
+    tag = "v1.0.7";
+    hash = "sha256-T5fhNj5AjFS/F+Q+aCHfL0fW9uMQoGEhYLf5u2aPrQk=";
   };
 
   nativeBuildInputs = [
@@ -61,8 +60,6 @@ stdenv.mkDerivation {
     # Using python.sitePackages handles the "lib/python3.13/site-packages" string automatically
     local targetDir="$out/${python3Packages.python.sitePackages}/eigen"
     mkdir -p "$targetDir"
-
-    ls -lR
 
     # 2. Copy your built files from the build tree to the target store path
     # (Adjust 'build/python/Release/eigen/' path if your build folder structure differs slightly)

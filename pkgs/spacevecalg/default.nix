@@ -13,13 +13,13 @@
 
 stdenv.mkDerivation {
   pname = "spacevecalg";
-  version = "1.2.9";
+  version = "1.2.10";
 
   src = fetchFromGitHub {
     owner = "jrl-umi3218";
     repo = "SpaceVecAlg";
-    rev = "cfe9af9068829f5e57fa8fe48f48852ceff52f03";
-    hash = "sha256-Mvl7/venZgaqVo7BLJwk8nfl+Ng9lhHewZc8v1X8u00=";
+    tag = "v1.2.10";
+    hash = "sha256-fTKKj3m8cO4F46LlO7r8JeuWLhlyRcX7EblHroDYFkQ=";
   };
 
   nativeBuildInputs = [
