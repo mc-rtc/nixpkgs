@@ -6,6 +6,7 @@
     Use this to access and override existing packages, or to call functions from the underlying package set.
 */
 {
+  lib,
   with-ros ? false,
   ...
 }:
@@ -45,11 +46,13 @@
       '';
     });
 
+    eigen3-to-python = prev.callPackage ./pkgs/eigen3-to-python { };
     spacevecalg = prev.callPackage ./pkgs/spacevecalg { };
     rbdyn = prev.callPackage ./pkgs/rbdyn { };
     eigen-qld = prev.callPackage ./pkgs/eigen-qld { };
     eigen-quadprog = prev.callPackage ./pkgs/eigen-quadprog { };
     sch-core = prev.callPackage ./pkgs/sch-core { };
+    sch-core-python = prev.callPackage ./pkgs/sch-core-python { };
     #sch-visualization = prev.callPackage ./pkgs/sch-visualization {};
     sch-visualization = prev.callPackage ./pkgs/sch-visualization { };
     tasks-qld = prev.callPackage ./pkgs/tasks { };
@@ -221,7 +224,7 @@
     # This is not per-say recomended, but it can drastically reduce build time for these components, and also allow for seamless LSP integration in your editor.
     #
     # TODO: investigate use of ccacheStdenv
-    # mc-rtc-superbuild = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-symlinkjoin.nix.nix {
+    # mc-rtc-superbuild = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-symlinkjoin.nix.nix
 
     # minimal superbuild environment (jvrc1, mc_rtc_ticker)
     mc-rtc-superbuild-minimal = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix {
@@ -265,5 +268,18 @@
     };
 
     sphinx-cmake = prev.callPackage ./pkgs/sphinx-cmake.nix { };
+
+    pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
+      (
+        python-final: _python-prev:
+        {
+          # custom overrides would go here see gepetto/nix for examples
+        }
+        // lib.filesystem.packagesFromDirectoryRecursive {
+          inherit (python-final) callPackage;
+          directory = ./py-pkgs;
+        }
+      )
+    ];
   }
 )
