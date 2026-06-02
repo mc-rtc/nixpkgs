@@ -4,11 +4,12 @@
 
 let
   version = "2.14.1";
+  # TODO: PR 538
   src = fetchFromGitHub {
-    owner = "jrl-umi3218";
+    owner = "Kooolkimooov";
     repo = "mc_rtc";
-    rev = "d1bb28f9bfab85a04ce1ff103289676cfa5bf4fc";
-    hash = "sha256-a8Wh5Xhvs+vM7k0uEJzSDCSUOK58AJSRSJx3XyboHO0=";
+    rev = "2846f365824531f162635323d0c32796842e02a8";
+    hash = "sha256-zTxxZOZCwlMGrRGG8B9kRLJcCvXLvYSigej8yDpihwg=";
   };
 in
 {

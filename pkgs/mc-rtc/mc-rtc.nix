@@ -15,6 +15,7 @@
   libtool,
   geos,
   spdlog,
+  fmt,
   ndcurves,
   mc-rtc-data,
   state-observation,
@@ -23,9 +24,8 @@
   rapidjson,
   boost,
   mesh-sampling,
-  python313Packages,
+  python3Packages,
   qt5,
-  eigen-fmt,
   doxygen,
   bundler, # Ruby for bundle dependencies
   with-ros ? false,
@@ -61,6 +61,10 @@ in
     pkg-config
     jrl-cmakemodules
     qt5.wrapQtAppsHook
+    python3Packages.distutils
+    python3Packages.pytest
+    python3Packages.cython
+    python3Packages.python
   ]
   ++ [
     # for documentation
@@ -83,13 +87,16 @@ in
     rapidjson
     boost
     mesh-sampling
-    eigen-fmt
+    fmt
+    python3Packages.tasks
   ]
-  ++ [
-    python313Packages.gitpython
-    python313Packages.pyqt5
-    python313Packages.matplotlib
-  ]
+  ++
+    # for python utils (mc_rtc_new_fsm_controller, mc_log_ui, etc)
+    [
+      python3Packages.gitpython
+      python3Packages.pyqt5
+      python3Packages.matplotlib
+    ]
   ++ lib.optional (with-ros && rclcpp != null) rclcpp
   ++ lib.optional (with-ros && nav-msgs != null) nav-msgs
   ++ lib.optional (with-ros && sensor-msgs != null) sensor-msgs
@@ -106,7 +113,6 @@ in
   cmakeFlags = [
     "-DBUILD_MC_RTC_PYTHON_UTILS=ON"
     "-DBUILD_TESTING=OFF"
-    "-DPYTHON_BINDING=OFF"
     "-DINSTALL_DOCUMENTATION=ON"
   ];
 
