@@ -5,21 +5,25 @@
   eigen,
   doxygen,
   boost,
-  fetchurl,
+  fetchgit,
+  jrl-cmakemodules
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation {
   pname = "sch-core";
-  version = "1.4.3";
+  version = "1.4.4";
 
-  src = fetchurl {
-    url = "https://github.com/jrl-umi3218/${pname}/releases/download/v${version}/${pname}-v${version}.tar.gz";
-    sha256 = "aa10a427bafc3fbe4fc687d1785b079539a438597b7b6ba20ae230d5286074dd";
+  # there is still a submodule for shared tests
+  src = fetchgit {
+    url = "https://github.com/jrl-umi3218/sch-core";
+    rev = "7dd530898d1041e3c985a2450a4066510399b9c6";
+    hash = "sha256-8RFl+JivzyWZ/aIuaBUSDrHGE/r17N7chHF3520Agrc=";
   };
 
   nativeBuildInputs = [
     cmake
     doxygen
+    jrl-cmakemodules
   ];
   propagatedBuildInputs = [
     eigen
@@ -27,8 +31,7 @@ stdenv.mkDerivation rec {
   ];
 
   cmakeFlags = [
-    "-DBUILD_TESTING=OFF"
-    "-DPYTHON_BINDING=OFF"
+    "-DBUILD_TESTING=ON"
     "-DINSTALL_DOCUMENTATION=OFF"
   ];
 
