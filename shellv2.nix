@@ -25,7 +25,7 @@ let
   };
   cfg = superbuildArgs // default-cfg;
   isDevel = builtins.isAttrs develSuperbuildArgs;
-  devel-cfg = if builtins.isAttrs develSuperbuildArgs then develSuperbuildArgs else {};
+  devel-cfg = if builtins.isAttrs develSuperbuildArgs then develSuperbuildArgs else { };
   # full-cfg = builtins.zipAttrsWith (name: values:
   #   if builtins.isList (builtins.head values)
   #   then builtins.concatLists values
@@ -75,109 +75,126 @@ pkgs.mkShell {
         [ ]
     );
 
-  inputsFrom = []
+  inputsFrom =
+    [ ]
     ++ traceGroup "inputsFrom apps" (devel-cfg.apps or [ ])
     ++ traceGroup "inputsFrom robots" (devel-cfg.robots or [ ])
     ++ traceGroup "inputsFrom plugins" (devel-cfg.plugins or [ ])
     ++ traceGroup "inputsFrom controllers" (devel-cfg.controllers or [ ])
     ++ traceGroup "inputsFrom observers" (devel-cfg.observers or [ ]);
 
-  shellHook = 
-    let 
+  shellHook =
+    let
       controllers = lib.optionals isDevel [ localInstallPath ] ++ cfg.controllers;
       robots = lib.optionals isDevel [ localInstallPath ] ++ cfg.robots;
       observers = lib.optionals isDevel [ localInstallPath ] ++ cfg.observers;
       plugins = lib.optionals isDevel [ localInstallPath ] ++ cfg.plugins;
-      configs = [ "${localPath}/mc_rtc.yaml" ] ++ lib.optionals isDevel (map (cfg: "${localInstallPath}/${cfg}") devel-cfg.configs) ++ cfg.configs;
+      configs = [
+        "${localPath}/mc_rtc.yaml"
+      ]
+      ++ lib.optionals isDevel (map (cfg: "${localInstallPath}/${cfg}") devel-cfg.configs)
+      ++ cfg.configs;
     in
-      ''
-    mkdir -p ${localInstallPath}
-    echo "Generating local mc_rtc.yaml in ${localPath}/mc_rtc.yaml..."
-    cat <<EOF > ${localPath}/mc_rtc.yaml
----
-# This mc_rtc.yaml file was generated from the mc-rtc-superbuild-standalone nix shell
-# Generated on: $(date)
+    ''
+          mkdir -p ${localInstallPath}
+          echo "Generating local mc_rtc.yaml in ${localPath}/mc_rtc.yaml..."
+          cat <<EOF > ${localPath}/mc_rtc.yaml
+      ---
+      # This mc_rtc.yaml file was generated from the mc-rtc-superbuild-standalone nix shell
+      # Generated on: $(date)
 
-# ${lib.optionalString (cfg.MainRobot or null != null) "MainRobot: ${cfg.MainRobot}"}
-# ${lib.optionalString (cfg.Enabled or null != null) "Enabled: [${cfg.Enabled}]"}
-# ${lib.optionalString (cfg.Timestep or null != null) "Timestep: ${toString (cfg.Timestep or "")}"}
+      # ${lib.optionalString (cfg.MainRobot or null != null) "MainRobot: ${cfg.MainRobot}"}
+      # ${lib.optionalString (cfg.Enabled or null != null) "Enabled: [${cfg.Enabled}]"}
+      # ${lib.optionalString (cfg.Timestep or null != null) "Timestep: ${toString (cfg.Timestep or "")}"}
 
-# Dynamically generated module paths
-# FIXME: should only be lib/ or lib64/ but not both
-ControllerModulePaths: [${toYamlList ((map (p: "${p}/lib64/mc_controller") controllers) ++ (map (p: "${p}/lib/mc_controller") controllers))}]
-RobotModulePaths: [${toYamlList ((map (p: "${p}/lib64/mc_robots") robots) ++ (map (p: "${p}/lib/mc_robots") robots))}]
-ObserverModulePaths: [${toYamlList ((map (p: "${p}/lib64/mc_observers") observers) ++ (map (p: "${p}/lib/mc_observers") observers))}]
-GlobalPluginPaths: [${toYamlList ((map (p: "${p}/lib64/mc_plugins") plugins) ++ (map (p: "${p}/lib/mc_plugins") plugins))}]
+      # Dynamically generated module paths
+      # FIXME: should only be lib/ or lib64/ but not both
+      ControllerModulePaths: [${
+        toYamlList (
+          (map (p: "${p}/lib64/mc_controller") controllers) ++ (map (p: "${p}/lib/mc_controller") controllers)
+        )
+      }]
+      RobotModulePaths: [${
+        toYamlList ((map (p: "${p}/lib64/mc_robots") robots) ++ (map (p: "${p}/lib/mc_robots") robots))
+      }]
+      ObserverModulePaths: [${
+        toYamlList (
+          (map (p: "${p}/lib64/mc_observers") observers) ++ (map (p: "${p}/lib/mc_observers") observers)
+        )
+      }]
+      GlobalPluginPaths: [${
+        toYamlList ((map (p: "${p}/lib64/mc_plugins") plugins) ++ (map (p: "${p}/lib/mc_plugins") plugins))
+      }]
 
-# Ignore ~/.config/mc_rtc/mc_rtc.yaml
-LoadUserConfiguration: false
-EOF
+      # Ignore ~/.config/mc_rtc/mc_rtc.yaml
+      LoadUserConfiguration: false
+      EOF
 
-    export MC_RTC_PATH=${pkgs.mc-rtc}
-    export MC_RTC_JEKYLL_PLUGINS=${pkgs.mc-rtc}/share/doc/mc-rtc/jekyll/plugins
-    export MC_RTC_LIB=${pkgs.mc-rtc}/lib
-    export MC_RTC_BIN=${pkgs.mc-rtc}/bin
-    export MC_RTC_PKGCONFIG=${pkgs.mc-rtc}/lib/pkgconfig
-    export MC_RTC_CONTROLLER_CONFIG=${pkgs.lib.concatStringsSep ":" configs}
+          export MC_RTC_PATH=${pkgs.mc-rtc}
+          export MC_RTC_JEKYLL_PLUGINS=${pkgs.mc-rtc}/share/doc/mc-rtc/jekyll/plugins
+          export MC_RTC_LIB=${pkgs.mc-rtc}/lib
+          export MC_RTC_BIN=${pkgs.mc-rtc}/bin
+          export MC_RTC_PKGCONFIG=${pkgs.mc-rtc}/lib/pkgconfig
+          export MC_RTC_CONTROLLER_CONFIG=${pkgs.lib.concatStringsSep ":" configs}
 
-    export PATH=$MC_RTC_BIN:$PATH
-    export LD_LIBRARY_PATH=${lib.optionalString isDevel "${localInstallPath}/lib:${localInstallPath}/lib64:"}$MC_RTC_LIB:$LD_LIBRARY_PATH
-    export PKG_CONFIG_PATH=$MC_RTC_PKGCONFIG:$PKG_CONFIG_PATH
+          export PATH=$MC_RTC_BIN:$PATH
+          export LD_LIBRARY_PATH=${lib.optionalString isDevel "${localInstallPath}/lib:${localInstallPath}/lib64:"}$MC_RTC_LIB:$LD_LIBRARY_PATH
+          export PKG_CONFIG_PATH=$MC_RTC_PKGCONFIG:$PKG_CONFIG_PATH
 
-    export TMP=/tmp
-    export TMPDIR=/tmp
-    export TEMP=/tmp
-    export TEMPDIR=/tmp
+          export TMP=/tmp
+          export TMPDIR=/tmp
+          export TEMP=/tmp
+          export TEMPDIR=/tmp
 
-    # FIXME this flag gets too huge and gcc fails
-    export NIX_CFLAGS_COMPILE=""
+          # FIXME this flag gets too huge and gcc fails
+          export NIX_CFLAGS_COMPILE=""
 
-    # FIXME we might need to run ros2 daemon stop && ros2 daemon start
-    export ROS_DOMAIN_ID=100
+          # FIXME we might need to run ros2 daemon stop && ros2 daemon start
+          export ROS_DOMAIN_ID=100
 
-    echo "${line}"
-    echo "${title}"
-    echo "${line}"
-    echo ""
+          echo "${line}"
+          echo "${title}"
+          echo "${line}"
+          echo ""
 
-    echo "The following convenience environment variables are set:"
-    env | grep '^MC_RTC_'
-    echo ""
+          echo "The following convenience environment variables are set:"
+          env | grep '^MC_RTC_'
+          echo ""
 
-    echo "Runtime dependencies (store paths):"
-    echo "Robot modules:"
-    for robot in ${pkgs.lib.concatStringsSep " " (map (r: "${r}") cfg.robots)}; do
-      echo "  $robot"
-    done
-    echo "Plugins:"
-    for plugin in ${pkgs.lib.concatStringsSep " " (map (r: "${r}") cfg.plugins)}; do
-      echo "  $plugin"
-    done
-    echo "Observers:"
-    for observer in ${pkgs.lib.concatStringsSep " " (map (r: "${r}") cfg.observers)}; do
-      echo "  $observer"
-    done
-    echo "Controllers:"
-    for controller in ${pkgs.lib.concatStringsSep " " (map (r: "${r}") cfg.controllers)}; do
-      echo "  $controller"
-    done
-    echo "Apps:"
-    for app in ${pkgs.lib.concatStringsSep " " (map (r: "${r}") cfg.apps)}; do
-      echo "  $app"
-    done
-    echo ""
-    echo "mc_rtc will use the following configuration files $MC_RTC_CONTROLLER_CONFIG"
+          echo "Runtime dependencies (store paths):"
+          echo "Robot modules:"
+          for robot in ${pkgs.lib.concatStringsSep " " (map (r: "${r}") cfg.robots)}; do
+            echo "  $robot"
+          done
+          echo "Plugins:"
+          for plugin in ${pkgs.lib.concatStringsSep " " (map (r: "${r}") cfg.plugins)}; do
+            echo "  $plugin"
+          done
+          echo "Observers:"
+          for observer in ${pkgs.lib.concatStringsSep " " (map (r: "${r}") cfg.observers)}; do
+            echo "  $observer"
+          done
+          echo "Controllers:"
+          for controller in ${pkgs.lib.concatStringsSep " " (map (r: "${r}") cfg.controllers)}; do
+            echo "  $controller"
+          done
+          echo "Apps:"
+          for app in ${pkgs.lib.concatStringsSep " " (map (r: "${r}") cfg.apps)}; do
+            echo "  $app"
+          done
+          echo ""
+          echo "mc_rtc will use the following configuration files $MC_RTC_CONTROLLER_CONFIG"
 
-    ${lib.optionalString isDevel "
+          ${lib.optionalString isDevel "
     echo ''
     echo 'This is a development shell, the controller has not been built automatically, build it with:'
     echo 'cmake -B build -DCMAKE_INSTALL_PREFX=${relativeLocalPath}/install'
     echo 'cmake --build build --target install'
     "}
 
-    export MC_RTC_DISABLE_CONVEX_GENERATION_PATCH="ON"
-    echo ""
-    echo "warning:"
-    echo "- MC_RTC_DISABLE_CONVEX_GENERATION_PATCH is set to ON, this will disable convex hull generation in mc_rtc"
-  '';
+          export MC_RTC_DISABLE_CONVEX_GENERATION_PATCH="ON"
+          echo ""
+          echo "warning:"
+          echo "- MC_RTC_DISABLE_CONVEX_GENERATION_PATCH is set to ON, this will disable convex hull generation in mc_rtc"
+    '';
 }
