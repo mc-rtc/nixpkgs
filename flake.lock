@@ -489,6 +489,10 @@
           "gepetto",
           "flake-parts"
         ],
+        "flakoboros": [
+          "gepetto",
+          "flakoboros"
+        ],
         "gepetto": "gepetto",
         "jrl-cmakemodulesv2": "jrl-cmakemodulesv2",
         "nixpkgs": [
