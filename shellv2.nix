@@ -26,11 +26,6 @@ let
   cfg = superbuildArgs // default-cfg;
   isDevel = builtins.isAttrs develSuperbuildArgs;
   devel-cfg = if builtins.isAttrs develSuperbuildArgs then develSuperbuildArgs else { };
-  # full-cfg = builtins.zipAttrsWith (name: values:
-  #   if builtins.isList (builtins.head values)
-  #   then builtins.concatLists values
-  #   else builtins.elemAt values ((builtins.length values) - 1)
-  # ) [ devel-cfg cfg ];
 
   traceGroup =
     name: pkgs:
@@ -82,6 +77,23 @@ pkgs.mkShell {
     ++ traceGroup "inputsFrom plugins" (devel-cfg.plugins or [ ])
     ++ traceGroup "inputsFrom controllers" (devel-cfg.controllers or [ ])
     ++ traceGroup "inputsFrom observers" (devel-cfg.observers or [ ]);
+
+  # Explicitly inherit cmake flags from the development targets
+  cmakeFlags =
+    let
+      # Gather all development packages
+      develPkgs =
+        (devel-cfg.apps or [ ])
+        ++ (devel-cfg.robots or [ ])
+        ++ (devel-cfg.plugins or [ ])
+        ++ (devel-cfg.controllers or [ ])
+        ++ (devel-cfg.observers or [ ]);
+
+      # Extract cmakeFlags from packages safely (falling back to empty lists if they don't exist)
+      extractedFlags = map (pkg: pkg.cmakeFlags or [ ]) develPkgs;
+    in
+    # Flatten the nested lists into a single list for cmakeFlags
+    lib.flatten extractedFlags;
 
   shellHook =
     let
