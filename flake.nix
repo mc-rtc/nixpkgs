@@ -40,6 +40,9 @@
           // attrs
         );
 
+      superbuildModule = inputs.flake-parts.lib.importApply ./modules/superbuild.nix ({
+        nixpkgs = inputs.nixpkgs;
+      });
       flakeModule = mkModule { importPerSystem = false; };
       flakeModuleCcache = mkModule {
         importPerSystem = false;
@@ -84,6 +87,7 @@
           public-ccache = flakeModuleCcache;
           private = flakeModulePrivate;
           private-ccache = flakeModulePrivateCcache;
+          superbuild = superbuildModule;
         };
         flakeModulePrivate = builtins.trace "WARNING: deprecated, use flakeModules.private or flakeModules.private-ccache instead" flakeModulePrivate;
 
