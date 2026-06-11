@@ -38,7 +38,7 @@
       imports = [
         flakeModule
         {
-          mc-rtc.importPerSystem = true;
+          mc-rtc.importPackages = true;
         }
       ];
 

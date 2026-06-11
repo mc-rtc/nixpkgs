@@ -24,7 +24,7 @@
       type = lib.types.bool;
       default = false;
     };
-    importPerSystem = lib.mkOption {
+    importPackages = lib.mkOption {
       type = lib.types.bool;
       default = false;
     };
@@ -32,6 +32,12 @@
       type = lib.types.bool;
       default = true;
     };
+  };
+
+  options.mc-rtc-superbuild = lib.mkOption {
+    type = lib.types.unspecified;
+    default = { };
+    description = "Global configuration schema or a function returning the schema for generating mc-rtc superbuild development environments.";
   };
 
   imports = [
@@ -86,7 +92,7 @@
     in
     {
       flake.overlays = flakeOverlays;
-      flake.flakeModules.superbuild = ./modules/superbuild.nix;
+      flake.flakeModules.superbuild = ./modules/superbuild/superbuild.nix;
 
       flakoboros = {
         extraPackages = [ "ninja" ];
@@ -96,13 +102,29 @@
         };
       };
 
-      perSystem = lib.mkIf cfg.importPerSystem (
+      perSystem = (
         { pkgs, ... }:
+        let
+          # 1. Safely parse either formatting layout
+          rawCfg =
+            if builtins.isFunction config.mc-rtc-superbuild then
+              config.mc-rtc-superbuild { inherit pkgs lib; }
+            else
+              config.mc-rtc-superbuild;
+
+          # 2. Merge defaults so fields like .enable and .pname are always available
+          superbuildCfg = {
+            enable = false;
+            pname = "mc-rtc-superbuild";
+          }
+          // rawCfg;
+        in
         {
           packages =
-            # inputs'.gepetto.packages
-            {
-            }
+            lib.mkIf cfg.importPackages
+              # inputs'.gepetto.packages
+              {
+              }
             // {
               # Main dependencies
               inherit (pkgs)
@@ -148,8 +170,6 @@
               inherit (pkgs)
                 mc-mujoco
                 mc-mujoco-full
-                mc-rtc-superbuild
-                mc-rtc-superbuild-full
                 ;
               inherit (pkgs) panda-prosthesis mc-force-shoe-plugin sphinx-cmake;
             }
@@ -167,52 +187,14 @@
                 dcm-vrptask
                 polytopeController
                 ;
-              inherit (pkgs) mc-rtc-superbuild-private;
             };
 
-          devShells =
-            # inputs'.gepetto.devShells
-            {
-            }
-            // {
-              mc-rtc-superbuild-minimal = pkgs.make-shell {
-                imports = [ ./modules/superbuild.nix ];
-                mc-rtc-superbuild = {
-                  enable = true;
-                  plugins = [
-                    pkgs.mc-state-observation
-                  ];
-                };
-              };
-              mc-rtc-superbuild = pkgs.make-shell {
-                imports = [ ./modules/superbuild.nix ];
-                mc-rtc-superbuild = {
-                  enable = true;
-                  apps = [
-                    pkgs.mc-rtc-magnum
-                    pkgs.mc-mujoco
-                    pkgs.mc-rtc-ticker
-                  ];
-                };
-              };
-              # mc-rtc-superbuild-all-public-robots = import ./shell.nix {
-              #   inherit pkgs;
-              #   with-ros = true;
-              #   mc-rtc-superbuild = pkgs.mc-rtc-superbuild-all-public-robots;
-              # };
-              # mc-rtc-superbuild-full = import ./shell.nix {
-              #   inherit pkgs;
-              #   with-ros = true;
-              #   mc-rtc-superbuild = pkgs.mc-rtc-superbuild-full;
-              # };
-            }
-            // lib.optionalAttrs cfg.enablePrivateOverlay {
-              # mc-rtc-superbuild-private = import ../shell.nix {
-              #   inherit pkgs;
-              #   with-ros = true;
-              #   mc-rtc-superbuild = pkgs.mc-rtc-superbuild-private;
-              # };
+          devShells = lib.optionalAttrs superbuildCfg.enable {
+            ${superbuildCfg.pname} = pkgs.make-shell {
+              imports = [ ./modules/superbuild/superbuild.nix ];
+              mc-rtc-superbuild = superbuildCfg;
             };
+          };
         }
       );
     };
