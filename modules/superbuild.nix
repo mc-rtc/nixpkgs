@@ -1,43 +1,49 @@
-# 1. The first line accepts what was passed down via importApply
-{ }:
+{ lib, config, ... }:
 
-# 2. The second line accepts standard flake-parts system infrastructure
-{ lib, flake-parts-lib, ... }:
-
+let
+  cfg = config.mc-rtc-superbuild;
+in
 {
-  options.perSystem = flake-parts-lib.mkPerSystemOption (
-    { ... }:
-    {
-      options.programs.mc-rtc-superbuild = {
+  options.mc-rtc-superbuild = lib.mkOption {
+    type = lib.types.submodule {
+      options = {
         enable = lib.mkEnableOption "mc-rtc superbuild shells configuration";
+
         pname = lib.mkOption {
           type = lib.types.str;
           default = "mc-rtc-superbuild";
         };
+
         mainRobot = lib.mkOption {
           type = lib.types.nullOr lib.types.str;
           default = null;
         };
+
         enabled = lib.mkOption {
-          type = lib.types.nullOr lib.types.str;
+          type = lib.types.nullOr (lib.types.listOf lib.types.str);
           default = null;
         };
+
         timestep = lib.mkOption {
           type = lib.types.nullOr lib.types.float;
           default = null;
         };
+
         relativeLocalPath = lib.mkOption {
           type = lib.types.str;
           default = ".superbuild";
         };
+
         withRos = lib.mkOption {
           type = lib.types.bool;
           default = false;
         };
+
         traceRuntimeDependencies = lib.mkOption {
           type = lib.types.bool;
           default = false;
         };
+
         extraBuildInputs = lib.mkOption {
           type = lib.types.listOf lib.types.package;
           default = [ ];
@@ -47,25 +53,31 @@
           type = lib.types.nullOr lib.types.str;
           default = null;
         };
+
+        # Functional lazy-type listings to prevent infinite system recursion loops
         robots = lib.mkOption {
-          type = lib.types.listOf lib.types.package;
-          default = [ ];
+          type = lib.types.functionTo (lib.types.listOf lib.types.package);
+          default = _pkgs: [ ];
         };
-        controllers = lib.mkOption {
-          type = lib.types.listOf lib.types.package;
-          default = [ ];
-        };
-        observers = lib.mkOption {
-          type = lib.types.listOf lib.types.package;
-          default = [ ];
-        };
-        plugins = lib.mkOption {
-          type = lib.types.listOf lib.types.package;
-          default = [ ];
-        };
+
         apps = lib.mkOption {
-          type = lib.types.listOf lib.types.package;
-          default = [ ];
+          type = lib.types.functionTo (lib.types.listOf lib.types.package);
+          default = _pkgs: [ ];
+        };
+
+        controllers = lib.mkOption {
+          type = lib.types.functionTo (lib.types.listOf lib.types.package);
+          default = _pkgs: [ ];
+        };
+
+        observers = lib.mkOption {
+          type = lib.types.functionTo (lib.types.listOf lib.types.package);
+          default = _pkgs: [ ];
+        };
+
+        plugins = lib.mkOption {
+          type = lib.types.functionTo (lib.types.listOf lib.types.package);
+          default = _pkgs: [ ];
         };
 
         devel = lib.mkOption {
@@ -78,55 +90,55 @@
                   default = null;
                 };
                 robots = lib.mkOption {
-                  type = lib.types.listOf lib.types.package;
-                  default = [ ];
+                  type = lib.types.functionTo (lib.types.listOf lib.types.package);
+                  default = _pkgs: [ ];
                 };
                 controllers = lib.mkOption {
-                  type = lib.types.listOf lib.types.package;
-                  default = [ ];
+                  type = lib.types.functionTo (lib.types.listOf lib.types.package);
+                  default = _pkgs: [ ];
                 };
                 observers = lib.mkOption {
-                  type = lib.types.listOf lib.types.package;
-                  default = [ ];
+                  type = lib.types.functionTo (lib.types.listOf lib.types.package);
+                  default = _pkgs: [ ];
                 };
                 plugins = lib.mkOption {
-                  type = lib.types.listOf lib.types.package;
-                  default = [ ];
+                  type = lib.types.functionTo (lib.types.listOf lib.types.package);
+                  default = _pkgs: [ ];
                 };
                 apps = lib.mkOption {
-                  type = lib.types.listOf lib.types.package;
-                  default = [ ];
+                  type = lib.types.functionTo (lib.types.listOf lib.types.package);
+                  default = _pkgs: [ ];
                 };
               };
             }
           );
         };
       };
-    }
-  );
+    };
+    default = { };
+    description = "Global configuration schema for generating mc-rtc superbuild development environments.";
+  };
 
   config.perSystem =
-    { config, pkgs, ... }:
+    { pkgs, ... }:
     let
-      cfg = config.programs.mc-rtc-superbuild;
-
       makeShell =
         { isReleaseShell }:
         let
           isDevel = cfg.devel != null && !isReleaseShell;
           devel-cfg = if cfg.devel != null then cfg.devel else { };
 
-          mergedControllers = cfg.controllers ++ (devel-cfg.controllers or [ ]);
+          mergedControllers = (cfg.controllers pkgs) ++ (devel-cfg.controllers pkgs);
 
           activeCfg =
             if isReleaseShell then
               {
                 pname = "${cfg.pname}-official";
-                apps = cfg.apps ++ (devel-cfg.apps or [ ]);
-                robots = cfg.robots ++ (devel-cfg.robots or [ ]);
-                plugins = cfg.plugins ++ (devel-cfg.plugins or [ ]);
+                apps = (cfg.apps pkgs) ++ (devel-cfg.apps pkgs);
+                robots = (cfg.robots pkgs) ++ (devel-cfg.robots pkgs);
+                plugins = (cfg.plugins pkgs) ++ (devel-cfg.plugins pkgs);
                 controllers = mergedControllers;
-                observers = cfg.observers ++ (devel-cfg.observers or [ ]);
+                observers = (cfg.observers pkgs) ++ (devel-cfg.observers pkgs);
                 config =
                   if cfg.config != null && cfg.config != "" && (builtins.length mergedControllers > 0) then
                     "${lib.head mergedControllers}/${cfg.config}"
@@ -136,15 +148,16 @@
             else
               {
                 pname = "${cfg.pname}-local";
-                inherit (cfg)
-                  apps
-                  robots
-                  plugins
-                  controllers
-                  observers
-                  ;
+                apps = cfg.apps pkgs;
+                robots = cfg.robots pkgs;
+                plugins = cfg.plugins pkgs;
+                controllers = cfg.controllers pkgs;
+                observers = cfg.observers pkgs;
                 config =
-                  if cfg.config != null && cfg.config != "" then "${localInstallPath}/${cfg.config}" else null;
+                  if devel-cfg.config != null && devel-cfg.config != "" then
+                    "${localInstallPath}/${devel-cfg.config}"
+                  else
+                    null;
               };
 
           localPath = "$PWD/${cfg.relativeLocalPath}";
@@ -162,14 +175,17 @@
           line = builtins.concatStringsSep "" (builtins.genList (_: "=") (builtins.stringLength title));
 
           allDevelPkgs =
-            (devel-cfg.apps or [ ])
-            ++ (devel-cfg.robots or [ ])
-            ++ (devel-cfg.plugins or [ ])
-            ++ (devel-cfg.controllers or [ ])
-            ++ (devel-cfg.observers or [ ]);
+            (devel-cfg.apps pkgs)
+            ++ (devel-cfg.robots pkgs)
+            ++ (devel-cfg.plugins pkgs)
+            ++ (devel-cfg.controllers pkgs)
+            ++ (devel-cfg.observers pkgs);
         in
         pkgs.mkShell {
-          cmakeFlags = lib.optionals isDevel (lib.flatten (map (pkg: pkg.cmakeFlags or [ ]) allDevelPkgs));
+          pname = builtins.trace "activeCfg is ${lib.toJSON activeCfg}" activeCfg.pname;
+          cmakeFlags =
+            lib.optionals isDevel (lib.flatten (map (pkg: pkg.cmakeFlags or [ ]) allDevelPkgs))
+            ++ [ "-DCMAKE_INSTALL_PREFIX=${localInstallPath}" ];
 
           buildInputs =
             with pkgs;
@@ -195,11 +211,11 @@
             ];
 
           inputsFrom = lib.optionals isDevel (
-            traceGroup "inputsFrom apps" (devel-cfg.apps or [ ])
-            ++ traceGroup "inputsFrom robots" (devel-cfg.robots or [ ])
-            ++ traceGroup "inputsFrom plugins" (devel-cfg.plugins or [ ])
-            ++ traceGroup "inputsFrom controllers" (devel-cfg.controllers or [ ])
-            ++ traceGroup "inputsFrom observers" (devel-cfg.observers or [ ])
+            traceGroup "inputsFrom apps" (devel-cfg.apps pkgs)
+            ++ traceGroup "inputsFrom robots" (devel-cfg.robots pkgs)
+            ++ traceGroup "inputsFrom plugins" (devel-cfg.plugins pkgs)
+            ++ traceGroup "inputsFrom controllers" (devel-cfg.controllers pkgs)
+            ++ traceGroup "inputsFrom observers" (devel-cfg.observers pkgs)
           );
 
           shellHook =
@@ -265,7 +281,7 @@
 
               ${lib.optionalString isDevel "
                 echo 'This is a development shell, build your local targets with:'
-                echo 'cmake -B build -DCMAKE_INSTALL_PREFIX=${cfg.relativeLocalPath}/install'
+                echo 'cmake -B build $cmakeFlags'
                 echo 'cmake --build build --target install'
               "}
               export MC_RTC_DISABLE_CONVEX_GENERATION_PATCH="ON"
@@ -273,9 +289,14 @@
         };
     in
     lib.mkIf cfg.enable {
-      devShells = {
-        default = makeShell { isReleaseShell = false; };
-        superbuild-official = makeShell { isReleaseShell = true; };
-      };
+      devShells =
+        let
+          devel = makeShell { isReleaseShell = false; };
+          release = makeShell { isReleaseShell = true; };
+        in
+        {
+          ${devel.pname} = devel;
+          ${release.pname} = release;
+        };
     };
 }

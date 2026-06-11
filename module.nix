@@ -1,13 +1,12 @@
 # The importApply argument. Use this to reference things defined locally,
 # as opposed to the flake where this is imported.
-{ gepetto, ... }: # localFlake
+{ gepetto, jrl-cmakemodulesv2, ... }: # localFlake
 
 # Regular module arguments; self, inputs, etc all reference the final user flake,
 # where this module was imported.
 {
   lib,
   config,
-  inputs,
   ...
 }:
 {
@@ -32,14 +31,12 @@
 
   imports = [
     gepetto.flakeModule
-    # ./modules/superbuild.nix
+    ./modules/superbuild.nix
   ];
 
   config =
     let
       cfg = config.mc-rtc;
-
-      jrl-cmakemodulesv2 = inputs.jrl-cmakemodulesv2;
 
       rawOverlays = [
         {

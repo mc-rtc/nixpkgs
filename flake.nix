@@ -29,7 +29,7 @@
     inputs:
     let
       flakeModule = inputs.flake-parts.lib.importApply ./module.nix {
-        inherit (inputs) gepetto;
+        inherit (inputs) gepetto jrl-cmakemodulesv2;
       };
     in
     inputs.flake-parts.lib.mkFlake { inherit inputs; } {
