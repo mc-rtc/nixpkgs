@@ -35,8 +35,18 @@
   };
 
   options.mc-rtc-superbuild = lib.mkOption {
+    # we expect either a options.mc-rtc-superbuild set, or a function of { pkgs, ...}: options.mc-rtc-superbuid
     type = lib.types.unspecified;
-    default = { };
+    default =
+      { pkgs, ... }:
+      {
+        enable = true;
+        apps = [
+          pkgs.mc-rtc-magnum
+          pkgs.mc-rtc-ticker
+          pkgs.mc-mujoco
+        ];
+      };
     description = "Global configuration schema or a function returning the schema for generating mc-rtc superbuild development environments.";
   };
 
@@ -189,12 +199,28 @@
                 ;
             };
 
-          devShells = lib.optionalAttrs superbuildCfg.enable {
-            ${superbuildCfg.pname} = pkgs.make-shell {
-              imports = [ ./modules/superbuild/superbuild.nix ];
-              mc-rtc-superbuild = superbuildCfg;
-            };
-          };
+          devShells = lib.optionalAttrs superbuildCfg.enable (
+            let
+              releaseName = "${superbuildCfg.pname}-release";
+              develName = "${superbuildCfg.pname}-devel";
+            in
+            {
+              ${develName} = pkgs.make-shell {
+                imports = [ ./modules/superbuild/superbuild.nix ];
+                mc-rtc-superbuild = superbuildCfg // {
+                  pname = develName;
+                  buildDevel = true;
+                };
+              };
+              ${releaseName} = pkgs.make-shell {
+                imports = [ ./modules/superbuild/superbuild.nix ];
+                mc-rtc-superbuild = superbuildCfg // {
+                  pname = releaseName;
+                  buildDevel = false;
+                };
+              };
+            }
+          );
         }
       );
     };

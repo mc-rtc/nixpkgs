@@ -73,6 +73,12 @@
     default = [ ];
   };
 
+  buildDevel = lib.mkOption {
+    type = lib.types.bool;
+    default = false;
+    description = "When true, packages in devel attribute sets are only added as inputsFrom but not built";
+  };
+
   devel = lib.mkOption {
     default = null;
     type = lib.types.nullOr (

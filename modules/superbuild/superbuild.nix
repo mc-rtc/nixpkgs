@@ -13,7 +13,7 @@ in
 
   config =
     let
-      isDevel = cfg.devel != null;
+      isDevel = cfg.buildDevel;
       develRobots = if cfg.devel != null then cfg.devel.robots else [ ];
       develApps = if cfg.devel != null then cfg.devel.apps else [ ];
       develControllers = if cfg.devel != null then cfg.devel.controllers else [ ];
@@ -23,10 +23,11 @@ in
 
       mergedControllers = cfg.controllers ++ develControllers;
 
+      pname = "${cfg.pname}";
+
       activeCfg =
         if !isDevel then
           {
-            pname = "${cfg.pname}-official";
             apps = cfg.apps ++ develApps;
             robots = cfg.robots ++ develRobots;
             plugins = cfg.plugins ++ develPlugins;
@@ -40,7 +41,6 @@ in
           }
         else
           {
-            pname = "${cfg.pname}-local";
             apps = cfg.apps;
             robots = cfg.robots;
             plugins = cfg.plugins;
@@ -56,12 +56,12 @@ in
       traceGroup =
         name: paths:
         if cfg.traceRuntimeDependencies then
-          map (p: builtins.trace "${activeCfg.pname} ${name}: ${toString p}" p) paths
+          map (p: builtins.trace "${pname} ${name}: ${toString p}" p) paths
         else
           paths;
 
       toYamlList = paths: lib.concatMapStringsSep ", " (p: "\"${p}\"") paths;
-      title = "  ${activeCfg.pname} interactive shell  ";
+      title = "  ${pname} interactive shell  ";
       line = builtins.concatStringsSep "" (builtins.genList (_: "=") (builtins.stringLength title));
 
       allDevelPkgs =
@@ -72,10 +72,12 @@ in
         ++ traceGroup "inputsFrom observers" develObservers;
     in
     lib.mkIf config.mc-rtc-superbuild.enable {
-      name = activeCfg.pname;
+      name = pname;
 
       additionalArguments = {
-        cmakeFlags = lib.optionals isDevel (lib.flatten (map (pkg: pkg.cmakeFlags or [ ]) allDevelPkgs));
+        cmakeFlags =
+          lib.optionals isDevel (lib.flatten (map (pkg: pkg.cmakeFlags or [ ]) allDevelPkgs))
+          ++ [ "-G Ninja" ];
       };
 
       packages =
