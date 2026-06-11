@@ -1,6 +1,11 @@
 # The importApply argument. Use this to reference things defined locally,
 # as opposed to the flake where this is imported.
-{ gepetto, jrl-cmakemodulesv2, ... }: # localFlake
+{
+  gepetto,
+  jrl-cmakemodulesv2,
+  make-shell,
+  ...
+}: # localFlake
 
 # Regular module arguments; self, inputs, etc all reference the final user flake,
 # where this module was imported.
@@ -31,7 +36,7 @@
 
   imports = [
     gepetto.flakeModule
-    ./modules/superbuild.nix
+    make-shell.flakeModules.default
   ];
 
   config =
@@ -45,6 +50,10 @@
             inherit lib;
             with-ros = cfg.with-ros;
           };
+        }
+        {
+          name = "make-shell";
+          value = make-shell.overlays.default;
         }
       ]
       ++ (lib.optional cfg.enablePrivateOverlay {
@@ -77,6 +86,7 @@
     in
     {
       flake.overlays = flakeOverlays;
+      flake.flakeModules.superbuild = ./modules/superbuild.nix;
 
       flakoboros = {
         extraPackages = [ "ninja" ];
@@ -165,33 +175,43 @@
             {
             }
             // {
-              mc-rtc-superbuild-minimal = import ./shell.nix {
-                inherit pkgs;
-                with-ros = true;
-                mc-rtc-superbuild = pkgs.mc-rtc-superbuild-minimal;
+              mc-rtc-superbuild-minimal = pkgs.make-shell {
+                imports = [ ./modules/superbuild.nix ];
+                mc-rtc-superbuild = {
+                  enable = true;
+                  plugins = [
+                    pkgs.mc-state-observation
+                  ];
+                };
               };
-              mc-rtc-superbuild = import ./shell.nix {
-                inherit pkgs;
-                with-ros = true;
-                mc-rtc-superbuild = pkgs.mc-rtc-superbuild;
+              mc-rtc-superbuild = pkgs.make-shell {
+                imports = [ ./modules/superbuild.nix ];
+                mc-rtc-superbuild = {
+                  enable = true;
+                  apps = [
+                    pkgs.mc-rtc-magnum
+                    pkgs.mc-mujoco
+                    pkgs.mc-rtc-ticker
+                  ];
+                };
               };
-              mc-rtc-superbuild-all-public-robots = import ./shell.nix {
-                inherit pkgs;
-                with-ros = true;
-                mc-rtc-superbuild = pkgs.mc-rtc-superbuild-all-public-robots;
-              };
-              mc-rtc-superbuild-full = import ./shell.nix {
-                inherit pkgs;
-                with-ros = true;
-                mc-rtc-superbuild = pkgs.mc-rtc-superbuild-full;
-              };
+              # mc-rtc-superbuild-all-public-robots = import ./shell.nix {
+              #   inherit pkgs;
+              #   with-ros = true;
+              #   mc-rtc-superbuild = pkgs.mc-rtc-superbuild-all-public-robots;
+              # };
+              # mc-rtc-superbuild-full = import ./shell.nix {
+              #   inherit pkgs;
+              #   with-ros = true;
+              #   mc-rtc-superbuild = pkgs.mc-rtc-superbuild-full;
+              # };
             }
             // lib.optionalAttrs cfg.enablePrivateOverlay {
-              mc-rtc-superbuild-private = import ../shell.nix {
-                inherit pkgs;
-                with-ros = true;
-                mc-rtc-superbuild = pkgs.mc-rtc-superbuild-private;
-              };
+              # mc-rtc-superbuild-private = import ../shell.nix {
+              #   inherit pkgs;
+              #   with-ros = true;
+              #   mc-rtc-superbuild = pkgs.mc-rtc-superbuild-private;
+              # };
             };
         }
       );

@@ -10,6 +10,7 @@
     jrl-cmakemodulesv2 = {
       url = "github:ahoarau/jrl-cmakemodules?ref=jrl-next";
     };
+    make-shell.url = "github:nicknovitski/make-shell";
   };
 
   nixConfig = {
@@ -29,7 +30,7 @@
     inputs:
     let
       flakeModule = inputs.flake-parts.lib.importApply ./module.nix {
-        inherit (inputs) gepetto jrl-cmakemodulesv2;
+        inherit (inputs) gepetto jrl-cmakemodulesv2 make-shell;
       };
     in
     inputs.flake-parts.lib.mkFlake { inherit inputs; } {
