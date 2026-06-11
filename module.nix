@@ -201,7 +201,7 @@
 
           devShells = lib.optionalAttrs superbuildCfg.enable (
             let
-              releaseName = "${superbuildCfg.pname}-release";
+              releaseName = "${superbuildCfg.pname}";
               develName = "${superbuildCfg.pname}-devel";
             in
             {
