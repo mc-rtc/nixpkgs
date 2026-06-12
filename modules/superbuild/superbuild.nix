@@ -6,7 +6,8 @@
 }:
 
 let
-  cfg = builtins.trace "config.mc-rtc-superbuild ${builtins.toJSON config.mc-rtc-superbuild}" config.mc-rtc-superbuild;
+  # cfg = builtins.trace "config.mc-rtc-superbuild ${builtins.toJSON config.mc-rtc-superbuild}" config.mc-rtc-superbuild;
+  cfg = config.mc-rtc-superbuild;
 in
 {
   options.mc-rtc-superbuild = import ./options.nix { inherit lib; };
@@ -14,45 +15,56 @@ in
   config =
     let
       isDevel = cfg.buildDevel;
-      develRobots = if cfg.devel != null then cfg.devel.robots else [ ];
-      develApps = if cfg.devel != null then cfg.devel.apps else [ ];
-      develControllers = if cfg.devel != null then cfg.devel.controllers else [ ];
-      develPlugins = if cfg.devel != null then cfg.devel.plugins else [ ];
-      develObservers = if cfg.devel != null then cfg.devel.observers else [ ];
-      develConfig = if cfg.devel != null then cfg.devel.config else null;
+      pname = cfg.pname;
 
-      mergedControllers = cfg.controllers ++ develControllers;
+      # Extract development dependencies safely
+      devel =
+        if cfg.devel != null then
+          cfg.devel
+        else
+          {
+            robots = [ ];
+            apps = [ ];
+            controllers = [ ];
+            plugins = [ ];
+            observers = [ ];
+            config = null;
+          };
 
-      pname = "${cfg.pname}";
+      mergedControllers = cfg.controllers ++ devel.controllers;
 
+      # Dynamically compute configuration based on mode
       activeCfg =
         if !isDevel then
           {
-            apps = cfg.apps ++ develApps;
-            robots = cfg.robots ++ develRobots;
-            plugins = cfg.plugins ++ develPlugins;
+            apps = cfg.apps ++ devel.apps;
+            robots = cfg.robots ++ devel.robots;
+            plugins = cfg.plugins ++ devel.plugins;
+            observers = cfg.observers ++ devel.observers;
             controllers = mergedControllers;
-            observers = cfg.observers ++ develObservers;
             config =
-              if cfg.config != null && cfg.config != "" && (builtins.length mergedControllers > 0) then
+              if cfg.config != null && cfg.config != "" && mergedControllers != [ ] then
                 "${lib.head mergedControllers}/${cfg.config}"
               else
                 null;
           }
         else
           {
-            apps = cfg.apps;
-            robots = cfg.robots;
-            plugins = cfg.plugins;
-            controllers = cfg.controllers;
-            observers = cfg.observers;
+            inherit (cfg)
+              apps
+              robots
+              plugins
+              controllers
+              observers
+              ;
             config =
-              if develConfig != null && develConfig != "" then "${localInstallPath}/${develConfig}" else null;
+              if devel.config != null && devel.config != "" then "${localInstallPath}/${devel.config}" else null;
           };
 
       localPath = "$PWD/${cfg.relativeLocalPath}";
       localInstallPath = "${localPath}/install";
 
+      # Wrap trace logic concisely
       traceGroup =
         name: paths:
         if cfg.traceRuntimeDependencies then
@@ -60,16 +72,28 @@ in
         else
           paths;
 
-      toYamlList = paths: lib.concatMapStringsSep ", " (p: "\"${p}\"") paths;
-      title = "  ${pname} interactive shell  ";
-      line = builtins.concatStringsSep "" (builtins.genList (_: "=") (builtins.stringLength title));
-
       allDevelPkgs =
-        traceGroup "inputsFrom apps" develApps
-        ++ traceGroup "inputsFrom robots" develRobots
-        ++ traceGroup "inputsFrom plugins" develPlugins
-        ++ traceGroup "inputsFrom controllers" develControllers
-        ++ traceGroup "inputsFrom observers" develObservers;
+        traceGroup "inputsFrom apps" devel.apps
+        ++ traceGroup "inputsFrom robots" devel.robots
+        ++ traceGroup "inputsFrom plugins" devel.plugins
+        ++ traceGroup "inputsFrom controllers" devel.controllers
+        ++ traceGroup "inputsFrom observers" devel.observers;
+
+      toYamlList = paths: lib.concatMapStringsSep ", " (p: "\"${p}\"") paths;
+
+      # Helper to expand standard and 64bit library structures
+      mkModulePaths =
+        suffix: paths:
+        toYamlList (
+          lib.concatMap (p: [
+            "${p}/lib64/${suffix}"
+            "${p}/lib/${suffix}"
+          ]) paths
+        );
+
+      title = "  ${pname} interactive shell" + lib.optionalString isDevel " (devel)" + "  ";
+      line = lib.concatStrings (builtins.genList (_: "=") (builtins.stringLength title));
+
     in
     lib.mkIf config.mc-rtc-superbuild.enable {
       name = pname;
@@ -94,32 +118,45 @@ in
         ++ traceGroup "controllers" activeCfg.controllers
         ++ traceGroup "observers" activeCfg.observers
         ++ cfg.extraBuildInputs
-        ++ lib.optionals cfg.withRos [
-          colcon
-          rosPackages.jazzy.rclcpp
-          rosPackages.jazzy.geometry-msgs
-          rosPackages.jazzy.sensor-msgs
-          rosPackages.jazzy.tf2-ros
-          rosPackages.jazzy.xacro
-        ];
+        ++ lib.optionals cfg.withRos (
+          with rosPackages.jazzy;
+          [
+            colcon
+            rclcpp
+            geometry-msgs
+            sensor-msgs
+            tf2-ros
+            xacro
+          ]
+        );
 
       inputsFrom = lib.optionals isDevel allDevelPkgs;
 
       shellHook =
         let
-          shellControllers = lib.optionals isDevel [ localInstallPath ] ++ activeCfg.controllers;
-          shellRobots = lib.optionals isDevel [ localInstallPath ] ++ activeCfg.robots;
-          shellObservers = lib.optionals isDevel [ localInstallPath ] ++ activeCfg.observers;
-          shellPlugins = lib.optionals isDevel [ localInstallPath ] ++ activeCfg.plugins;
+          # Apply dev paths conditionally
+          devPrefix = lib.optional isDevel localInstallPath;
+          shellControllers = devPrefix ++ activeCfg.controllers;
+          shellRobots = devPrefix ++ activeCfg.robots;
+          shellObservers = devPrefix ++ activeCfg.observers;
+          shellPlugins = devPrefix ++ activeCfg.plugins;
+
           shellConfigs = [
             "${localPath}/mc_rtc.yaml"
           ]
           ++ lib.optional (activeCfg.config != null) activeCfg.config;
+
           printRuntimeDeps =
-            cfg:
+            showPaths: listGroup:
             let
-              # Helper function to generate the bash loop safely
-              # If the list is empty, it outputs nothing instead of broken Bash syntax
+              # Format items dynamically based on the boolean argument
+              formatItem =
+                p:
+                if showPaths then
+                  builtins.unsafeDiscardStringContext "${p}"
+                else
+                  p.name or p.pname or "unknown-package";
+
               makeLoop =
                 title: list:
                 if list == [ ] then
@@ -127,52 +164,34 @@ in
                 else
                   ''
                     echo "${title}:"
-                    for item in ${pkgs.lib.concatStringsSep " " list}; do
-                      echo "  $item"
+                    for item in ${lib.concatStringsSep " " (map formatItem list)}; do
+                      echo "      $item"
                     done
                   '';
             in
             ''
-              echo "Runtime dependencies (store paths):"
-              ${makeLoop "Robot modules" cfg.robots}
-              ${makeLoop "Plugins" cfg.plugins}
-              ${makeLoop "Observers" cfg.observers}
-              ${makeLoop "Controllers" cfg.controllers}
-              ${makeLoop "Apps" cfg.apps}
+              ${makeLoop "  - Robot modules" listGroup.robots}
+              ${makeLoop "  - Plugins" listGroup.plugins}
+              ${makeLoop "  - Observers" listGroup.observers}
+              ${makeLoop "  - Controllers" listGroup.controllers}
+              ${makeLoop "  - Apps" listGroup.apps}
             '';
         in
-        builtins.trace "shellConfigs is ${builtins.toJSON shellConfigs}" ''
+        ''
           export PROJECT_DIR="$(pwd)/${cfg.relativeLocalPath}"
           export INSTALL_DIR="$PROJECT_DIR/install"
           mkdir -p $INSTALL_DIR
-          echo "Generating local mc_rtc.yaml in $PROJECT_DIR/mc_rtc.yaml..."
+
+          # echo "Generating local mc_rtc.yaml in $PROJECT_DIR/mc_rtc.yaml..."
           cat <<EOF > $PROJECT_DIR/mc_rtc.yaml
           ---
           ${lib.optionalString (cfg.mainRobot != null && cfg.mainRobot != "") "MainRobot: ${cfg.mainRobot}"}
           ${lib.optionalString (cfg.enabled != null) "Enabled: [${lib.concatStringsSep "," cfg.enabled}]"}
           ${lib.optionalString (cfg.timestep != null) "Timestep: ${toString cfg.timestep}"}
-          ControllerModulePaths: [${
-            toYamlList (
-              (map (p: "${p}/lib64/mc_controller") shellControllers)
-              ++ (map (p: "${p}/lib/mc_controller") shellControllers)
-            )
-          }]
-          RobotModulePaths: [${
-            toYamlList (
-              (map (p: "${p}/lib64/mc_robots") shellRobots) ++ (map (p: "${p}/lib/mc_robots") shellRobots)
-            )
-          }]
-          ObserverModulePaths: [${
-            toYamlList (
-              (map (p: "${p}/lib64/mc_observers") shellObservers)
-              ++ (map (p: "${p}/lib/mc_observers") shellObservers)
-            )
-          }]
-          GlobalPluginPaths: [${
-            toYamlList (
-              (map (p: "${p}/lib64/mc_plugins") shellPlugins) ++ (map (p: "${p}/lib/mc_plugins") shellPlugins)
-            )
-          }]
+          ControllerModulePaths: [${mkModulePaths "mc_controller" shellControllers}]
+          RobotModulePaths: [${mkModulePaths "mc_robots" shellRobots}]
+          ObserverModulePaths: [${mkModulePaths "mc_observers" shellObservers}]
+          GlobalPluginPaths: [${mkModulePaths "mc_plugins" shellPlugins}]
           LoadUserConfiguration: false
           EOF
 
@@ -191,35 +210,36 @@ in
           export NIX_CFLAGS_COMPILE=""
           export ROS_DOMAIN_ID=100
 
-          echo ""
-          echo "${line}"
-          echo "${title}"
-          echo "${line}"
-          echo ""
+          echo -e "\n${line}\n${title}\n${line}"
+          echo "This shell was built from an mc-rtc-superbuild configuration."
 
+          echo ""
+          echo "It contains the following runtime dependencies installed by Nix:"
+          ${printRuntimeDeps true activeCfg}
+          ${lib.optionalString isDevel ''
+            echo ""
+            echo 'This is a development shell, you should install the following dependencies from source in $INSTALL_DIR:'
+
+            ${printRuntimeDeps false devel}
+
+            echo ""
+            echo "This is a development shell, build your local targets with:"
+            echo ""
+            echo '  cmake -B build $cmakeFlags -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR'
+            echo "  cmake --build build --target install"
+            echo ""
+          ''}
+
+          echo ""
           echo "The following convenience environment variables are set:"
           env | grep '^MC_RTC_'
           echo ""
 
-          ${printRuntimeDeps activeCfg}
-
-          echo ""
-          echo "mc_rtc will use the following configuration files $MC_RTC_CONTROLLER_CONFIG"
-
+          echo -e "mc_rtc will use the following configuration files $MC_RTC_CONTROLLER_CONFIG\n"
           export MC_RTC_DISABLE_CONVEX_GENERATION_PATCH="ON"
-          echo "warning:"
-          echo "- MC_RTC_DISABLE_CONVEX_GENERATION_PATCH is set to ON, this will disable convex hull generation in mc_rtc"
-          echo ""
+          echo -e "Warning:\n- MC_RTC_DISABLE_CONVEX_GENERATION_PATCH is set to ON, this will disable convex hull generation in mc_rtc\n"
+          echo "--------"
 
-
-          ${lib.optionalString isDevel "
-                echo 'This is a development shell, build your local targets with:'
-                echo ''
-                echo '  cmake -B build $cmakeFlags -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR'
-                echo '  cmake --build build --target install'
-                echo ''
-              "}
-          echo ""
         '';
     };
 }
