@@ -26,15 +26,15 @@ jobs:
         variant: [ "private", "private-ccache" ]
         build: [ "mc-mujoco-full", "mc-rtc-superbuild-private" ]
     steps:
-      - name: "Variant override arguments"
+      - name: "Determine Variant Arguments"
         id: flags
         run: |
           if [ "${{ matrix.variant }}" = "private" ]; then
             echo "args=--override-input private-trigger github:boolean-option/true" >> "$GITHUB_OUTPUT"
-          else if [ "${{ matrix.variant }}" = "private-ccache" ]; then
+          elif [ "${{ matrix.variant }}" = "private-ccache" ]; then
             echo "args=--override-input private-trigger github:boolean-option/true --override-input ccache-trigger github:boolean-option/true" >> "$GITHUB_OUTPUT"
           else
-            echo "unsupported args"
+            echo "Unsupported variant: ${{ matrix.variant }}"
             exit 42
           fi
       - uses: actions/checkout@v6
@@ -73,8 +73,7 @@ jobs:
           echo 'extra-sandbox-paths = /var/cache/ccache' | sudo tee -a /etc/nix/nix.conf
           sudo systemctl restart nix-daemon.service
           sudo ls -ld /var/cache/ccache
-      - run:
-        nix build -L ${{ steps.flags.outputs.args }} ".#${{ matrix.build }}" --cores 4
+      - run: nix build -L ${{ steps.flags.outputs.args }} ".#${{ matrix.build }}" --cores 4
   complete:
     needs: populate-cache
     name: "complete ${{ matrix.os }}"
