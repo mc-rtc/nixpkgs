@@ -2,6 +2,7 @@
   stdenv,
   lib,
   cmake,
+  jrl-cmakemodules,
   spacevecalg,
   yaml-cpp,
   tinyxml-2,
@@ -21,6 +22,7 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [
     cmake
+    jrl-cmakemodules
     python3Packages.cython
     python3Packages.python
     python3Packages.distutils

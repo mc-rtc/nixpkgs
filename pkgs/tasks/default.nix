@@ -2,6 +2,7 @@
   stdenv,
   lib,
   cmake,
+  jrl-cmakemodules,
   rbdyn,
   sch-core,
   eigen-qld,
@@ -21,6 +22,7 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [
     cmake
+    jrl-cmakemodules
     python3Packages.distutils
     python3Packages.pytest
     python3Packages.cython
