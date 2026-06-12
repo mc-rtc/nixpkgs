@@ -1,7 +1,7 @@
-# build variants.private and variants.private-ccache
-# push cache to mc-rtc-nix-private attic
-# TODO we cannot use nix flake check to ensure that everything is built
-# so currently we build the largest meta-packages available (mc-rtc-superbuild-private, mc-mujoco-full, etc)
+# Build with private overlay and private + ccache overlay
+# WARNING: This workflow builds private repositories
+#          It uses the cachix cache but must NOT push to it
+#          Instead it must push to the private authenticated attic cache
 name: "CI - Nix - Private"
 on:
   push:
