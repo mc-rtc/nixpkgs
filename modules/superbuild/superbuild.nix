@@ -111,11 +111,35 @@ in
           shellRobots = lib.optionals isDevel [ localInstallPath ] ++ activeCfg.robots;
           shellObservers = lib.optionals isDevel [ localInstallPath ] ++ activeCfg.observers;
           shellPlugins = lib.optionals isDevel [ localInstallPath ] ++ activeCfg.plugins;
-          shellConfigs =
-            if activeCfg.config != null then
-              [ "${localPath}/mc_rtc.yaml" ] ++ [ activeCfg.config ]
-            else
-              [ "${localPath}/mc_rtc.yaml" ];
+          shellConfigs = [
+            "${localPath}/mc_rtc.yaml"
+          ]
+          ++ lib.optional (activeCfg.config != null) activeCfg.config;
+          printRuntimeDeps =
+            cfg:
+            let
+              # Helper function to generate the bash loop safely
+              # If the list is empty, it outputs nothing instead of broken Bash syntax
+              makeLoop =
+                title: list:
+                if list == [ ] then
+                  ""
+                else
+                  ''
+                    echo "${title}:"
+                    for item in ${pkgs.lib.concatStringsSep " " list}; do
+                      echo "  $item"
+                    done
+                  '';
+            in
+            ''
+              echo "Runtime dependencies (store paths):"
+              ${makeLoop "Robot modules" cfg.robots}
+              ${makeLoop "Plugins" cfg.plugins}
+              ${makeLoop "Observers" cfg.observers}
+              ${makeLoop "Controllers" cfg.controllers}
+              ${makeLoop "Apps" cfg.apps}
+            '';
         in
         builtins.trace "shellConfigs is ${builtins.toJSON shellConfigs}" ''
           export PROJECT_DIR="$(pwd)/${cfg.relativeLocalPath}"
@@ -167,17 +191,35 @@ in
           export NIX_CFLAGS_COMPILE=""
           export ROS_DOMAIN_ID=100
 
+          echo ""
           echo "${line}"
           echo "${title}"
           echo "${line}"
           echo ""
 
+          echo "The following convenience environment variables are set:"
+          env | grep '^MC_RTC_'
+          echo ""
+
+          ${printRuntimeDeps activeCfg}
+
+          echo ""
+          echo "mc_rtc will use the following configuration files $MC_RTC_CONTROLLER_CONFIG"
+
+          export MC_RTC_DISABLE_CONVEX_GENERATION_PATCH="ON"
+          echo "warning:"
+          echo "- MC_RTC_DISABLE_CONVEX_GENERATION_PATCH is set to ON, this will disable convex hull generation in mc_rtc"
+          echo ""
+
+
           ${lib.optionalString isDevel "
                 echo 'This is a development shell, build your local targets with:'
-                echo 'cmake -B build $cmakeFlags -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR'
-                echo 'cmake --build build --target install'
+                echo ''
+                echo '  cmake -B build $cmakeFlags -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR'
+                echo '  cmake --build build --target install'
+                echo ''
               "}
-          export MC_RTC_DISABLE_CONVEX_GENERATION_PATCH="ON"
+          echo ""
         '';
     };
 }
