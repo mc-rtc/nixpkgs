@@ -15,23 +15,25 @@
   ...
 }:
 {
-  options.mc-rtc = {
-    enablePrivateOverlay = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-    };
-    enableCcacheOverlay = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-    };
-    importPackages = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-    };
+  options.mc-rtc-nix = {
+    # Root level option
     with-ros = lib.mkOption {
       type = lib.types.bool;
       default = true;
+      description = "Whether to build with ROS support.";
     };
+
+    overlays = {
+      private = lib.mkEnableOption "enables the private repository overlay";
+      ccache = lib.mkEnableOption "enables the ccache overlay";
+    };
+
+    gepetto = {
+      packages = lib.mkEnableOption "adds gepetto packages";
+      devShells = lib.mkEnableOption "adds gepetto devShells";
+    };
+
+    packages = lib.mkEnableOption "adds mc-rtc-nix packages";
   };
 
   options.mc-rtc-superbuild = lib.mkOption {
@@ -57,7 +59,7 @@
 
   config =
     let
-      cfg = config.mc-rtc;
+      cfg = config.mc-rtc-nix;
 
       rawOverlays = [
         {
@@ -72,7 +74,7 @@
           value = make-shell.overlays.default;
         }
       ]
-      ++ (lib.optional cfg.enablePrivateOverlay {
+      ++ (lib.optional cfg.overlays.private {
         name = "mc-rtc-private";
         value = import ./overlay-private.nix { with-ros = cfg.with-ros; };
       })
@@ -84,7 +86,7 @@
           );
         }
       ]
-      ++ (lib.optional cfg.enableCcacheOverlay {
+      ++ (lib.optional cfg.overlays.ccache {
         name = "mc-rtc-ccache";
         value = import ./overlay-ccache.nix { };
       });
@@ -113,7 +115,7 @@
       };
 
       perSystem = (
-        { pkgs, ... }:
+        { pkgs, inputs', ... }:
         let
           # 1. Safely parse either formatting layout
           rawCfg =
@@ -130,97 +132,100 @@
           // rawCfg;
         in
         {
-          packages =
-            lib.mkIf cfg.importPackages
-              # inputs'.gepetto.packages
-              {
+          packages = lib.mkMerge [
+            (lib.mkIf cfg.gepetto.packages inputs'.gepetto.packages)
+            (
+              lib.mkIf cfg.packages {
+                # Main dependencies
+                inherit (pkgs)
+                  eigen3-to-python
+                  spacevecalg
+                  rbdyn
+                  sch-core
+                  sch-core-python
+                  tasks
+                  tasks-qld
+                  tvm
+                  eigen-quadprog
+                  eigen-qld
+                  state-observation
+                  mesh-sampling
+                  eigen-fmt
+                  ;
+
+                # mc-rtc
+                inherit (pkgs) mc-rtc-data mc-rtc;
+
+                # Main GUIs and applications
+                inherit (pkgs) mc-rtc-magnum mc-rtc-ticker mc-franka;
+
+                # Main robots
+                inherit (pkgs)
+                  mc-g1
+                  mc-h1
+                  mc-ur5e
+                  mc-panda
+                  mc-panda-lirmm
+                  ;
+
+                # MuJoCo Robots
+                inherit (pkgs)
+                  h1-mj-description
+                  jvrc1-mj-description
+                  g1-mj-description
+                  ur5e-mj-description
+                  env-mj-description
+                  ;
+
+                inherit (pkgs)
+                  mc-mujoco
+                  mc-mujoco-full
+                  ;
+                inherit (pkgs) panda-prosthesis mc-force-shoe-plugin sphinx-cmake;
               }
-            // {
-              # Main dependencies
-              inherit (pkgs)
-                eigen3-to-python
-                spacevecalg
-                rbdyn
-                sch-core
-                sch-core-python
-                tasks
-                tasks-qld
-                tvm
-                eigen-quadprog
-                eigen-qld
-                state-observation
-                mesh-sampling
-                eigen-fmt
-                ;
+              // lib.optionalAttrs cfg.overlays.private {
+                inherit (pkgs)
+                  mc-hrp2
+                  mc-hrp4
+                  mc-hrp5-p
+                  mc-rhps1
+                  tasks-lssol
+                  ;
+                inherit (pkgs)
+                  politopix
+                  mc-dynamic-polytopes
+                  dcm-vrptask
+                  polytopeController
+                  ;
+              }
+            )
+          ];
 
-              # mc-rtc
-              inherit (pkgs) mc-rtc-data mc-rtc;
-
-              # Main GUIs and applications
-              inherit (pkgs) mc-rtc-magnum mc-rtc-ticker mc-franka;
-
-              # Main robots
-              inherit (pkgs)
-                mc-g1
-                mc-h1
-                mc-ur5e
-                mc-panda
-                mc-panda-lirmm
-                ;
-
-              # MuJoCo Robots
-              inherit (pkgs)
-                h1-mj-description
-                jvrc1-mj-description
-                g1-mj-description
-                ur5e-mj-description
-                env-mj-description
-                ;
-
-              inherit (pkgs)
-                mc-mujoco
-                mc-mujoco-full
-                ;
-              inherit (pkgs) panda-prosthesis mc-force-shoe-plugin sphinx-cmake;
-            }
-            // lib.optionalAttrs cfg.enablePrivateOverlay {
-              inherit (pkgs)
-                mc-hrp2
-                mc-hrp4
-                mc-hrp5-p
-                mc-rhps1
-                tasks-lssol
-                ;
-              inherit (pkgs)
-                politopix
-                mc-dynamic-polytopes
-                dcm-vrptask
-                polytopeController
-                ;
-            };
-
-          devShells = lib.optionalAttrs superbuildCfg.enable (
-            let
-              releaseName = "${superbuildCfg.pname}";
-              develName = "${superbuildCfg.pname}-devel";
-            in
-            {
-              ${develName} = pkgs.make-shell {
-                imports = [ ./modules/superbuild/superbuild.nix ];
-                mc-rtc-superbuild = superbuildCfg // {
-                  pname = develName;
-                  buildDevel = true;
+          devShells = lib.mkMerge [
+            (lib.mkIf cfg.gepetto.devShells inputs'.gepetto.devShells)
+            (
+              let
+                releaseName = "${superbuildCfg.pname}";
+                develName = "${superbuildCfg.pname}-devel";
+              in
+              lib.mkIf superbuildCfg.enable {
+                ${develName} = pkgs.make-shell {
+                  imports = [ ./modules/superbuild/superbuild.nix ];
+                  mc-rtc-superbuild = superbuildCfg // {
+                    pname = develName;
+                    buildDevel = true;
+                  };
                 };
-              };
-              ${releaseName} = pkgs.make-shell {
-                imports = [ ./modules/superbuild/superbuild.nix ];
-                mc-rtc-superbuild = superbuildCfg // {
-                  pname = releaseName;
-                  buildDevel = false;
+                ${releaseName} = pkgs.make-shell {
+                  imports = [ ./modules/superbuild/superbuild.nix ];
+                  mc-rtc-superbuild = superbuildCfg // {
+                    pname = releaseName;
+                    buildDevel = false;
+                  };
                 };
-              };
-            }
-          );
+              }
+            )
+          ];
         }
       );
     };

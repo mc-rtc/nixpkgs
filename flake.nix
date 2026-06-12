@@ -38,7 +38,11 @@
       imports = [
         flakeModule
         {
-          mc-rtc.importPackages = true;
+          mc-rtc-nix = {
+            packages = true;
+            # gepetto.packages = true;
+            # gepetto.devShells = true;
+          };
         }
       ];
 
