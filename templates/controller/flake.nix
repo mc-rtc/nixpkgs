@@ -1,5 +1,5 @@
 {
-  description = "Flake example for an mc-rtc controller with a superbuild shell";
+  description = "mc-rtc-superbuild release and development shells";
 
   inputs = {
     mc-rtc-nix.url = "github:mc-rtc/nixpkgs";
@@ -19,40 +19,46 @@
       {
         systems = import inputs.systems;
         imports = [
-          # available flakeModules modules are:
-          # - flakeModule : default module, with overlays for all public repositories in mc-rtc ecosystem
-          # - flakeModules.default : same as flakeModule
-          # - flakeModules.ccache : same as default but built with ccache
-          # - flakeModules.private : private module, with overlays for all public and private repositories in mc-rtc ecosystem.
-          #   Please note that some repositories and the private cache require permission
-          #   If you have sufficient access, this is provided with through your SSH key / binary cache token
-          # - flakeModules.private-ccache : same as private, but with ccache support
           inputs.mc-rtc-nix.flakeModule
           {
-            flakoboros = {
+            # This mc-rtc-superbuild configuration will:
+            # - Generate a ${pname-devel} development shell wth all runtime dependencies in controllers/robots/plugins/observers
+            #   installed by Nix, and all dependencies specified in `devel` attribute set used as `inputFrom`
+            #   (e.g not built by Nix, but with their build dependencies available)
+            # - Generate a ${pname} release shell with all runtime dependencies in both controllers/robots/plugins/observers and devel
+            #   installed by Nix
+            #
+            # This will also generate a .superbuild/mc_rtc.yaml file containg the suitable mc_rtc configuration
+            # Devel dependencies are expected to be installed manually in .superbuild/install
+            #
+            # As always, indivdual packages can be overridden using flakoboros
+            mc-rtc-superbuild =
+              { pkgs, ... }:
+              {
+                enable = true;
+                pname = "mc-rtc-superbuild";
 
-              # Define a custom superbuild configuration
-              # This will make all
-              overrides.mc-rtc-superbuild =
-                { pkgs-prev, ... }:
-                let
-                  cfg-prev = pkgs-prev.mc-rtc-superbuild.superbuildArgs;
-                in
-                {
-                  superbuildArgs = cfg-prev // {
-                    pname = "mc-rtc-superbuild-override";
-                    # # for example, override any runtime dependency (robots, controllers, etc)
-                    # # extend robots
-                    # robots = cfg-prev.robots ++ [ pkgs-final.mc-hrp4 ];
-                    # # override controllers
-                    # controllers = [ pkgs-final.polytopeController ];
-                    # configs = [ "${pkgs-final.polytopeController}/lib/mc_controller/etc/mc_rtc.yaml" ];
-                    # plugins = [ pkgs-final.mc-force-shoe-plugin ];
-                    # observers = [ pkgs-final.mc-state-observation ];
-                    # apps = [];
-                  };
+                # These runtime dependencies are installed by Nix in both devel and release shells
+                controllers = [ ];
+                robots = [ ];
+                plugins = [ ];
+                observers = [ ];
+                apps = [ pkgs.mc-rtc-magnum ];
+                # You controller's default mc_rtc.yaml configuration
+                config = "lib/mc_controller/etc/<controller_name>/mc_rtc.yaml";
+
+                # The devel configuration is used by ${pnanme}-devel shell as inputsFrom
+                # You must install them manually
+                devel = {
+                  controllers = [ ];
+                  plugins = [ ];
+                  robots = [ ];
+                  observers = [ ];
+                  config = "lib64/mc_controller/etc/<controller_name>/mc_rtc.yaml";
                 };
+              };
 
+            flakoboros = {
               # # Override all dependencies
               # # They are locked in flake.lock to the latest commit available at the time
               # # To update to all inputs' latest commit, use
@@ -63,23 +69,6 @@
             };
           }
         ];
-        perSystem =
-          { pkgs, ... }:
-          {
-            # define a default devShell called with the superbuild configuration above
-            # you can also override attributes to add additional shell functionality
-            devShells.default =
-              (pkgs.callPackage "${inputs.mc-rtc-nix}/shell.nix" {
-                inherit (pkgs) mc-rtc-superbuild;
-              }).overrideAttrs
-                (old: {
-                  shellHook = ''
-                    ${old.shellHook or ""}
-
-                    echo "Welcome to the ${pkgs.mc-rtc-superbuild.pname} devShell with the overridden mc-rtc-superbuild configuration!"
-                  '';
-                });
-          };
       }
     );
 }
