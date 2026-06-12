@@ -244,7 +244,7 @@
                         # mc-panda mc-panda-lirmm ## no macos support
                         # mc-rhps1
                       ]
-                      ++ lib.optional cfg.overlays.private [
+                      ++ lib.optionals cfg.overlays.private [
                         mc-hrp2
                         mc-hrp4
                         mc-hrp5-p
