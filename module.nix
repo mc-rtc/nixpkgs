@@ -223,6 +223,40 @@
                     buildDevel = false;
                   };
                 };
+                # A release shell with all supported runtime dependencies
+                # This is mainly useful for CI to build everything at once
+                mc-rtc-superbuild-full = pkgs.make-shell {
+                  imports = [ superbuildFlakeModule ];
+                  mc-rtc-superbuild = {
+                    pname = "mc-rtc-superbuild-full";
+                    enable = true;
+                    apps = [
+                      pkgs.mc-rtc-magnum
+                      pkgs.mc-mujoco-full
+                    ]
+                    ++ lib.optional cfg.with-ros pkgs.mc-rtc-ticker;
+                    robots =
+                      with pkgs;
+                      [
+                        mc-g1
+                        mc-h1
+                        mc-ur5e
+                        # mc-panda mc-panda-lirmm ## no macos support
+                        # mc-rhps1
+                      ]
+                      ++ lib.optional cfg.overlays.private [
+                        mc-hrp2
+                        mc-hrp4
+                        mc-hrp5-p
+                      ];
+                    controllers = [ ];
+                    observers = with pkgs; [ mc-state-observation ];
+                    plugins = with pkgs; [
+                      mc-force-shoe-plugin
+                      mc-robot-model-update
+                    ];
+                  };
+                };
               }
             )
           ];

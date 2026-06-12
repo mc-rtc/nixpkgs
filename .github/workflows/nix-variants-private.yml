@@ -24,7 +24,7 @@ jobs:
       matrix:
         os: [ubuntu-24.04]
         variant: [ "private", "private-ccache" ]
-        build: [ "mc-mujoco-full", "mc-rtc-superbuild-private" ]
+        build: ["devShells.x86_64-linux.mc-rtc-superbuild-full"]
     steps:
       - name: "Determine Variant Arguments"
         id: flags
@@ -92,7 +92,7 @@ jobs:
       - *setup-ccache-env
       - run: nix flake check -L ${{ steps.flags.outputs.args }}
   fallback:
-    needs: populate-cache
+    needs: complete
     if: always() && needs.populate-cache.result == 'failure'
     name: "fallback ${{ matrix.os }}"
     runs-on: "${{ matrix.os }}-latest"
