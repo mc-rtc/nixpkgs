@@ -1,5 +1,20 @@
 {
   "nodes": {
+    "ccache-trigger": {
+      "locked": {
+        "lastModified": 1657739266,
+        "narHash": "sha256-vLy8GQr0noEcoA+jX24FgUVBA/poV36zDWAUChN3hIY=",
+        "owner": "boolean-option",
+        "repo": "false",
+        "rev": "d06b4794a134686c70a1325df88a6e6768c6b212",
+        "type": "github"
+      },
+      "original": {
+        "owner": "boolean-option",
+        "repo": "false",
+        "type": "github"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -463,6 +478,21 @@
         "type": "github"
       }
     },
+    "private-trigger": {
+      "locked": {
+        "lastModified": 1657739266,
+        "narHash": "sha256-vLy8GQr0noEcoA+jX24FgUVBA/poV36zDWAUChN3hIY=",
+        "owner": "boolean-option",
+        "repo": "false",
+        "rev": "d06b4794a134686c70a1325df88a6e6768c6b212",
+        "type": "github"
+      },
+      "original": {
+        "owner": "boolean-option",
+        "repo": "false",
+        "type": "github"
+      }
+    },
     "pyproject-build-systems": {
       "inputs": {
         "nixpkgs": [
@@ -519,6 +549,7 @@
     },
     "root": {
       "inputs": {
+        "ccache-trigger": "ccache-trigger",
         "flake-parts": [
           "gepetto",
           "flake-parts"
@@ -534,6 +565,7 @@
           "gepetto",
           "nixpkgs"
         ],
+        "private-trigger": "private-trigger",
         "systems": [
           "gepetto",
           "systems"

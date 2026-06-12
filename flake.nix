@@ -11,6 +11,12 @@
       url = "github:ahoarau/jrl-cmakemodules?ref=jrl-next";
     };
     make-shell.url = "github:nicknovitski/make-shell";
+
+    # A tiny community repository that just yields a true/false value
+    # This is used by CI to activate the private overlay while remaining in pure evaluation mode
+    # Use as nix build . --override-input private-trigger github:boolean-option/true
+    private-trigger.url = "github:boolean-option/false";
+    ccache-trigger.url = "github:boolean-option/false";
   };
 
   nixConfig = {
@@ -32,6 +38,7 @@
       flakeModule = inputs.flake-parts.lib.importApply ./module.nix {
         inherit (inputs) gepetto jrl-cmakemodulesv2 make-shell;
       };
+      buildPrivate = inputs.private-trigger.value or false;
     in
     inputs.flake-parts.lib.mkFlake { inherit inputs; } {
       systems = import inputs.systems;
@@ -42,6 +49,9 @@
             packages = true;
             # gepetto.packages = true;
             # gepetto.devShells = true;
+            overlays = {
+              private = buildPrivate;
+            };
           };
         }
       ];

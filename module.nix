@@ -99,12 +99,14 @@
       );
 
       overlaysList = map (o: o.value) rawOverlays;
-      overlaysListTraced = builtins.trace "mc-rtc-nix: adding additional overlays: ${builtins.toString (map (o: o.name) rawOverlays)}" overlaysList;
+      overlaysListTraced = builtins.trace "mc-rtc-nix: adding additional overlays: ${toString (map (o: o.name) rawOverlays)}" overlaysList;
+
+      superbuildFlakeModule = ./modules/superbuild/superbuild.nix;
 
     in
     {
       flake.overlays = flakeOverlays;
-      flake.flakeModules.superbuild = ./modules/superbuild/superbuild.nix;
+      flake.flakeModules.superbuild = superbuildFlakeModule;
 
       flakoboros = {
         extraPackages = [ "ninja" ];
@@ -134,71 +136,69 @@
         {
           packages = lib.mkMerge [
             (lib.mkIf cfg.gepetto.packages inputs'.gepetto.packages)
-            (
-              lib.mkIf cfg.packages {
-                # Main dependencies
-                inherit (pkgs)
-                  eigen3-to-python
-                  spacevecalg
-                  rbdyn
-                  sch-core
-                  sch-core-python
-                  tasks
-                  tasks-qld
-                  tvm
-                  eigen-quadprog
-                  eigen-qld
-                  state-observation
-                  mesh-sampling
-                  eigen-fmt
-                  ;
+            (lib.mkIf cfg.packages {
+              # Main dependencies
+              inherit (pkgs)
+                eigen3-to-python
+                spacevecalg
+                rbdyn
+                sch-core
+                sch-core-python
+                tasks
+                tasks-qld
+                tvm
+                eigen-quadprog
+                eigen-qld
+                state-observation
+                mesh-sampling
+                eigen-fmt
+                ;
 
-                # mc-rtc
-                inherit (pkgs) mc-rtc-data mc-rtc;
+              # mc-rtc
+              inherit (pkgs) mc-rtc-data mc-rtc;
 
-                # Main GUIs and applications
-                inherit (pkgs) mc-rtc-magnum mc-rtc-ticker mc-franka;
+              # Main GUIs and applications
+              inherit (pkgs) mc-rtc-magnum mc-rtc-ticker mc-franka;
 
-                # Main robots
-                inherit (pkgs)
-                  mc-g1
-                  mc-h1
-                  mc-ur5e
-                  mc-panda
-                  mc-panda-lirmm
-                  ;
+              # Main robots
+              inherit (pkgs)
+                mc-g1
+                mc-h1
+                mc-ur5e
+                mc-panda
+                mc-panda-lirmm
+                ;
 
-                # MuJoCo Robots
-                inherit (pkgs)
-                  h1-mj-description
-                  jvrc1-mj-description
-                  g1-mj-description
-                  ur5e-mj-description
-                  env-mj-description
-                  ;
+              # MuJoCo Robots
+              inherit (pkgs)
+                h1-mj-description
+                jvrc1-mj-description
+                g1-mj-description
+                ur5e-mj-description
+                env-mj-description
+                ;
 
-                inherit (pkgs)
-                  mc-mujoco
-                  mc-mujoco-full
-                  ;
-                inherit (pkgs) panda-prosthesis mc-force-shoe-plugin sphinx-cmake;
-              }
-              // lib.optionalAttrs cfg.overlays.private {
-                inherit (pkgs)
-                  mc-hrp2
-                  mc-hrp4
-                  mc-hrp5-p
-                  mc-rhps1
-                  tasks-lssol
-                  ;
-                inherit (pkgs)
-                  politopix
-                  mc-dynamic-polytopes
-                  dcm-vrptask
-                  polytopeController
-                  ;
-              }
-            )
+              inherit (pkgs)
+                mc-mujoco
+                mc-mujoco-full
+                ;
+              inherit (pkgs) panda-prosthesis mc-force-shoe-plugin sphinx-cmake;
+            })
+            (lib.mkIf (cfg.packages && cfg.overlays.private) {
+              inherit (pkgs)
+                mc-hrp2
+                mc-hrp4
+                mc-hrp5-p
+                mc-rhps1
+                tasks-lssol
+                ;
+              inherit (pkgs)
+                politopix
+                mc-dynamic-polytopes
+                dcm-vrptask
+                polytopeController
+                ;
+            })
           ];
 
           devShells = lib.mkMerge [
@@ -210,14 +210,14 @@
               in
               lib.mkIf superbuildCfg.enable {
                 ${develName} = pkgs.make-shell {
-                  imports = [ ./modules/superbuild/superbuild.nix ];
+                  imports = [ superbuildFlakeModule ];
                   mc-rtc-superbuild = superbuildCfg // {
                     pname = develName;
                     buildDevel = true;
                   };
                 };
                 ${releaseName} = pkgs.make-shell {
-                  imports = [ ./modules/superbuild/superbuild.nix ];
+                  imports = [ superbuildFlakeModule ];
                   mc-rtc-superbuild = superbuildCfg // {
                     pname = releaseName;
                     buildDevel = false;
