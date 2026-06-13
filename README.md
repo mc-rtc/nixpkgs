@@ -111,31 +111,60 @@ Define your own superbuild
 `mc-rtc-superbuild` now uses a typed schema with named reusable presets:
 
 ```nix
-mc-rtc-superbuild = {
-  enable = true;
+mc-rtc-superbuild =
+{ pkgs, ... }:
+{
+  enable = true; # enables the mc-rtc-superbuild module
+  configurations = { # adds configurations for your controller
+    your-controller-minimal = {
+      extends = [ "minimal" ]; # adds a configuration based on the "minimal" preset
+      runtime = { # define runtime dependencies installed by nix
+        robots = [
+          pkgs.mc-panda-lirmm
+          pkgs.mc-panda
+        ];
 
-  configurations = {
-    default = {
-      runtime = { };
+        apps = [
+          pkgs.mc-rtc-magnum
+        ];
+        config = "lib/mc_controller/etc/your-controller/mc_rtc.yaml";
+      };
+      # define devel dependencies:
+      # - In devel shells, these are not built by Nix, you must build them from source.
+      # - In release shells, they are merged wiith the runtime configuration
+      # mc_rtc.yaml is configured to use them
+      devel = {
+        config = "lib64/mc_controller/etc/your-controller/mc_rtc.yaml";
+        controllers = [ pkgs.your-controller ];
+        plugins = [ pkgs.your-controller ];
+        robots = [ pkgs.your-controller ];
+      };
+    };
+    # define another configuration merging the "default" preset and the preset you just created
+    your-controller-full = {
+      extends = [
+        "default"
+        "your-controller-minimal"
+      ];
+      runtime = {
+        apps = [
+          pkgs.mc-franka # adds mc-franka app on top of all other apps
+        ];
+      };
     };
   };
 
-  defaults = {
-    package = "default";
-    develShell = "default";
-    releaseShell = "full";
-  };
-
-  project = {
-    pname = "mc-rtc-superbuild";
-    configuration = "default";
-
-    runtime = {
-      config = "lib/mc_controller/etc/<controller_name>/mc_rtc.yaml";
-    };
-
-    devel = {
-      config = "lib64/mc_controller/etc/<controller_name>/mc_rtc.yaml";
+  shells = {
+    defaultShells.release = false; # don't generate the default release devshells (default = false)
+    defaultShells.devel = false; # don't generate the default devel devshells (default = false)
+    autoShells.release = true; # generate this project's release devshells in `configurations` (default = true)
+    autoShells.devel = true; # generate this project's devel devshells in `configurations` (default = true)
+    # define additionalShells, can be ommited
+    additionalShells = {
+      panda-prosthesis-custom = {
+        mode = "release";
+        configuration = "panda-prosthesis-minimal";
+      };
     };
   };
 };

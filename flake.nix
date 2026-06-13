@@ -53,6 +53,10 @@
               private = buildPrivate;
             };
           };
+          mc-rtc-superbuild = {
+            enable = true;
+            shells.defaultShells.release = true;
+          };
         }
       ];
 

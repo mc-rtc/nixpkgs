@@ -94,32 +94,68 @@ in
   };
 
   shells = lib.mkOption {
-    type = lib.types.attrsOf (
-      lib.types.submodule {
-        options = {
-          mode = lib.mkOption {
-            type = lib.types.enum [
-              "release"
-              "devel"
-            ];
-            default = "release";
-            description = "Shell mode: release or devel.";
-          };
-
-          configuration = lib.mkOption {
-            type = lib.types.str;
-            description = "Name of the configuration preset to use for this shell.";
+    description = "Configuration for devShell generation.";
+    default = { };
+    type = lib.types.submodule {
+      options = {
+        defaultShells = lib.mkOption {
+          description = "Enable auto-generation of default configuration shells.";
+          default = { };
+          type = lib.types.submodule {
+            options = {
+              release = lib.mkEnableOption "enable default release shells";
+              devel = lib.mkEnableOption "enable default devel shells";
+            };
           };
         };
-      }
-    );
-    default = { };
-    description = ''
-      Explicit set of named devShells to generate.
-      When non-empty, only these shells are produced and the default
-      auto-generated shells (one per configuration × mode) are suppressed.
-      Each attribute name becomes the devShell name.
-    '';
+
+        autoShells = lib.mkOption {
+          description = "Auto-generate shells from your specified configurations.";
+          default = { };
+          type = lib.types.submodule {
+            options = {
+              release = lib.mkOption {
+                type = lib.types.bool;
+                default = true;
+                description = "auto-generate release shells";
+              };
+              devel = lib.mkOption {
+                type = lib.types.bool;
+                default = true;
+                description = "auto-generate devel shells";
+              };
+            };
+          };
+        };
+
+        additionalShells = lib.mkOption {
+          type = lib.types.attrsOf (
+            lib.types.submodule {
+              options = {
+                mode = lib.mkOption {
+                  type = lib.types.enum [
+                    "release"
+                    "devel"
+                  ];
+                  default = "release";
+                  description = "Shell mode: release or devel.";
+                };
+
+                configuration = lib.mkOption {
+                  type = lib.types.str;
+                  description = "Name of the configuration preset to use for this shell.";
+                };
+              };
+            }
+          );
+          default = { };
+          description = ''
+            Explicit set of named devShells to generate.
+            They are generated in addition to the auto-generated ones (activated by: defaultShells, autoShells).
+          '';
+        };
+      };
+    };
   };
 
   project = lib.mkOption {

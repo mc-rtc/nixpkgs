@@ -202,7 +202,7 @@ in
           ${printRuntimeDeps false develOverlay}
 
           echo ""
-          echo "This is a development shell, build your local targets with:"
+          echo "To build this project, use:"
           echo ""
           echo '  cmake -B build $cmakeFlags -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR'
           echo "  cmake --build build --target install"

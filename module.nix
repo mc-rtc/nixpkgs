@@ -39,7 +39,7 @@
   options.mc-rtc-superbuild = lib.mkOption {
     type = lib.types.deferredModuleWith {
       staticModules = [
-        { config.enable = lib.mkDefault true; }
+        { config.enable = lib.mkDefault false; }
       ];
     };
     default = { };
@@ -125,13 +125,13 @@
           builtInConfigurations = {
             minimal = {
               runtime = {
-                observers = [ pkgs.mc-state-observation ];
               };
             };
 
             default = {
               extends = [ "minimal" ];
               runtime = {
+                observers = [ pkgs.mc-state-observation ];
                 apps = [
                   pkgs.mc-rtc-magnum
                   pkgs.mc-mujoco
@@ -140,34 +140,37 @@
               };
             };
 
-            all-public-robots = {
+            default-all-robots = {
               extends = [ "default" ];
               runtime = {
                 robots = [
                   pkgs.mc-g1
                   pkgs.mc-h1
                   pkgs.mc-ur5e
+                  # FIXME: disabled until merged and compatible with macos
+                  # pkgs.mc-panda
+                  # pkgs.mc-panda-lirmm
+                ]
+                ++ lib.optionals cfg.overlays.private [
+                  pkgs.mc-hrp2
+                  pkgs.mc-hrp4
+                  pkgs.mc-hrp5-p
+                  # FIXME: disable mc-rhps1 as it is too heavy
+                  # pkgs.mc-rhps1
                 ];
               };
             };
 
             full = {
-              extends = [ "all-public-robots" ];
+              extends = [ "default-all-robots" ];
               runtime = {
                 plugins = [
                   pkgs.mc-force-shoe-plugin
                   pkgs.mc-robot-model-update
                 ];
-                robots = lib.optionals cfg.overlays.private [
-                  pkgs.mc-hrp2
-                  pkgs.mc-hrp4
-                  pkgs.mc-hrp5-p
-                ];
                 apps = lib.optionals cfg.overlays.private [ pkgs.mc-mujoco-full ];
               };
             };
-          }
-          // lib.optionalAttrs cfg.with-ros {
           };
 
           configurations = builtInConfigurations // superbuildCfg.configurations;
@@ -211,8 +214,19 @@
                 }
               ) (builtins.attrNames configurations)
             );
-          releaseShellsByPreset = mkShellsByPreset "release" configurations;
-          develShellsByPreset = mkShellsByPreset "devel" configurations;
+
+          filterConfgurations =
+            defaultShells_: autoShells_:
+            if defaultShells_ then
+              configurations
+            else
+              lib.optionalAttrs autoShells_ superbuildCfg.configurations;
+          releaseShellsByPreset = mkShellsByPreset "release" (
+            filterConfgurations superbuildCfg.shells.defaultShells.release superbuildCfg.shells.autoShells.release
+          );
+          develShellsByPreset = mkShellsByPreset "devel" (
+            filterConfgurations superbuildCfg.shells.defaultShells.devel superbuildCfg.shells.autoShells.devel
+          );
 
           explicitShells = lib.mapAttrs (
             name: shellCfg:
@@ -221,17 +235,14 @@
               shellPname = name;
               configuration = shellCfg.configuration;
             }
-          ) superbuildCfg.shells;
+          ) superbuildCfg.shells.additionalShells;
 
-          hasExplicitShells = superbuildCfg.shells != { };
-
+          hasExplicitShells = superbuildCfg.shells.additionalShells != { };
           generatedShells =
-            if hasExplicitShells then
-              explicitShells
-            else
-              releaseShellsByPreset // develShellsByPreset;
+            if hasExplicitShells then explicitShells else releaseShellsByPreset // develShellsByPreset;
         in
         {
+          # TODO: auto-generate
           packages = lib.mkMerge [
             (lib.mkIf cfg.gepetto.packages inputs'.gepetto.packages)
             (lib.mkIf cfg.packages {
@@ -301,6 +312,7 @@
 
           devShells = lib.mkMerge [
             (lib.mkIf cfg.gepetto.devShells inputs'.gepetto.devShells)
+            # auto-generated release and devel shells for mc-rtc-superbuild
             (lib.mkIf superbuildCfg.enable generatedShells)
           ];
         }
