@@ -213,6 +213,23 @@
             );
           releaseShellsByPreset = mkShellsByPreset "release" configurations;
           develShellsByPreset = mkShellsByPreset "devel" configurations;
+
+          explicitShells = lib.mapAttrs (
+            name: shellCfg:
+            mkSuperbuildShell {
+              mode = shellCfg.mode;
+              shellPname = name;
+              configuration = shellCfg.configuration;
+            }
+          ) superbuildCfg.shells;
+
+          hasExplicitShells = superbuildCfg.shells != { };
+
+          generatedShells =
+            if hasExplicitShells then
+              explicitShells
+            else
+              releaseShellsByPreset // develShellsByPreset;
         in
         {
           packages = lib.mkMerge [
@@ -284,7 +301,7 @@
 
           devShells = lib.mkMerge [
             (lib.mkIf cfg.gepetto.devShells inputs'.gepetto.devShells)
-            (lib.mkIf superbuildCfg.enable (releaseShellsByPreset // develShellsByPreset))
+            (lib.mkIf superbuildCfg.enable generatedShells)
           ];
         }
       );

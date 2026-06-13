@@ -93,6 +93,35 @@ in
     description = "Reusable named presets for mc-rtc-superbuild.";
   };
 
+  shells = lib.mkOption {
+    type = lib.types.attrsOf (
+      lib.types.submodule {
+        options = {
+          mode = lib.mkOption {
+            type = lib.types.enum [
+              "release"
+              "devel"
+            ];
+            default = "release";
+            description = "Shell mode: release or devel.";
+          };
+
+          configuration = lib.mkOption {
+            type = lib.types.str;
+            description = "Name of the configuration preset to use for this shell.";
+          };
+        };
+      }
+    );
+    default = { };
+    description = ''
+      Explicit set of named devShells to generate.
+      When non-empty, only these shells are produced and the default
+      auto-generated shells (one per configuration × mode) are suppressed.
+      Each attribute name becomes the devShell name.
+    '';
+  };
+
   project = lib.mkOption {
     type = lib.types.submodule {
       options = {
