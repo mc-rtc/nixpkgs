@@ -113,13 +113,14 @@
       perSystem = (
         { pkgs, inputs', ... }:
         let
-          superbuildCfg = (lib.evalModules {
-            modules = [
-              { options = import ./modules/superbuild/options.nix { inherit lib; }; }
-              config.mc-rtc-superbuild
-            ];
-            specialArgs = { inherit pkgs; };
-          }).config;
+          superbuildCfg =
+            (lib.evalModules {
+              modules = [
+                { options = import ./modules/superbuild/options.nix { inherit lib; }; }
+                config.mc-rtc-superbuild
+              ];
+              specialArgs = { inherit pkgs; };
+            }).config;
 
           builtInConfigurations = {
             minimal = {
@@ -165,6 +166,8 @@
                 apps = lib.optionals cfg.overlays.private [ pkgs.mc-mujoco-full ];
               };
             };
+          }
+          // lib.optionalAttrs cfg.with-ros {
           };
 
           configurations = builtInConfigurations // superbuildCfg.configurations;

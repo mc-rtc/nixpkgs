@@ -39,12 +39,6 @@
                 };
               };
 
-              defaults = {
-                package = "default";
-                develShell = "default";
-                releaseShell = "full";
-              };
-
               project = {
                 pname = "mc-rtc-superbuild";
                 configuration = "default";

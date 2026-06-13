@@ -93,31 +93,6 @@ in
     description = "Reusable named presets for mc-rtc-superbuild.";
   };
 
-  defaults = lib.mkOption {
-    type = lib.types.submodule {
-      options = {
-        package = lib.mkOption {
-          type = lib.types.str;
-          default = "default";
-          description = "Default preset name for package-oriented use-cases.";
-        };
-
-        develShell = lib.mkOption {
-          type = lib.types.str;
-          default = "default";
-          description = "Preset used to generate the default devel shell.";
-        };
-
-        releaseShell = lib.mkOption {
-          type = lib.types.str;
-          default = "full";
-          description = "Preset used to generate the default release shell.";
-        };
-      };
-    };
-    default = { };
-  };
-
   project = lib.mkOption {
     type = lib.types.submodule {
       options = {
