@@ -14,7 +14,8 @@ let
 
   isDevel = cfg.mode == "devel";
 
-  activeRuntime = if isDevel then resolver.resolved.devel.runtime else resolver.resolved.release.runtime;
+  activeRuntime =
+    if isDevel then resolver.resolved.devel.runtime else resolver.resolved.release.runtime;
   develOverlay = resolver.resolved.devel.devel;
 
   localPath = "$PWD/${relativeLocalPath}";
@@ -30,10 +31,10 @@ let
       "${fallbackPkg}/${cfgPath}";
 
   normalizeRelativeConfigList =
-    paths: fallbackPkg:
-    map (p: normalizeRelativeConfig p fallbackPkg) paths;
+    paths: fallbackPkg: map (p: normalizeRelativeConfig p fallbackPkg) paths;
 
-  activeMainController = if activeRuntime.controllers == [ ] then null else lib.head activeRuntime.controllers;
+  activeMainController =
+    if activeRuntime.controllers == [ ] then null else lib.head activeRuntime.controllers;
 
   activeConfigPath =
     if isDevel then
@@ -123,10 +124,11 @@ in
         shellObservers = devPrefix ++ activeRuntime.observers;
         shellPlugins = devPrefix ++ activeRuntime.plugins;
 
-        shellConfigs =
-          [ "${localPath}/mc_rtc.yaml" ]
-          ++ lib.optional (activeConfigPath != null) activeConfigPath
-          ++ extraConfigPaths;
+        shellConfigs = [
+          "${localPath}/mc_rtc.yaml"
+        ]
+        ++ lib.optional (activeConfigPath != null) activeConfigPath
+        ++ extraConfigPaths;
 
         printRuntimeDeps =
           showPaths: listGroup:

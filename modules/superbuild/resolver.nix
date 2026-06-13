@@ -20,8 +20,7 @@ let
     devel = mkComponent;
   };
 
-  preferString = previous: next:
-    if next != null && next != "" then next else previous;
+  preferString = previous: next: if next != null && next != "" then next else previous;
 
   mergeComponent = left: right: {
     apps = left.apps ++ right.apps;

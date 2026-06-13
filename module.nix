@@ -37,15 +37,18 @@
   };
 
   options.mc-rtc-superbuild = lib.mkOption {
-    type = lib.types.either
-      (lib.types.submodule {
-        options = import ./modules/superbuild/options.nix { inherit lib; };
-      })
-      (lib.types.functionTo (
-        lib.types.submodule {
+    type =
+      lib.types.either
+        (lib.types.submodule {
           options = import ./modules/superbuild/options.nix { inherit lib; };
-        }
-      ));
+        })
+        (
+          lib.types.functionTo (
+            lib.types.submodule {
+              options = import ./modules/superbuild/options.nix { inherit lib; };
+            }
+          )
+        );
     default = {
       enable = true;
       defaults = {
@@ -146,12 +149,11 @@
             default = {
               extends = [ "minimal" ];
               runtime = {
-                apps =
-                  [
-                    pkgs.mc-rtc-magnum
-                    pkgs.mc-mujoco
-                  ]
-                  ++ lib.optionals cfg.with-ros [ pkgs.mc-rtc-ticker ];
+                apps = [
+                  pkgs.mc-rtc-magnum
+                  pkgs.mc-mujoco
+                ]
+                ++ lib.optionals cfg.with-ros [ pkgs.mc-rtc-ticker ];
               };
             };
 
@@ -204,24 +206,28 @@
               };
             };
 
-          releaseName = superbuildCfg.project.pname;
-          develName = "${releaseName}-devel";
+          shellBaseName = superbuildCfg.project.pname;
 
-          releasePreset = superbuildCfg.defaults.releaseShell;
-          develPreset = superbuildCfg.defaults.develShell;
-
-          releaseShellsByPreset = builtins.listToAttrs (
-            map (
-              preset: {
-                name = "${releaseName}-${preset}";
-                value = mkSuperbuildShell {
-                  mode = "release";
-                  shellPname = "${releaseName}-${preset}";
-                  configuration = preset;
-                };
-              }
-            ) (builtins.attrNames configurations)
-          );
+          mkShellsByPreset =
+            mode: configurations:
+            builtins.listToAttrs (
+              map (
+                preset:
+                let
+                  name = "${shellBaseName}-${preset}" + lib.optionalString (mode == "devel") "-devel";
+                in
+                {
+                  inherit name;
+                  value = mkSuperbuildShell {
+                    mode = mode;
+                    shellPname = name;
+                    configuration = preset;
+                  };
+                }
+              ) (builtins.attrNames configurations)
+            );
+          releaseShellsByPreset = mkShellsByPreset "release" configurations;
+          develShellsByPreset = mkShellsByPreset "devel" configurations;
         in
         {
           packages = lib.mkMerge [
@@ -293,28 +299,7 @@
 
           devShells = lib.mkMerge [
             (lib.mkIf cfg.gepetto.devShells inputs'.gepetto.devShells)
-            (
-              lib.mkIf superbuildCfg.enable (
-                {
-                  ${develName} = mkSuperbuildShell {
-                    mode = "devel";
-                    shellPname = develName;
-                    configuration = develPreset;
-                  };
-                  ${releaseName} = mkSuperbuildShell {
-                    mode = "release";
-                    shellPname = releaseName;
-                    configuration = releasePreset;
-                  };
-                  mc-rtc-superbuild-full = mkSuperbuildShell {
-                    mode = "release";
-                    shellPname = "mc-rtc-superbuild-full";
-                    configuration = "full";
-                  };
-                }
-                // releaseShellsByPreset
-              )
-            )
+            (lib.mkIf superbuildCfg.enable (releaseShellsByPreset // develShellsByPreset))
           ];
         }
       );

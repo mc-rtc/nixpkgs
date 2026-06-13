@@ -45,7 +45,10 @@ in
   enable = lib.mkEnableOption "enable";
 
   mode = lib.mkOption {
-    type = lib.types.enum [ "release" "devel" ];
+    type = lib.types.enum [
+      "release"
+      "devel"
+    ];
     default = "release";
     description = "Internal shell mode used by generated release/devel shells.";
   };

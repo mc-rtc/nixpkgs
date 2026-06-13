@@ -149,7 +149,7 @@ Built-in presets are:
 
 Presets are extensible with `extends` and merge with these semantics:
 - list fields append (`apps`, `robots`, `controllers`, `observers`, `plugins`, `extraConfigFiles`)
-- scalar fields override (`config`, `mainRobot`, `enabled`, `timestep`)
+- scalar fields override (`config`)
 
 `runtime` vs `devel`:
 - `runtime`: Nix runtime components always installed in the shell runtime closure
@@ -163,19 +163,17 @@ Conditional defaults:
 
 Additional config fragments can be provided with `extraConfigFiles` (instead of overloading `config`).
 
-Backward compatibility:
-- Legacy top-level fields (`apps`, `robots`, `controllers`, `observers`, `plugins`, `config`, `devel`, etc.) are still accepted and merged into `project.runtime` / `project.devel`
-- New configurations should use the explicit `project.runtime` and `project.devel` schema
-
-Run your own controller
+Run a default mc-rtc-superbuild environment
 --
+
+To simply execute one of the provided `mc-rtc-superbuild` development shells, use
 
 ```bash
 # if cachix is setup correctly this should just pull binary dependencies. Otherwise
 # it will build everything specified in the `mc-rtc-superbuild` derivation (and their depencencies)
-nix develop
-# or nix develop .#mc-rtc-superbuild-rolkneematics # if you want to use your own derivation
-mc-rtc-magnum &
+nix develop .#mc-rtc-superbuild-<variant>
+# Run the gui in the background
+(mc-rtc-magnum &)
 # By default mc_rtc_ticker will use the configuration provided by `MC_RTC_CONTROLLER_CONFIG` env variable
 # This is set by the mc-rtc-superbuild derivation and devShell to contain all needed runtime depencencies
 # and optionally a default controller's configuration
