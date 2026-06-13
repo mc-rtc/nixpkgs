@@ -9,7 +9,7 @@ let
   cfg = config.mc-rtc-superbuild;
   resolver = import ./resolver.nix { inherit lib; } cfg;
 
-  pname = cfg.project.name;
+  pname = cfg.project.pname;
   relativeLocalPath = cfg.project.relativeLocalPath;
 
   isDevel = cfg.mode == "devel";

@@ -115,6 +115,7 @@ mc-rtc-superbuild =
 { pkgs, ... }:
 {
   enable = true; # enables the mc-rtc-superbuild module
+  project.pname = "your-project"; # prefix shell names
   configurations = { # adds configurations for your controller
     your-controller-minimal = {
       extends = [ "minimal" ]; # adds a configuration based on the "minimal" preset

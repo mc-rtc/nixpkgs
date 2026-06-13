@@ -161,7 +161,7 @@ in
   project = lib.mkOption {
     type = lib.types.submodule {
       options = {
-        name = lib.mkOption {
+        pname = lib.mkOption {
           type = lib.types.str;
           default = "mc-rtc-superbuild";
         };

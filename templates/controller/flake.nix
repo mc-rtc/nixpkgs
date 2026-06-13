@@ -34,7 +34,7 @@
               { pkgs, ... }:
               {
                 enable = true;
-                project.name = "";
+                project.pname = "";
                 # TODO: replace this section with your own configuration presets for your project
                 configurations = {
                   your-project-minimal = {

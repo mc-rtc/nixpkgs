@@ -194,7 +194,7 @@
               };
             };
 
-          shellBaseName = superbuildCfg.project.name;
+          shellBaseName = superbuildCfg.project.pname;
 
           mkShellsByPreset =
             mode: configurations:
