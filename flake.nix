@@ -39,6 +39,20 @@
         inherit (inputs) gepetto jrl-cmakemodulesv2 make-shell;
       };
       buildPrivate = inputs.private-trigger.value or false;
+
+      mkFlakoboros =
+        {
+          localInputs,
+          localFlakeModule ? flakeModule,
+        }:
+        flakoborosModule:
+        inputs.flake-parts.lib.mkFlake { inputs = localInputs; } (args: {
+          systems = import inputs.systems;
+          imports = [
+            localFlakeModule
+            { flakoboros = flakoborosModule args; }
+          ];
+        });
     in
     inputs.flake-parts.lib.mkFlake { inherit inputs; } {
       systems = import inputs.systems;
@@ -62,6 +76,16 @@
 
       flake = {
         inherit flakeModule;
+
+        # lib.mkFlakoboros
+        #   Usage: lib.mkFlakoboros localInputs module
+        #   Description: Creates a flake using the default flakeModule (public, with-ros).
+        #   Arguments:
+        #     - localInputs: The flake inputs set.
+        #     - flakoborosModule: The flake-parts module to use.
+        #                         See https://gepetto.github.io/flakoboros/index.html
+        lib.mkFlakoboros =
+          localInputs: flakoborosModule: mkFlakoboros { inherit localInputs; } flakoborosModule;
 
         templates = {
           default = {
