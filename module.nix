@@ -194,7 +194,7 @@
               };
             };
 
-          shellBaseName = superbuildCfg.project.pname;
+          shellBaseName = superbuildCfg.project.name;
 
           mkShellsByPreset =
             mode: configurations:
@@ -202,7 +202,10 @@
               map (
                 preset:
                 let
-                  name = "${shellBaseName}-${preset}" + lib.optionalString (mode == "devel") "-devel";
+                  name =
+                    (lib.optionalString (shellBaseName != "") "${shellBaseName}-")
+                    + "${preset}"
+                    + lib.optionalString (mode == "devel") "-devel";
                 in
                 {
                   inherit name;

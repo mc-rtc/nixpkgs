@@ -24,42 +24,52 @@
             # This mc-rtc-superbuild configuration will:
             # - Define named reusable configurations in `configurations`
             # - Use explicit runtime (Nix runtime components) vs devel (local/source overlays)
-            # - Generate `${project.pname}` and `${project.pname}-devel` shells from `defaults`
+            # - Generate `${project.name}-<configuration>` and `${project.name}-<configuration>-devel` shells
             #
             # This will also generate a .superbuild/mc_rtc.yaml file containg the suitable mc_rtc configuration
             # Devel dependencies are expected to be installed manually in .superbuild/install
             #
-            # As always, indivdual packages can be overridden using flakoboros
-            mc-rtc-superbuild = {
-              enable = true;
+            # As always, individual packages can be overridden using flakoboros
+            mc-rtc-superbuild =
+              { pkgs, ... }:
+              {
+                enable = true;
+                project.name = "";
+                # TODO: replace this section with your own configuration presets for your project
+                configurations = {
+                  your-project-minimal = {
+                    extends = [ "minimal" ];
+                    runtime = {
+                      robots = [
+                        pkgs.mc-panda-lirmm
+                        pkgs.mc-panda
+                      ];
 
-              configurations = {
-                default = {
-                  runtime = { };
+                      apps = [
+                        pkgs.mc-rtc-magnum
+                      ];
+                      config = "lib/mc_controller/etc/your-project/mc_rtc.yaml";
+                    };
+                    devel = {
+                      config = "lib64/mc_controller/etc/your-project/mc_rtc.yaml";
+                      controllers = [ pkgs.your-project ];
+                      plugins = [ pkgs.your-project ];
+                      robots = [ pkgs.your-project ];
+                    };
+                  };
+                  your-project-full = {
+                    extends = [
+                      "default"
+                      "your-project-minimal"
+                    ];
+                    runtime = {
+                      apps = [
+                        pkgs.mc-franka
+                      ];
+                    };
+                  };
                 };
               };
-
-              project = {
-                pname = "mc-rtc-superbuild";
-                configuration = "default";
-
-                runtime = {
-                  controllers = [ ];
-                  robots = [ ];
-                  plugins = [ ];
-                  observers = [ ];
-                  config = "lib/mc_controller/etc/<controller_name>/mc_rtc.yaml";
-                };
-
-                devel = {
-                  controllers = [ ];
-                  plugins = [ ];
-                  robots = [ ];
-                  observers = [ ];
-                  config = "lib64/mc_controller/etc/<controller_name>/mc_rtc.yaml";
-                };
-              };
-            };
 
             flakoboros = {
               # # Override all dependencies
