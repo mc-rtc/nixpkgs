@@ -93,14 +93,27 @@ jobs:
       - run: nix flake check -L ${{ steps.flags.outputs.args }}
   fallback:
     needs: complete
-    if: always() && needs.populate-cache.result == 'failure'
-    name: "fallback ${{ matrix.os }}"
+    if: always() && needs.complete.result == 'failure'
+    name: "fallback ${{matrix.variant}}: ${{ matrix.build }} on ${{ matrix.os }}"
     runs-on: "${{ matrix.os }}-latest"
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu] # TODO: macos
+        variant: [ "private", "private-ccache" ]
+        build: ["devShells.x86_64-linux.mc-rtc-superbuild-full"]
     steps:
+      - name: "Determine Variant Arguments"
+        id: flags
+        run: |
+          if [ "${{ matrix.variant }}" = "private" ]; then
+            echo "args=--override-input private-trigger github:boolean-option/true" >> "$GITHUB_OUTPUT"
+          elif [ "${{ matrix.variant }}" = "private-ccache" ]; then
+            echo "args=--override-input private-trigger github:boolean-option/true --override-input ccache-trigger github:boolean-option/true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Unsupported variant: ${{ matrix.variant }}"
+            exit 42
+          fi
       - uses: jlumbroso/free-disk-space@main
         if: ${{ matrix.os == 'ubuntu' }}
       - *confiure-ssh-agent
