@@ -73,7 +73,7 @@ let
   base = mergePreset selectedPreset projectOverlay;
 
   release = {
-    runtime = mergeRuntime base.runtime base.devel;
+    runtime = mergeRuntime base.devel base.runtime;
     devel = mkComponent;
   };
 
