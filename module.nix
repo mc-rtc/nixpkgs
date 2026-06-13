@@ -37,19 +37,28 @@
   };
 
   options.mc-rtc-superbuild = lib.mkOption {
-    # we expect either a options.mc-rtc-superbuild set, or a function of { pkgs, ...}: options.mc-rtc-superbuid
-    type = lib.types.unspecified;
-    default =
-      { pkgs, ... }:
-      {
-        enable = true;
-        apps = [
-          pkgs.mc-rtc-magnum
-          pkgs.mc-rtc-ticker
-          pkgs.mc-mujoco
-        ];
+    type = lib.types.either
+      (lib.types.submodule {
+        options = import ./modules/superbuild/options.nix { inherit lib; };
+      })
+      (lib.types.functionTo (
+        lib.types.submodule {
+          options = import ./modules/superbuild/options.nix { inherit lib; };
+        }
+      ));
+    default = {
+      enable = true;
+      defaults = {
+        package = "default";
+        develShell = "default";
+        releaseShell = "full";
       };
-    description = "Global configuration schema or a function returning the schema for generating mc-rtc superbuild development environments.";
+      project = {
+        pname = "mc-rtc-superbuild";
+        configuration = "default";
+      };
+    };
+    description = "Typed mc-rtc superbuild schema with named reusable configurations and explicit runtime/devel settings.";
   };
 
   imports = [
@@ -119,19 +128,100 @@
       perSystem = (
         { pkgs, inputs', ... }:
         let
-          # 1. Safely parse either formatting layout
-          rawCfg =
+          rawSuperbuildCfg =
             if builtins.isFunction config.mc-rtc-superbuild then
               config.mc-rtc-superbuild { inherit pkgs lib; }
             else
               config.mc-rtc-superbuild;
 
-          # 2. Merge defaults so fields like .enable and .pname are always available
-          superbuildCfg = {
-            enable = false;
-            pname = "mc-rtc-superbuild";
-          }
-          // rawCfg;
+          superbuildCfg = rawSuperbuildCfg;
+
+          builtInConfigurations = {
+            minimal = {
+              runtime = {
+                observers = [ pkgs.mc-state-observation ];
+              };
+            };
+
+            default = {
+              extends = [ "minimal" ];
+              runtime = {
+                apps =
+                  [
+                    pkgs.mc-rtc-magnum
+                    pkgs.mc-mujoco
+                  ]
+                  ++ lib.optionals cfg.with-ros [ pkgs.mc-rtc-ticker ];
+              };
+            };
+
+            all-public-robots = {
+              extends = [ "default" ];
+              runtime = {
+                robots = [
+                  pkgs.mc-g1
+                  pkgs.mc-h1
+                  pkgs.mc-ur5e
+                ];
+              };
+            };
+
+            full = {
+              extends = [ "all-public-robots" ];
+              runtime = {
+                plugins = [
+                  pkgs.mc-force-shoe-plugin
+                  pkgs.mc-robot-model-update
+                ];
+                robots = lib.optionals cfg.overlays.private [
+                  pkgs.mc-hrp2
+                  pkgs.mc-hrp4
+                  pkgs.mc-hrp5-p
+                ];
+                apps = lib.optionals cfg.overlays.private [ pkgs.mc-mujoco-full ];
+              };
+            };
+          };
+
+          configurations = builtInConfigurations // superbuildCfg.configurations;
+
+          mkSuperbuildShell =
+            {
+              mode,
+              shellPname,
+              configuration,
+            }:
+            pkgs.make-shell {
+              imports = [ superbuildFlakeModule ];
+              mc-rtc-superbuild = superbuildCfg // {
+                inherit mode;
+                withRos = cfg.with-ros;
+                configurations = configurations;
+                project = superbuildCfg.project // {
+                  pname = shellPname;
+                  inherit configuration;
+                };
+              };
+            };
+
+          releaseName = superbuildCfg.project.pname;
+          develName = "${releaseName}-devel";
+
+          releasePreset = superbuildCfg.defaults.releaseShell;
+          develPreset = superbuildCfg.defaults.develShell;
+
+          releaseShellsByPreset = builtins.listToAttrs (
+            map (
+              preset: {
+                name = "${releaseName}-${preset}";
+                value = mkSuperbuildShell {
+                  mode = "release";
+                  shellPname = "${releaseName}-${preset}";
+                  configuration = preset;
+                };
+              }
+            ) (builtins.attrNames configurations)
+          );
         in
         {
           packages = lib.mkMerge [
@@ -204,60 +294,26 @@
           devShells = lib.mkMerge [
             (lib.mkIf cfg.gepetto.devShells inputs'.gepetto.devShells)
             (
-              let
-                releaseName = "${superbuildCfg.pname}";
-                develName = "${superbuildCfg.pname}-devel";
-              in
-              lib.mkIf superbuildCfg.enable {
-                ${develName} = pkgs.make-shell {
-                  imports = [ superbuildFlakeModule ];
-                  mc-rtc-superbuild = superbuildCfg // {
-                    pname = develName;
-                    buildDevel = true;
+              lib.mkIf superbuildCfg.enable (
+                {
+                  ${develName} = mkSuperbuildShell {
+                    mode = "devel";
+                    shellPname = develName;
+                    configuration = develPreset;
                   };
-                };
-                ${releaseName} = pkgs.make-shell {
-                  imports = [ superbuildFlakeModule ];
-                  mc-rtc-superbuild = superbuildCfg // {
-                    pname = releaseName;
-                    buildDevel = false;
+                  ${releaseName} = mkSuperbuildShell {
+                    mode = "release";
+                    shellPname = releaseName;
+                    configuration = releasePreset;
                   };
-                };
-                # A release shell with all supported runtime dependencies
-                # This is mainly useful for CI to build everything at once
-                mc-rtc-superbuild-full = pkgs.make-shell {
-                  imports = [ superbuildFlakeModule ];
-                  mc-rtc-superbuild = {
-                    pname = "mc-rtc-superbuild-full";
-                    enable = true;
-                    apps = [
-                      pkgs.mc-rtc-magnum
-                      pkgs.mc-mujoco-full
-                    ]
-                    ++ lib.optional cfg.with-ros pkgs.mc-rtc-ticker;
-                    robots =
-                      with pkgs;
-                      [
-                        mc-g1
-                        mc-h1
-                        mc-ur5e
-                        # mc-panda mc-panda-lirmm ## no macos support
-                        # mc-rhps1
-                      ]
-                      ++ lib.optionals cfg.overlays.private [
-                        mc-hrp2
-                        mc-hrp4
-                        mc-hrp5-p
-                      ];
-                    controllers = [ ];
-                    observers = with pkgs; [ mc-state-observation ];
-                    plugins = with pkgs; [
-                      mc-force-shoe-plugin
-                      mc-robot-model-update
-                    ];
+                  mc-rtc-superbuild-full = mkSuperbuildShell {
+                    mode = "release";
+                    shellPname = "mc-rtc-superbuild-full";
+                    configuration = "full";
                   };
-                };
-              }
+                }
+                // releaseShellsByPreset
+              )
             )
           ];
         }

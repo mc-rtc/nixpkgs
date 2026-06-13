@@ -108,27 +108,64 @@ cmake_local ..
 Define your own superbuild
 --
 
-This is still a WIP, but the gist of it is:
-- define a derivation in your overlay containing all the derivations you wish to have available to mc-rtc. Runtime dependencies are passed to the `robots/controllers/observers/plugins` list and a corresponding `mc_rtc.yaml` containing the required library paths is auto-generated and added to `MC_RTC_CONTROLLER_CONFIG` env variable.
+`mc-rtc-superbuild` now uses a typed schema with named reusable presets:
 
-  ```nix
-  mc-rtc-superbuild-rolkneematics = final.mc-rtc-superbuild.overrideAttrs (old: {
-    robots = [
-      # note that panda-prosthesis is not strictly-speaking a robot, but it builds a robot module so we need it here as well to populate the robots runtime paths
-      panda-prosthesis
-      mc-panda-lirmm
-      mc-panda
-    ];
-    controllers = [ panda-prosthesis ];
-    # extra mc_rtc.yaml
-    configs = [ "${panda-prosthesis}/lib/mc_controller/etc/mc_rtc.yaml" ];
-    observers = [];
-    plugins = [ panda-prosthesis mc-force-shoe-plugin ];
-    apps = [ mc-rtc-magnum mc-franka mc-rtc-ticker sch-visualization ];
-  });
-  ```
+```nix
+mc-rtc-superbuild = {
+  enable = true;
 
-  Full doc coming soon...
+  configurations = {
+    default = {
+      runtime = { };
+    };
+  };
+
+  defaults = {
+    package = "default";
+    develShell = "default";
+    releaseShell = "full";
+  };
+
+  project = {
+    pname = "mc-rtc-superbuild";
+    configuration = "default";
+
+    runtime = {
+      config = "lib/mc_controller/etc/<controller_name>/mc_rtc.yaml";
+    };
+
+    devel = {
+      config = "lib64/mc_controller/etc/<controller_name>/mc_rtc.yaml";
+    };
+  };
+};
+```
+
+Built-in presets are:
+- `minimal`
+- `default`
+- `all-public-robots`
+- `full`
+
+Presets are extensible with `extends` and merge with these semantics:
+- list fields append (`apps`, `robots`, `controllers`, `observers`, `plugins`, `extraConfigFiles`)
+- scalar fields override (`config`, `mainRobot`, `enabled`, `timestep`)
+
+`runtime` vs `devel`:
+- `runtime`: Nix runtime components always installed in the shell runtime closure
+- `devel`: local/source-oriented components
+  - release shell: devel components are also built and added to runtime paths
+  - devel shell: devel components are added as `inputsFrom` and expected in `.superbuild/install`
+
+Conditional defaults:
+- ROS defaults (e.g. `mc-rtc-ticker`) are only added when `mc-rtc-nix.with-ros = true`
+- private robots are only added to `full` when `mc-rtc-nix.overlays.private = true`
+
+Additional config fragments can be provided with `extraConfigFiles` (instead of overloading `config`).
+
+Backward compatibility:
+- Legacy top-level fields (`apps`, `robots`, `controllers`, `observers`, `plugins`, `config`, `devel`, etc.) are still accepted and merged into `project.runtime` / `project.devel`
+- New configurations should use the explicit `project.runtime` and `project.devel` schema
 
 Run your own controller
 --
