@@ -16,11 +16,10 @@ jobs:
         # os: TODO [macos-15, ubuntu-24.04]
         os: [ubuntu-24.04]
         build:
-          - "devShells.x86_64-linux.mc-rtc-superbuild-full"
-          - "devShells.x86_64-linux.mc-rtc-superbuild-devel"
           - "devShells.x86_64-linux.mc-rtc-superbuild-minimal"
           - "devShells.x86_64-linux.mc-rtc-superbuild-default"
-          - "devShells.x86_64-linux.mc-rtc-superbuild-all-public-robots"
+          - "devShells.x86_64-linux.mc-rtc-superbuild-default-all-robots"
+          - "devShells.x86_64-linux.mc-rtc-superbuild-full"
     steps:
       - uses: actions/checkout@v6
       - uses: cachix/install-nix-action@v31
