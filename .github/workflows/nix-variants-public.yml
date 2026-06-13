@@ -1,7 +1,4 @@
-# build variants.ccache
-# push cache to cachix
-# TODO we cannot use nix flake check to ensure that everything is built
-# so currently we build the largest meta-packages available (mc-rtc-superbuild-private, mc-mujoco-full, etc)
+# Build the public flake with ccache overlay
 name: "CI - Nix - ccache"
 on:
   push:
@@ -21,11 +18,24 @@ jobs:
     runs-on: "${{ matrix.os }}"
     strategy:
       fail-fast: false
-      matrix:
+      matrix: &matrix
         os: [ubuntu-24.04]
         variant: [ "ccache" ]
-        build: [ "mc-mujoco-full", "mc-rtc-superbuild-full" ]
+        build:
+          - "devShells.x86_64-linux.mc-rtc-superbuild-minimal"
+          - "devShells.x86_64-linux.mc-rtc-superbuild-default"
+          - "devShells.x86_64-linux.mc-rtc-superbuild-default-all-robots"
+          - "devShells.x86_64-linux.mc-rtc-superbuild-full"
     steps:
+      - name: "Determine Variant Arguments"
+        id: flags
+        run: |
+          if [ "${{ matrix.variant }}" = "ccache" ]; then
+            echo "args=--override-input ccache-trigger github:boolean-option/true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Unsupported variant: ${{ matrix.variant }}"
+            exit 42
+          fi
       - uses: actions/checkout@v6
       - uses: cachix/install-nix-action@v31
       - &cachix-step
@@ -43,11 +53,10 @@ jobs:
           echo 'extra-sandbox-paths = /var/cache/ccache' | sudo tee -a /etc/nix/nix.conf
           sudo systemctl restart nix-daemon.service
           sudo ls -ld /var/cache/ccache
-      - run: nix build -L ".#variants.${{ matrix.variant }}.packages.x86_64-linux.${{ matrix.build }}" --cores 4
-  fallback:
+      - run: nix build -L ${{ steps.flags.outputs.args }} ".#${{ matrix.build }}" --cores 4
+  complete:
     needs: populate-cache
-    if: always() && needs.populate-cache.result == 'failure'
-    name: "fallback ${{ matrix.os }}"
+    name: "complete ${{ matrix.os }}"
     runs-on: "${{ matrix.os }}-latest"
     strategy:
       fail-fast: false
@@ -58,9 +67,34 @@ jobs:
         if: ${{ matrix.os == 'ubuntu' }}
       - uses: actions/checkout@v6
       - uses: cachix/install-nix-action@v31
-      - <<: *cachix-step
-      - <<: *setup-ccache
-      - run: nix build -L ".#variants.${{ matrix.variant }}.packages.x86_64-linux.${{ matrix.build }}" --cores 1
+      - *cachix-step
+      - *setup-ccache
+      - run: nix flake check -L ${{ steps.flags.outputs.args }}
+  fallback:
+    needs: complete
+    if: always() && needs.complete.result == 'failure'
+    name: "fallback ${{matrix.variant}}: ${{ matrix.build }} on ${{ matrix.os }}"
+    runs-on: "${{ matrix.os }}-latest"
+    strategy:
+      fail-fast: false
+      matrix: *matrix
+    steps:
+      - name: "Determine Variant Arguments"
+        id: flags
+        run: |
+          if [ "${{ matrix.variant }}" = "ccache" ]; then
+            echo "args=--override-input ccache-trigger github:boolean-option/true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Unsupported variant: ${{ matrix.variant }}"
+            exit 42
+          fi
+      - uses: jlumbroso/free-disk-space@main
+        if: ${{ matrix.os == 'ubuntu' }}
+      - uses: actions/checkout@v6
+      - uses: cachix/install-nix-action@v31
+      - *cachix-step
+      - *setup-ccache
+      - run: nix build -L ${{ steps.flags.outputs.args }} ".#${{ matrix.build }}" --cores 1
   check:
     if: always()
     name: check-macos-linux-nix-private

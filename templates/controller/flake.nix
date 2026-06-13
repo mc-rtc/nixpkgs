@@ -1,5 +1,5 @@
 {
-  description = "Flake example for an mc-rtc controller with a superbuild shell";
+  description = "mc-rtc-superbuild release and development shells";
 
   inputs = {
     mc-rtc-nix.url = "github:mc-rtc/nixpkgs";
@@ -19,40 +19,59 @@
       {
         systems = import inputs.systems;
         imports = [
-          # available flakeModules modules are:
-          # - flakeModule : default module, with overlays for all public repositories in mc-rtc ecosystem
-          # - flakeModules.default : same as flakeModule
-          # - flakeModules.ccache : same as default but built with ccache
-          # - flakeModules.private : private module, with overlays for all public and private repositories in mc-rtc ecosystem.
-          #   Please note that some repositories and the private cache require permission
-          #   If you have sufficient access, this is provided with through your SSH key / binary cache token
-          # - flakeModules.private-ccache : same as private, but with ccache support
           inputs.mc-rtc-nix.flakeModule
           {
-            flakoboros = {
+            # This mc-rtc-superbuild configuration will:
+            # - Define named reusable configurations in `configurations`
+            # - Use explicit runtime (Nix runtime components) vs devel (local/source overlays)
+            # - Generate `${project.name}-<configuration>` and `${project.name}-<configuration>-devel` shells
+            #
+            # This will also generate a .superbuild/mc_rtc.yaml file containg the suitable mc_rtc configuration
+            # Devel dependencies are expected to be installed manually in .superbuild/install
+            #
+            # As always, individual packages can be overridden using flakoboros
+            mc-rtc-superbuild =
+              { pkgs, ... }:
+              {
+                enable = true;
+                project.pname = "";
+                # TODO: replace this section with your own configuration presets for your project
+                configurations = {
+                  your-project-minimal = {
+                    extends = [ "minimal" ];
+                    runtime = {
+                      robots = [
+                        pkgs.mc-panda-lirmm
+                        pkgs.mc-panda
+                      ];
 
-              # Define a custom superbuild configuration
-              # This will make all
-              overrides.mc-rtc-superbuild =
-                { pkgs-prev, ... }:
-                let
-                  cfg-prev = pkgs-prev.mc-rtc-superbuild.superbuildArgs;
-                in
-                {
-                  superbuildArgs = cfg-prev // {
-                    pname = "mc-rtc-superbuild-override";
-                    # # for example, override any runtime dependency (robots, controllers, etc)
-                    # # extend robots
-                    # robots = cfg-prev.robots ++ [ pkgs-final.mc-hrp4 ];
-                    # # override controllers
-                    # controllers = [ pkgs-final.polytopeController ];
-                    # configs = [ "${pkgs-final.polytopeController}/lib/mc_controller/etc/mc_rtc.yaml" ];
-                    # plugins = [ pkgs-final.mc-force-shoe-plugin ];
-                    # observers = [ pkgs-final.mc-state-observation ];
-                    # apps = [];
+                      apps = [
+                        pkgs.mc-rtc-magnum
+                      ];
+                      config = "lib/mc_controller/etc/your-project/mc_rtc.yaml";
+                    };
+                    devel = {
+                      config = "lib64/mc_controller/etc/your-project/mc_rtc.yaml";
+                      controllers = [ pkgs.your-project ];
+                      plugins = [ pkgs.your-project ];
+                      robots = [ pkgs.your-project ];
+                    };
+                  };
+                  your-project-full = {
+                    extends = [
+                      "default"
+                      "your-project-minimal"
+                    ];
+                    runtime = {
+                      apps = [
+                        pkgs.mc-franka
+                      ];
+                    };
                   };
                 };
+              };
 
+            flakoboros = {
               # # Override all dependencies
               # # They are locked in flake.lock to the latest commit available at the time
               # # To update to all inputs' latest commit, use
@@ -63,23 +82,6 @@
             };
           }
         ];
-        perSystem =
-          { pkgs, ... }:
-          {
-            # define a default devShell called with the superbuild configuration above
-            # you can also override attributes to add additional shell functionality
-            devShells.default =
-              (pkgs.callPackage "${inputs.mc-rtc-nix}/shell.nix" {
-                inherit (pkgs) mc-rtc-superbuild;
-              }).overrideAttrs
-                (old: {
-                  shellHook = ''
-                    ${old.shellHook or ""}
-
-                    echo "Welcome to the ${pkgs.mc-rtc-superbuild.pname} devShell with the overridden mc-rtc-superbuild configuration!"
-                  '';
-                });
-          };
       }
     );
 }

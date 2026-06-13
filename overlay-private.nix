@@ -73,17 +73,5 @@
         robots = final.mc-mujoco-robots-public.robots ++ final.mc-mujoco-robots-private.robots;
       };
     };
-
-    mc-rtc-superbuild-private = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix {
-      superbuildArgs = prev.mc-rtc-superbuild-full.superbuildArgs // {
-        pname = "mc-rtc-superbuild-private";
-        robots = prev.mc-rtc-superbuild-full.superbuildArgs.robots ++ [
-          final.mc-hrp2
-          final.mc-hrp4
-          final.mc-hrp5-p
-          # final.mc-rhps1
-        ];
-      };
-    };
   }
 )

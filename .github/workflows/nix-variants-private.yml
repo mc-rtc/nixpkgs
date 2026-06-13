@@ -1,7 +1,7 @@
-# build variants.private and variants.private-ccache
-# push cache to mc-rtc-nix-private attic
-# TODO we cannot use nix flake check to ensure that everything is built
-# so currently we build the largest meta-packages available (mc-rtc-superbuild-private, mc-mujoco-full, etc)
+# Build with private overlay and private + ccache overlay
+# WARNING: This workflow builds private repositories
+#          It uses the cachix cache but must NOT push to it
+#          Instead it must push to the private authenticated attic cache
 name: "CI - Nix - Private"
 on:
   push:
@@ -21,34 +21,57 @@ jobs:
     runs-on: "${{ matrix.os }}"
     strategy:
       fail-fast: false
-      matrix:
+      matrix: &matrix
         os: [ubuntu-24.04]
-        variant: [ "private", "private-ccache" ]
-        build: [ "mc-mujoco-full", "mc-rtc-superbuild-private" ]
+        variant:
+          - "private"
+          - "private-ccache"
+        build:
+          - "devShells.x86_64-linux.mc-rtc-superbuild-minimal"
+          - "devShells.x86_64-linux.mc-rtc-superbuild-default"
+          - "devShells.x86_64-linux.mc-rtc-superbuild-default-all-robots"
+          - "devShells.x86_64-linux.mc-rtc-superbuild-full"
     steps:
+      - name: "Determine Variant Arguments"
+        id: flags
+        run: |
+          if [ "${{ matrix.variant }}" = "private" ]; then
+            echo "args=--override-input private-trigger github:boolean-option/true" >> "$GITHUB_OUTPUT"
+          elif [ "${{ matrix.variant }}" = "private-ccache" ]; then
+            echo "args=--override-input private-trigger github:boolean-option/true --override-input ccache-trigger github:boolean-option/true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Unsupported variant: ${{ matrix.variant }}"
+            exit 42
+          fi
       - uses: actions/checkout@v6
       # Configures ssh-agent if SSH_KEY secret exists
-      - name: Configure ssh-agent
+      - &confiure-ssh-agent
+        name: Configure ssh-agent
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
-      - name: Add gite.lirmm.fr to known_hosts
+      - &add-known-hosts 
+        name: Add gite.lirmm.fr to known_hosts
         run: |
           ssh-keyscan gite.lirmm.fr >> ~/.ssh/known_hosts
       - uses: cachix/install-nix-action@v31
       # read-only cache
-      - uses: cachix/cachix-action@v17
+      - &setup-cachix-action
+        uses: cachix/cachix-action@v17
         with:
           name: mc-rtc-nix
           extraPullNames: "ros,gepetto"
       # will push all paths not already in the public cache
-      - name: Setup Attic cache (private)
+      - &setup-private-attic 
+        name: Setup Attic cache (private)
         uses: ryanccn/attic-action@v0
         with:
           endpoint: https://attic.arntanguy.fr
           cache: mc-rtc-nix-private
           token: ${{ secrets.ATTIC_TOKEN }}
-      - name: Setup ccache environment
+      - &setup-ccache-env
+        name: Setup ccache environment
+        if: ${{ matrix.variant == 'private-ccache' }}
         run: |
           sudo mkdir -m0770 -p '/var/cache/ccache'
           sudo chown --reference=/nix/store '/var/cache/ccache'
@@ -56,11 +79,10 @@ jobs:
           echo 'extra-sandbox-paths = /var/cache/ccache' | sudo tee -a /etc/nix/nix.conf
           sudo systemctl restart nix-daemon.service
           sudo ls -ld /var/cache/ccache
-      - run: nix build -L ".#variants.${{ matrix.variant }}.packages.x86_64-linux.${{ matrix.build }}" --cores 4
-  fallback:
+      - run: nix build -L ${{ steps.flags.outputs.args }} ".#${{ matrix.build }}" --cores 4
+  complete:
     needs: populate-cache
-    if: always() && needs.populate-cache.result == 'failure'
-    name: "fallback ${{ matrix.os }}"
+    name: "complete ${{ matrix.os }}"
     runs-on: "${{ matrix.os }}-latest"
     strategy:
       fail-fast: false
@@ -69,21 +91,42 @@ jobs:
     steps:
       - uses: jlumbroso/free-disk-space@main
         if: ${{ matrix.os == 'ubuntu' }}
-      - name: Configure ssh-agent
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_KEY }}
-      - name: Add gite.lirmm.fr to known_hosts
-        run: |
-          ssh-keyscan gite.lirmm.fr >> ~/.ssh/known_hosts
       - uses: actions/checkout@v6
       - uses: cachix/install-nix-action@v31
-      - uses: cachix/cachix-action@v17
-        with:
-          name: mc-rtc-nix
-          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-          extraPullNames: "ros,gepetto"
-      - run: nix build -L ".#variants.${{ matrix.variant }}.packages.x86_64-linux.${{ matrix.build }}" --cores 1
+      - *setup-cachix-action
+      - *setup-private-attic
+      - *setup-ccache-env
+      - run: nix flake check -L ${{ steps.flags.outputs.args }}
+  fallback:
+    needs: complete
+    if: always() && needs.complete.result == 'failure'
+    name: "fallback ${{matrix.variant}}: ${{ matrix.build }} on ${{ matrix.os }}"
+    runs-on: "${{ matrix.os }}-latest"
+    strategy:
+      fail-fast: false
+      matrix: *matrix
+    steps:
+      - name: "Determine Variant Arguments"
+        id: flags
+        run: |
+          if [ "${{ matrix.variant }}" = "private" ]; then
+            echo "args=--override-input private-trigger github:boolean-option/true" >> "$GITHUB_OUTPUT"
+          elif [ "${{ matrix.variant }}" = "private-ccache" ]; then
+            echo "args=--override-input private-trigger github:boolean-option/true --override-input ccache-trigger github:boolean-option/true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Unsupported variant: ${{ matrix.variant }}"
+            exit 42
+          fi
+      - uses: jlumbroso/free-disk-space@main
+        if: ${{ matrix.os == 'ubuntu' }}
+      - *confiure-ssh-agent
+      - *add-known-hosts
+      - uses: actions/checkout@v6
+      - uses: cachix/install-nix-action@v31
+      - *setup-cachix-action
+      - *setup-private-attic
+      - *setup-ccache-env
+      - run: nix build -L ${{ steps.flags.outputs.args }} ".#${{ matrix.build }}" --cores 1 
   check:
     if: always()
     name: check-macos-linux-nix-private

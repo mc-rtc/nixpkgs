@@ -108,37 +108,102 @@ cmake_local ..
 Define your own superbuild
 --
 
-This is still a WIP, but the gist of it is:
-- define a derivation in your overlay containing all the derivations you wish to have available to mc-rtc. Runtime dependencies are passed to the `robots/controllers/observers/plugins` list and a corresponding `mc_rtc.yaml` containing the required library paths is auto-generated and added to `MC_RTC_CONTROLLER_CONFIG` env variable.
+`mc-rtc-superbuild` now uses a typed schema with named reusable presets:
 
-  ```nix
-  mc-rtc-superbuild-rolkneematics = final.mc-rtc-superbuild.overrideAttrs (old: {
-    robots = [
-      # note that panda-prosthesis is not strictly-speaking a robot, but it builds a robot module so we need it here as well to populate the robots runtime paths
-      panda-prosthesis
-      mc-panda-lirmm
-      mc-panda
-    ];
-    controllers = [ panda-prosthesis ];
-    # extra mc_rtc.yaml
-    configs = [ "${panda-prosthesis}/lib/mc_controller/etc/mc_rtc.yaml" ];
-    observers = [];
-    plugins = [ panda-prosthesis mc-force-shoe-plugin ];
-    apps = [ mc-rtc-magnum mc-franka mc-rtc-ticker sch-visualization ];
-  });
-  ```
+```nix
+mc-rtc-superbuild =
+{ pkgs, ... }:
+{
+  enable = true; # enables the mc-rtc-superbuild module
+  project.pname = "your-project"; # prefix shell names
+  configurations = { # adds configurations for your controller
+    your-controller-minimal = {
+      extends = [ "minimal" ]; # adds a configuration based on the "minimal" preset
+      runtime = { # define runtime dependencies installed by nix
+        robots = [
+          pkgs.mc-panda-lirmm
+          pkgs.mc-panda
+        ];
 
-  Full doc coming soon...
+        apps = [
+          pkgs.mc-rtc-magnum
+        ];
+        config = "lib/mc_controller/etc/your-controller/mc_rtc.yaml";
+      };
+      # define devel dependencies:
+      # - In devel shells, these are not built by Nix, you must build them from source.
+      # - In release shells, they are merged wiith the runtime configuration
+      # mc_rtc.yaml is configured to use them
+      devel = {
+        config = "lib64/mc_controller/etc/your-controller/mc_rtc.yaml";
+        controllers = [ pkgs.your-controller ];
+        plugins = [ pkgs.your-controller ];
+        robots = [ pkgs.your-controller ];
+      };
+    };
+    # define another configuration merging the "default" preset and the preset you just created
+    your-controller-full = {
+      extends = [
+        "default"
+        "your-controller-minimal"
+      ];
+      runtime = {
+        apps = [
+          pkgs.mc-franka # adds mc-franka app on top of all other apps
+        ];
+      };
+    };
+  };
 
-Run your own controller
+  shells = {
+    defaultShells.release = false; # don't generate the default release devshells (default = false)
+    defaultShells.devel = false; # don't generate the default devel devshells (default = false)
+    autoShells.release = true; # generate this project's release devshells in `configurations` (default = true)
+    autoShells.devel = true; # generate this project's devel devshells in `configurations` (default = true)
+    # define additionalShells, can be ommited
+    additionalShells = {
+      panda-prosthesis-custom = {
+        mode = "release";
+        configuration = "panda-prosthesis-minimal";
+      };
+    };
+  };
+};
+```
+
+Built-in presets are:
+- `minimal`
+- `default`
+- `all-public-robots`
+- `full`
+
+Presets are extensible with `extends` and merge with these semantics:
+- list fields append (`apps`, `robots`, `controllers`, `observers`, `plugins`, `extraConfigFiles`)
+- scalar fields override (`config`)
+
+`runtime` vs `devel`:
+- `runtime`: Nix runtime components always installed in the shell runtime closure
+- `devel`: local/source-oriented components
+  - release shell: devel components are also built and added to runtime paths
+  - devel shell: devel components are added as `inputsFrom` and expected in `.superbuild/install`
+
+Conditional defaults:
+- ROS defaults (e.g. `mc-rtc-ticker`) are only added when `mc-rtc-nix.with-ros = true`
+- private robots are only added to `full` when `mc-rtc-nix.overlays.private = true`
+
+Additional config fragments can be provided with `extraConfigFiles` (instead of overloading `config`).
+
+Run a default mc-rtc-superbuild environment
 --
+
+To simply execute one of the provided `mc-rtc-superbuild` development shells, use
 
 ```bash
 # if cachix is setup correctly this should just pull binary dependencies. Otherwise
 # it will build everything specified in the `mc-rtc-superbuild` derivation (and their depencencies)
-nix develop
-# or nix develop .#mc-rtc-superbuild-rolkneematics # if you want to use your own derivation
-mc-rtc-magnum &
+nix develop .#mc-rtc-superbuild-<variant>
+# Run the gui in the background
+(mc-rtc-magnum &)
 # By default mc_rtc_ticker will use the configuration provided by `MC_RTC_CONTROLLER_CONFIG` env variable
 # This is set by the mc-rtc-superbuild derivation and devShell to contain all needed runtime depencencies
 # and optionally a default controller's configuration

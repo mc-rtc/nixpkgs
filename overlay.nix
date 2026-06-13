@@ -204,69 +204,6 @@
     # and a standalone mc-rtc-imgui version
     mc-rtc-magnum = prev.callPackage ./pkgs/mc-rtc-magnum/standalone.nix { };
 
-    #####################
-    # mc-rtc-superbuild #
-    #####################
-    # This derivation provides a mechanism to bring configurations of the whole framework together,
-    # that is:
-    # - mc-rtc itself
-    # - all runtime dependencies controllers/robots/observers/plugins required by the user
-    # - a default mc-rtc configuration, e.g which controller/timestep/main robot to use, or if the controllers
-    #   provide a suitable mc_rtc.yaml file, it can be referenced here as well
-    #
-    # This is handled as follows:
-    # - all runtime dependencies (including mc-rtc) are built independently, and their output is merged together (symlinkJoin) into a single runtimepath
-    # - the default mc_rtc.yaml runtime paths are overridden with corresponding paths in the merged output such that all runtime dependencies are available at the same place (this avoids confusion as to where each runtime dependency is located in the store and makes for a more user-friendly approach). In practice mc_rtc loads this mc_rtc.yaml override through the MC_RTC_CONTROLLER_CONFIG environment variable
-    #
-    # Note that local out-of-nix overrides from local source folders of controller/robot/plugin/observers can be achieved by:
-    # - prefixing LD_LIBRARY_PATH with the local intalled lib path
-    # - providing a custom mc_rtc.yaml with ControllerModulePaths, ObserverModulePaths, etc pointing to their corresponding installed folder
-    # This is not per-say recomended, but it can drastically reduce build time for these components, and also allow for seamless LSP integration in your editor.
-    #
-    # TODO: investigate use of ccacheStdenv
-    # mc-rtc-superbuild = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-symlinkjoin.nix.nix
-
-    # minimal superbuild environment (jvrc1, mc_rtc_ticker)
-    mc-rtc-superbuild-minimal = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix {
-      superbuildArgs = {
-        pname = "mc-rtc-superbuild-minimal";
-        observers = [ final.mc-state-observation ];
-      };
-    };
-
-    # default superbuild environment (jvrc1 robot, with gui apps and mujoco simulation)
-    mc-rtc-superbuild = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix {
-      superbuildArgs = final.mc-rtc-superbuild-minimal.superbuildArgs // {
-        pname = "mc-rtc-superbuild";
-        apps = [
-          final.mc-rtc-magnum
-          final.mc-mujoco
-          final.mc-rtc-ticker
-        ];
-      };
-    };
-
-    # default superbuild environment with all public robots (jvrc1, g1, h1, ur5e), with gui apps
-    mc-rtc-superbuild-all-public-robots =
-      prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix
-        {
-          superbuildArgs = final.mc-rtc-superbuild.superbuildArgs // {
-            pname = "mc-rtc-superbuild-all-public-robots";
-            robots = final.mc-rtc-superbuild.superbuildArgs.robots ++ [
-              final.mc-g1
-              final.mc-h1
-              final.mc-ur5e
-            ];
-          };
-        };
-
-    # full superbuild environment (all public robots, all default controllers, gui apps, mujoco)
-    mc-rtc-superbuild-full = prev.callPackage ./pkgs/mc-rtc/mc-rtc-superbuild-standalone.nix {
-      superbuildArgs = final.mc-rtc-superbuild-all-public-robots.superbuildArgs // {
-        pname = "mc-rtc-superbuild-full";
-      };
-    };
-
     sphinx-cmake = prev.callPackage ./pkgs/sphinx-cmake.nix { };
 
     pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
