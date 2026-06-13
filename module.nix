@@ -37,31 +37,13 @@
   };
 
   options.mc-rtc-superbuild = lib.mkOption {
-    type =
-      lib.types.either
-        (lib.types.submodule {
-          options = import ./modules/superbuild/options.nix { inherit lib; };
-        })
-        (
-          lib.types.functionTo (
-            lib.types.submodule {
-              options = import ./modules/superbuild/options.nix { inherit lib; };
-            }
-          )
-        );
-    default = {
-      enable = true;
-      defaults = {
-        package = "default";
-        develShell = "default";
-        releaseShell = "full";
-      };
-      project = {
-        pname = "mc-rtc-superbuild";
-        configuration = "default";
-      };
+    type = lib.types.deferredModuleWith {
+      staticModules = [
+        { config.enable = lib.mkDefault true; }
+      ];
     };
-    description = "Typed mc-rtc superbuild schema with named reusable configurations and explicit runtime/devel settings.";
+    default = { };
+    description = "mc-rtc superbuild configuration. Accepts a module attrset or a function of { pkgs, ... } returning a module attrset.";
   };
 
   imports = [
@@ -131,13 +113,13 @@
       perSystem = (
         { pkgs, inputs', ... }:
         let
-          rawSuperbuildCfg =
-            if builtins.isFunction config.mc-rtc-superbuild then
-              config.mc-rtc-superbuild { inherit pkgs lib; }
-            else
-              config.mc-rtc-superbuild;
-
-          superbuildCfg = rawSuperbuildCfg;
+          superbuildCfg = (lib.evalModules {
+            modules = [
+              { options = import ./modules/superbuild/options.nix { inherit lib; }; }
+              config.mc-rtc-superbuild
+            ];
+            specialArgs = { inherit pkgs; };
+          }).config;
 
           builtInConfigurations = {
             minimal = {
