@@ -14,12 +14,12 @@ stdenv.mkDerivation {
   pname = "mc-rtc-magnum";
   version = "main";
 
-  # main on branch topic/nix
+  # nix branch on official remote
   src = fetchFromGitHub {
     owner = "mc-rtc";
     repo = "mc_rtc-magnum";
-    rev = "e3cb734";
-    hash = "sha256-4XiyBZl+ZqHKcStjYu33fYHgVD1umfVzgbdaN7RDm5Q=";
+    rev = "a700fedc432bf1c453f6e13a26fc7dfd8f38ff78";
+    hash = "sha256-NvIFuR31Niy+NhIkeW6yQCgQkydBc+JFeIVp5nszpc0=";
   };
 
   nativeBuildInputs = [
