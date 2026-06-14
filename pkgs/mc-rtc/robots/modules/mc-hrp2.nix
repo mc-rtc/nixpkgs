@@ -19,9 +19,15 @@ stdenv.mkDerivation {
   version = "1.0.0";
 
   # TODO: release mc-hrp2
+  # src = builtins.fetchGit {
+  #   url = "git@github.com:isri-aist/mc-hrp2";
+  #   rev = "58d64f62e6031571f9fff9b6211f6dcc2d93535b";
+  # };
+
+  # PR https://github.com/isri-aist/mc-hrp2/pull/8
   src = builtins.fetchGit {
-    url = "git@github.com:isri-aist/mc-hrp2";
-    rev = "58d64f62e6031571f9fff9b6211f6dcc2d93535b";
+    url = "git@github.com:arntanguy/mc-hrp2";
+    rev = "2d72cd24eda07c2cd131e53a26e20643a522261e";
   };
 
   nativeBuildInputs = [ cmake ];

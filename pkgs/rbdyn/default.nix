@@ -7,17 +7,19 @@
   yaml-cpp,
   tinyxml-2,
   boost,
-  fetchurl,
+  fetchFromGitHub,
   python3Packages,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation {
   pname = "rbyn";
-  version = "1.9.2";
+  version = "1.9.5";
 
-  src = fetchurl {
-    url = "https://github.com/jrl-umi3218/RBDyn/releases/download/v${version}/RBDyn-v${version}.tar.gz";
-    sha256 = "sha256-IFqX4z8r2JTwgNnPB35/vZKwgWoPO78ebnUvPdNOnjY=";
+  src = fetchFromGitHub {
+    owner = "jrl-umi3218";
+    repo = "RBDyn";
+    tag = "v1.9.5";
+    hash = "sha256-ihQc5+TLL0g7vXdC+yO8Iea0h9inJEIm/Ei1oPV7WpA=";
   };
 
   nativeBuildInputs = [

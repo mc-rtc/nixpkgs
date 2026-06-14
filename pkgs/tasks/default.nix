@@ -1,6 +1,7 @@
 {
   stdenv,
   lib,
+  fetchFromGitHub,
   cmake,
   jrl-cmakemodules,
   rbdyn,
@@ -11,13 +12,15 @@
   eigen-lssol ? null,
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation {
   pname = if (with-lssol && eigen-lssol != null) then "tasks-lssol" else "tasks-qld";
-  version = "v1.8.2";
+  version = "v1.8.4";
 
-  src = fetchTarball {
-    url = "https://github.com/jrl-umi3218/Tasks/releases/download/${version}/Tasks-${version}.tar.gz";
-    sha256 = "0if144c0jjpxk97fn2qszybdlx8b66qsa1kdkvwzfipvf8fh364q";
+  src = fetchFromGitHub {
+    owner = "jrl-umi3218";
+    repo = "Tasks";
+    tag = "v1.8.4";
+    hash = "sha256-1XrRagwiMJwukbqPmlJCzp/Y11POdUdDIFjeZTCg3Ik=";
   };
 
   nativeBuildInputs = [
