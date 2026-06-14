@@ -18,7 +18,9 @@
           {
             # Configuration for the mc-rtc-nix module
             # Activate overlays, disable ros, etc
-            mc-rtc-nix = { };
+            mc-rtc-nix = {
+              overlays.private = true; # enable private overlay
+            };
 
             # If you need a superbuild environment configure it here
             mc-rtc-superbuild = { };

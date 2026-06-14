@@ -1,0 +1,60 @@
+# WARNING: This workflow builds private repositories
+#          It uses the cachix cache but must NOT push to it
+#          Instead it must push to the private authenticated attic cache
+name: "CI - Nix - Private"
+on:
+  push:
+    branches:
+      - devel
+      - master
+      - main
+  pull_request:
+    branches:
+      - devel
+      - master
+      - main
+jobs:
+  nix :
+    # - This condition allows the job to run if:
+    #   - The workflow is not triggered by a pull request (`github.event_name != 'pull_request'`), or
+    #   - The PR's source repo is the same as the base repo.
+    # This is done to make sure that the required secrets are available to the CI
+    if: github.event_name != 'pull_request' || github.repository == github.event.pull_request.head.repo.full_name
+    name: ${{ matrix.build }} (private) on ${{ matrix.os }}"
+    runs-on: "${{ matrix.os }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu]
+    steps:
+      - uses: actions/checkout@v6
+      # Configures ssh-agent if SSH_KEY secret exists
+      - name: Configure ssh-agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+      - uses: cachix/install-nix-action@v31
+      # read-only cache
+      - uses: cachix/cachix-action@v17
+        with:
+          name: mc-rtc-nix
+          extraPullNames: "ros,gepetto"
+      # will push all paths not already in the private cache
+      - name: Setup Attic cache (private)
+        uses: ryanccn/attic-action@v0
+        with:
+          endpoint: https://attic.arntanguy.fr
+          cache: mc-rtc-nix-private
+          token: ${{ secrets.ATTIC_TOKEN }}
+      - run: nix build -L
+  check:
+    if: always()
+    name: check-macos-linux-nix-private
+    runs-on: ubuntu-latest
+    needs:
+      - nix
+    steps:
+      - uses: re-actors/alls-green@release/v1
+        with:
+          jobs: ${{ toJSON(needs) }}
+
