@@ -20,9 +20,11 @@ stdenv.mkDerivation {
     sha256 = "sha256-qse7emorGWqoWlmzaHNdbDiHFXrVOo3oz8Fah4AYmL8=";
   };
 
+  buildInputs = [
+    jrl-cmakemodules
+  ];
   nativeBuildInputs = [
     cmake
-    jrl-cmakemodules
   ];
   propagatedBuildInputs = [
     eigen-qld

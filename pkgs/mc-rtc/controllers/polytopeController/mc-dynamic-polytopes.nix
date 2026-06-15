@@ -34,9 +34,11 @@ stdenv.mkDerivation (_finalAttrs: {
       hash = "";
     };
 
+  buildInputs = [
+    jrl-cmakemodules
+  ];
   nativeBuildInputs = [
     cmake
-    jrl-cmakemodules
   ];
   propagatedBuildInputs = [
     mc-rtc

@@ -23,9 +23,11 @@ stdenv.mkDerivation {
     hash = "sha256-1XrRagwiMJwukbqPmlJCzp/Y11POdUdDIFjeZTCg3Ik=";
   };
 
+  buildInputs = [
+    jrl-cmakemodules
+  ];
   nativeBuildInputs = [
     cmake
-    jrl-cmakemodules
     python3Packages.distutils
     python3Packages.pytest
     python3Packages.cython

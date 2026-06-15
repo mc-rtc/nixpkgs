@@ -40,10 +40,12 @@ stdenv.mkDerivation (_finalAttrs: {
     hash = "sha256-GDJKEOyRjPF5eTpXA7x82K86fjLyx3N3eTt2ZSmcYv4=";
   };
 
-  buildInputs = [ cli11 ];
+  buildInputs = [
+    cli11
+    jrl-cmakemodules
+  ];
   nativeBuildInputs = [
     cmake
-    jrl-cmakemodules
     makeWrapper
   ];
   propagatedBuildInputs = [

@@ -27,9 +27,11 @@ stdenv.mkDerivation (_finalAttrs: {
       hash = "sha256-JLwciNGo90vR5tsFB4z5JPvhCz38FhN9Ja/5+Ct6YPo=";
     };
 
+  buildInputs = [
+    jrl-cmakemodules
+  ];
   nativeBuildInputs = [
     cmake
-    jrl-cmakemodules
   ];
   propagatedBuildInputs = [
     imgui
