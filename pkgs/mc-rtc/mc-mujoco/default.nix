@@ -6,6 +6,7 @@
   mc-mujoco-robots,
   cmake,
   jrl-cmakemodules,
+  cli11,
   mc-rtc,
   mujoco,
   pugixml,
@@ -29,13 +30,17 @@ stdenv.mkDerivation (_finalAttrs: {
 
   dontBuild = true;
 
+  # stanalone mc_mujoco version from
+  # https://github.com/rohanpsingh/mc_mujoco/pull/98
+  # we cannot merge as the standalone version cannot be easily set-up outside of Nix
   src = fetchFromGitHub {
     owner = "arntanguy";
     repo = "mc_mujoco";
-    tag = "1d17567c2264b32aceb3c77841765c0409a1e97";
-    hash = "sha256-h1TPFQ4qxrAk3bKdY7evZq8sRld8lIJHQKogLOiSF8I=";
+    rev = "8ca3efe89478c96abf74bd30675ccdc424bcf178";
+    hash = "sha256-GDJKEOyRjPF5eTpXA7x82K86fjLyx3N3eTt2ZSmcYv4=";
   };
 
+  buildInputs = [ cli11 ];
   nativeBuildInputs = [
     cmake
     jrl-cmakemodules
