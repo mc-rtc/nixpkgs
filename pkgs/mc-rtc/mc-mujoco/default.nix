@@ -1,7 +1,7 @@
 {
   stdenv,
   lib,
-  fetchgit,
+  fetchFromGitHub,
   makeWrapper,
   mc-mujoco-robots,
   cmake,
@@ -29,13 +29,11 @@ stdenv.mkDerivation (_finalAttrs: {
 
   dontBuild = true;
 
-  src = fetchgit {
-    url = "https://github.com/arntanguy/mc_mujoco.git";
-    # tag = "v${finalAttrs.version}";
-    # future v2.0.0 version once https://github.com/rohanpsingh/mc_mujoco/pull/98 is merged
-    rev = "a43b2af02fced68914f5e619da03d87c8c51e792";
-    sha256 = "sha256-6doLp+Kcbam+XnPwGLprLZYm5b3AtBrZpLg5yZfvE98=";
-    fetchSubmodules = true;
+  src = fetchFromGitHub {
+    owner = "arntanguy";
+    repo = "mc_mujoco";
+    tag = "1d17567c2264b32aceb3c77841765c0409a1e97";
+    hash = "sha256-h1TPFQ4qxrAk3bKdY7evZq8sRld8lIJHQKogLOiSF8I=";
   };
 
   nativeBuildInputs = [
