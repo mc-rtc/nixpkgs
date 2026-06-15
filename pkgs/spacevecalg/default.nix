@@ -22,9 +22,11 @@ stdenv.mkDerivation {
     hash = "sha256-fTKKj3m8cO4F46LlO7r8JeuWLhlyRcX7EblHroDYFkQ=";
   };
 
+  buildInputs = [
+    jrl-cmakemodules
+  ];
   nativeBuildInputs = [
     cmake
-    jrl-cmakemodules
     pkg-config
     doxygen
     python3Packages.cython
