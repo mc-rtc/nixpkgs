@@ -3,9 +3,11 @@
   lib,
   fetchgit,
   cmake,
+  jrl-cmakemodules,
+  gtest,
+  cli11,
   qhull,
   assimp,
-  cli11,
   eigen,
   libz,
 }:
@@ -23,9 +25,13 @@ stdenv.mkDerivation {
       sha256 = "sha256-2e1Ctq/2lj2BNyxPH3VD+owYlURyIUq82D74y4nKPeg=";
     };
 
+  buildInputs = [
+    cli11
+    jrl-cmakemodules
+  ];
   nativeBuildInputs = [
     cmake
-    cli11
+    gtest
   ];
   # XXX why is libz dependency manually required here? Either qhull or assimp should bring it
   propagatedBuildInputs = [
@@ -39,9 +45,10 @@ stdenv.mkDerivation {
     "-DINSTALL_DOCUMENTATION=OFF"
   ];
 
-  doCheck = false;
+  doCheck = true;
 
   meta = with lib; {
+    mainProgram = "mesh_sampling";
     description = "Samplers to obtain pointclouds from CAD meshes ";
     homepage = "https://github.com/jrl-umi3218/mesh_sampling";
     license = licenses.bsd2;

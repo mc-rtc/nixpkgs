@@ -56,10 +56,12 @@ in
     else
       "";
 
+  buildInputs = [
+    jrl-cmakemodules
+  ];
   nativeBuildInputs = [
     cmake
     pkg-config
-    jrl-cmakemodules
     qt5.wrapQtAppsHook
     python3Packages.distutils
     python3Packages.pytest
