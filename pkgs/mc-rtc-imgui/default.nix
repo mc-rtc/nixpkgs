@@ -15,14 +15,14 @@ stdenv.mkDerivation (_finalAttrs: {
 
   dontBuild = true;
 
-  src =
-    # head of nix branch (for stanalone install)
-    fetchFromGitHub {
-      owner = "mc-rtc";
-      repo = "mc_rtc-imgui";
-      rev = "3e6c1617a5e622795019b2bccd2ba259df18026f";
-      hash = "sha256-KmcF5e0O2bQheTArjxaDeBQlxf3cywaFtNlxleHYsL8=";
-    };
+  # head of nix branch (for stanalone install)
+  # https://github.com/mc-rtc/mc_rtc-imgui/tree/nix
+  src = fetchFromGitHub {
+    owner = "mc-rtc";
+    repo = "mc_rtc-imgui";
+    rev = "6ac125c00ca5e18c7da80e0049dc5697f4f36a23";
+    hash = "sha256-J9uQpfn08Yv5ROxQmxHYwiVRdvZsVOp2klZmgnw90Bg=";
+  };
 
   nativeBuildInputs = [
     cmake
