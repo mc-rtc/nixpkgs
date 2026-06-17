@@ -15,7 +15,7 @@ stdenv.mkDerivation {
   src = fetchgit {
     url = "https://github.com/jrl-umi3218/mc_udp";
     rev = "b6be9c9423b6c68a3b375641e99affed448cf825";
-    sha256 = "";
+    sha256 = "sha256-VZxbxerpH4o6bt9dP8JjlEGNNpPijbwHDqC+RdWuw8Y=";
   };
 
   nativeBuildInputs = [ cmake ];
@@ -31,6 +31,7 @@ stdenv.mkDerivation {
   doCheck = false;
 
   meta = with lib; {
+    mainProgram = "MCUDPControl";
     description = "UDP interface for mc_rtc";
     homepage = "https://github.com/jrl-umi3218/mc_udp";
     license = licenses.bsd2;
