@@ -96,6 +96,10 @@
             path = ./templates/controller;
             description = "A template with superbuild configuration for use with mc-rtc/nixpkgs";
           };
+          flakoboros = {
+            path = ./templates/flakoboros;
+            description = "A flakoboros template for simple projects";
+          };
           ros = {
             path = ./templates/ros;
             description = "A template for use with mc-rtc/nixpkgs and ROS";
