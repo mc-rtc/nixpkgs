@@ -270,7 +270,12 @@
               inherit (pkgs) mc-rtc-data mc-rtc;
 
               # Main GUIs and applications
-              inherit (pkgs) mc-rtc-magnum mc-rtc-ticker mc-franka;
+              inherit (pkgs)
+                mc-rtc-magnum
+                mc-rtc-ticker
+                mc-franka
+                mc-udp
+                ;
 
               # Main robots
               inherit (pkgs)
