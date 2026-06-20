@@ -24,9 +24,6 @@ jobs:
         ccache: [true, false]
         ros: [true, false]
         build:
-          - "devShells.x86_64-linux.mc-rtc-superbuild-minimal"
-          - "devShells.x86_64-linux.mc-rtc-superbuild-default"
-          - "devShells.x86_64-linux.mc-rtc-superbuild-default-all-robots"
           - "devShells.x86_64-linux.mc-rtc-superbuild-full"
     steps:
       - name: "Determine Variant Arguments"
