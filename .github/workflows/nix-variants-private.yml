@@ -2,7 +2,7 @@
 # WARNING: This workflow builds private repositories
 #          It uses the cachix cache but must NOT push to it
 #          Instead it must push to the private authenticated attic cache
-name: "CI - Nix - Private"
+name: "Nix - Private"
 on:
   push:
     branches:

@@ -1,5 +1,5 @@
 # Build the public flake with ccache overlay
-name: "CI - Nix - ccache"
+name: "Nix"
 on:
   push:
     branches:
@@ -14,14 +14,18 @@ jobs:
     #   - The PR's source repo is the same as the base repo.
     # This is done to make sure that the required secrets are available to the CI
     if: github.event_name != 'pull_request' || github.repository == github.event.pull_request.head.repo.full_name
-    name: "public-${{ matrix.ccache == true && 'ccache' || 'no-ccache' }}-${{ matrix.ros == true && 'ros' || 'ros-free' }}: ${{ matrix.build }} on ${{ matrix.os }}"
+    name: "${{ matrix.ccache == true && 'ccache' || 'no-ccache' }}-${{ matrix.ros == true && 'ros' || 'ros-free' }}: ${{ matrix.build }} on ${{ matrix.os }}"
     runs-on: "${{ matrix.os }}"
     strategy:
       fail-fast: false
       matrix: &matrix
-        os: [ubuntu-24.04]
+        os: [ubuntu-24.04, macos-latest]
         ccache: [true, false]
         ros: [true, false]
+        exclude:
+          # only build on macos for non-ros and avoid ccache builds
+          - os: macos-latest
+            ros: true
         build:
           - "devShells.x86_64-linux.mc-rtc-superbuild-minimal"
           - "devShells.x86_64-linux.mc-rtc-superbuild-default"
@@ -58,6 +62,7 @@ jobs:
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
           extraPullNames: "ros,gepetto"
       - &setup-ccache
+        if: ${{ matrix.ccahe == true }}
         name: Setup ccache environment
         run: |
           sudo mkdir -m0770 -p '/var/cache/ccache'
