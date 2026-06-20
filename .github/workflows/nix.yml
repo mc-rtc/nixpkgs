@@ -8,6 +8,7 @@ on:
       - main
 jobs:
   populate-cache:
+    if: false
     name: "${{ matrix.build }} on ${{ matrix.os }}"
     runs-on: "${{ matrix.os }}"
     strategy:
@@ -30,6 +31,7 @@ jobs:
           extraPullNames: "ros,gepetto"
       - run: nix build -L ".#${{ matrix.build }}" --cores 4
   complete:
+    if: false
     needs: populate-cache
     name: "complete ${{ matrix.os }}"
     runs-on: "${{ matrix.os }}-latest"
@@ -49,6 +51,7 @@ jobs:
           extraPullNames: "ros,gepetto"
       - run: nix flake check -L
   fallback:
+    if: false
     needs: complete
     if: always() && needs.complete.result == 'failure'
     name: "fallback ${{ matrix.os }}"

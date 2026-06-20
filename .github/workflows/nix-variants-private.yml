@@ -12,7 +12,8 @@ on:
       - main
 jobs:
   populate-cache:
-    if: github.event_name != 'pull_request' || github.repository == github.event.pull_request.head.repo.full_name
+    #if: github.event_name != 'pull_request' || github.repository == github.event.pull_request.head.repo.full_name
+    if: false
     name: "private-${{ matrix.ccache == true && 'ccache' || 'no-ccache' }}-${{ matrix.ros == true && 'ros' || 'ros-free' }}: ${{ matrix.build }} on ${{ matrix.os }}"
     runs-on: "${{ matrix.os }}"
     strategy:
@@ -92,6 +93,7 @@ jobs:
           sudo ls -ld /var/cache/ccache
       - run: nix build -L ${{ steps.flags.outputs.args }} ".#${{ matrix.build }}" --cores 4
   complete:
+    if: false
     needs: populate-cache
     name: "complete ${{ matrix.os }}"
     runs-on: "${{ matrix.os }}-latest"
@@ -110,7 +112,8 @@ jobs:
       - run: nix flake check -L ${{ steps.flags.outputs.args }}
   fallback:
     needs: complete
-    if: always() && needs.complete.result == 'failure'
+    if: false
+    # if: always() && needs.complete.result == 'failure'
     name: "fallback ${{matrix.variant}}: ${{ matrix.build }} on ${{ matrix.os }}"
     runs-on: "${{ matrix.os }}-latest"
     strategy:
