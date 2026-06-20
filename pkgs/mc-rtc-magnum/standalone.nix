@@ -4,6 +4,7 @@
   makeWrapper,
   fetchFromGitHub,
   cmake,
+  pkg-config,
   mc-rtc-imgui,
   magnum-with-plugins,
   imguizmo,
@@ -18,8 +19,8 @@ stdenv.mkDerivation {
   src = fetchFromGitHub {
     owner = "mc-rtc";
     repo = "mc_rtc-magnum";
-    rev = "a700fedc432bf1c453f6e13a26fc7dfd8f38ff78";
-    hash = "sha256-NvIFuR31Niy+NhIkeW6yQCgQkydBc+JFeIVp5nszpc0=";
+    rev = "ede3e81fc2eafce633821718ed52b386cdd7671b";
+    hash = "sha256-tZN1qwxHYfJb9jEWwv6PWxO+LTVkoGBZLkjdDhFDS+I=";
   };
 
   nativeBuildInputs = [
@@ -28,6 +29,7 @@ stdenv.mkDerivation {
   ];
   dontBuild = true;
   buildInputs = [
+    pkg-config
     mc-rtc-imgui
     # magnum
     # magnum-integration

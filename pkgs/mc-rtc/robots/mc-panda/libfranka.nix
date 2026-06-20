@@ -55,7 +55,7 @@ stdenv.mkDerivation {
     description = "C++ library for Franka Robotics research robots";
     homepage = "https://github.com/frankarobotics/libfranka";
     license = licenses.asl20;
-    platforms = platforms.linux;
+    # platforms = platforms.linux;
     maintainers = [ ];
   };
 }

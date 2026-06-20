@@ -3,6 +3,7 @@
   lib,
   fetchurl,
   cmake,
+  pkg-config,
   mc-rtc,
   tf2-eigen,
   with-ros ? false,
@@ -22,7 +23,10 @@ in
     sha256 = "sha256-F1LzhAK0MQM4mc5+dr0lK364J7f0nA1ZBe1RZlG3Pmo=";
   };
 
-  nativeBuildInputs = [ cmake ];
+  nativeBuildInputs = [
+    cmake
+    pkg-config
+  ];
   propagatedBuildInputs = [ mc-rtc ] ++ lib.optional (with-ros && tf2-eigen != null) tf2-eigen;
 
   # This requirement implies < 2.0 but in fact it's fine for this one

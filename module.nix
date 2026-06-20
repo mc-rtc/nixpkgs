@@ -146,10 +146,14 @@
                 robots = [
                   pkgs.mc-g1
                   pkgs.mc-h1
+                ]
+                ++ lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [
+                  # FIXME: macos support
+                  pkgs.mc-panda
+                  pkgs.mc-panda-lirmm
+                ]
+                ++ lib.optionals cfg.with-ros [
                   pkgs.mc-ur5e
-                  # FIXME: disabled until merged and compatible with macos
-                  # pkgs.mc-panda
-                  # pkgs.mc-panda-lirmm
                 ]
                 ++ lib.optionals cfg.overlays.private [
                   pkgs.mc-hrp2
@@ -284,6 +288,12 @@
                 mc-ur5e
                 mc-panda
                 mc-panda-lirmm
+                ;
+
+              # Robot description
+              inherit (pkgs)
+                mc-int-obj-description
+                jvrc-description
                 ;
 
               # MuJoCo Robots

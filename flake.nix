@@ -17,6 +17,7 @@
     # Use as nix build . --override-input private-trigger github:boolean-option/true
     private-trigger.url = "github:boolean-option/false";
     ccache-trigger.url = "github:boolean-option/false";
+    with-ros-trigger.url = "github:boolean-option/true";
   };
 
   nixConfig = {
@@ -38,7 +39,11 @@
       flakeModule = inputs.flake-parts.lib.importApply ./module.nix {
         inherit (inputs) gepetto jrl-cmakemodulesv2 make-shell;
       };
-      buildPrivate = inputs.private-trigger.value or false;
+      inputTriggers = {
+        buildPrivate = inputs.private-trigger.value or false;
+        with-ros = inputs.with-ros-trigger.value or true;
+        ccache = inputs.ccache-trigger.value or false;
+      };
 
       mkFlakoboros =
         {
@@ -61,10 +66,12 @@
         {
           mc-rtc-nix = {
             packages = true;
+            with-ros = inputTriggers.with-ros;
             # gepetto.packages = true;
             # gepetto.devShells = true;
             overlays = {
-              private = buildPrivate;
+              private = inputTriggers.buildPrivate;
+              ccache = inputTriggers.ccache;
             };
           };
           mc-rtc-superbuild = {

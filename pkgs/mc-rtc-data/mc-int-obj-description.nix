@@ -35,6 +35,7 @@ in
   '';
 
   cmakeFlags = [
+    (lib.cmakeBool "DISABLE_ROS" (!with-ros))
     "-DROS_VERSION=2"
     "-DBUILD_TESTING=OFF"
     "-DPYTHON_BINDING=OFF"
