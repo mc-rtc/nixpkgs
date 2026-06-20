@@ -30,8 +30,8 @@ in
       builtins.trace "with-ros false: ${toString with-ros}" (fetchgit {
         # master
         url = "https://github.com/jrl-umi3218/mc_env_description";
-        rev = "ca84a40a0a27783c4ed63bd8f057af7ef41b33bb";
-        sha256 = "sha256-ntz/u9YTWd2YuVhtRngm0qnOU8nsH0ODZ828x/Uba9s=";
+        rev = "b55cddfead7a43217d5b179a6eca213ad94f4e65";
+        sha256 = "sha256-5sjyojlG+MM4OCUmNSlEhu7FLvckk2n7oE8mFu9H7Sw=";
         fetchSubmodules = true;
       });
 
@@ -43,6 +43,7 @@ in
   '';
 
   cmakeFlags = [
+    (lib.cmakeBool "DISABLE_ROS" (!with-ros))
     "-DROS_VERSION=2"
     "-DBUILD_TESTING=OFF"
     "-DPYTHON_BINDING=OFF"

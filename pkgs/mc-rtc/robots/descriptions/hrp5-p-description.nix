@@ -26,6 +26,7 @@
   '';
 
   cmakeFlags = [
+    (lib.cmakeBool "DISABLE_ROS" (!with-ros))
     "-DBUILD_TESTING=OFF"
   ];
 

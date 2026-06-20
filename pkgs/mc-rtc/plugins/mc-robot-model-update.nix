@@ -3,6 +3,7 @@
   lib,
   fetchFromGitHub,
   cmake,
+  pkg-config,
   mc-rtc,
 }:
 
@@ -19,6 +20,7 @@ stdenv.mkDerivation (_finalAttrs: {
     hash = "sha256-/gvwqy73elA6gUppwd7OSp0jkojHZUDZGUJlAVnkodU=";
   };
 
+  buildInputs = [ pkg-config ];
   nativeBuildInputs = [ cmake ];
   propagatedBuildInputs = [
     mc-rtc

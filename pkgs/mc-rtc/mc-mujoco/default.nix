@@ -5,6 +5,7 @@
   makeWrapper,
   mc-mujoco-robots,
   cmake,
+  pkg-config,
   jrl-cmakemodules,
   cli11,
   mc-rtc,
@@ -43,6 +44,7 @@ stdenv.mkDerivation (_finalAttrs: {
   buildInputs = [
     cli11
     jrl-cmakemodules
+    pkg-config
   ];
   nativeBuildInputs = [
     cmake

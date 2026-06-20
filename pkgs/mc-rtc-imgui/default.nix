@@ -4,6 +4,7 @@
   fetchFromGitHub,
   cmake,
   jrl-cmakemodules,
+  pkg-config,
   mc-rtc,
   imgui,
   implot,
@@ -26,6 +27,7 @@ stdenv.mkDerivation (_finalAttrs: {
 
   nativeBuildInputs = [
     cmake
+    pkg-config
     jrl-cmakemodules
   ];
   propagatedBuildInputs = [

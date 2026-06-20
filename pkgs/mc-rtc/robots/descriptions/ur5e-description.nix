@@ -30,7 +30,9 @@
     export ROS_VERSION=2
   '';
 
-  cmakeFlags = lib.optional (!with-ros) "-DDISABLE_ROS=ON" ++ [
+  cmakeFlags = [
+    (lib.cmakeBool "DISABLE_ROS" (!with-ros))
+    "-DROS_VERSION=0" # FIXME: this version does not have DISABLE_ROS flag
     "-DBUILD_TESTING=OFF"
   ];
 

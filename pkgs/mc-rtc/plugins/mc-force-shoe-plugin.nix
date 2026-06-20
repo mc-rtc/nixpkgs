@@ -3,6 +3,7 @@
   lib,
   fetchFromGitHub,
   cmake,
+  pkg-config,
   mc-rtc,
   socat,
   picocom,
@@ -23,6 +24,7 @@ stdenv.mkDerivation (finalAttrs: {
       hash = "sha256-mgtuJ0rmFKSgtth+/uVnvIJvXY7Ij8veywQ7Fm1neyk=";
     };
 
+  buildInputs = [ pkg-config ];
   nativeBuildInputs = [ cmake ];
   propagatedBuildInputs = [
     mc-rtc

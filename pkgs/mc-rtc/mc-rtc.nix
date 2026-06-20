@@ -61,7 +61,6 @@ in
   ];
   nativeBuildInputs = [
     cmake
-    pkg-config
     qt5.wrapQtAppsHook
     python3Packages.distutils
     python3Packages.pytest
@@ -75,6 +74,7 @@ in
   ];
 
   propagatedBuildInputs = [
+    pkg-config
     tasks
     eigen-quadprog
     libtool
@@ -124,6 +124,14 @@ in
 
   postInstall = ''
     wrapQtApp $out/bin/mc_log_ui
+  '';
+
+  # XXX: Without this fixupPhase fails due to RPATHS references to /build/
+  preFixup = ''
+    find "$out/${python3Packages.python.sitePackages}" -name "*.so" -type f | while read -r binary; do
+      echo "Shrinking RPATH for $binary"
+      patchelf --shrink-rpath --allowed-rpath-prefixes "$NIX_STORE" "$binary"
+    done
   '';
 
   meta = with lib; {

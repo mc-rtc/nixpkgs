@@ -91,9 +91,11 @@ else
     propagatedBuildInputs = map (d: d.drv) deps;
     buildInputs = [ ];
     nativeBuildInputs = [ ];
-    installPhase = ''
-      mkdir -p $out
-    '';
+    dontUnpack = true;
+    dontInstall = true;
+    # installPhase = ''
+    #   mkdir -p $out
+    # '';
     meta = with lib; {
       description = "Metapackage for mc-rtc data (envs, objects, etc)";
       homepage = "https://github.com/jrl-umi3218/mc_rtc_data";
