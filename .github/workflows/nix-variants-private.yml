@@ -82,7 +82,7 @@ jobs:
           token: ${{ secrets.ATTIC_TOKEN }}
       - &setup-ccache-env
         name: Setup ccache environment
-        if: ${{ matrix.variant == 'private-ccache' }}
+        if: ${{ matrix.ccache == true }}
         run: |
           sudo mkdir -m0770 -p '/var/cache/ccache'
           sudo chown --reference=/nix/store '/var/cache/ccache'
