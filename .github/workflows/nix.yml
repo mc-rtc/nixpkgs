@@ -1,3 +1,14 @@
+# This workflows builds and populates a mc-rtc-nix cachix and/or attic cache for all flake combinations:
+# Variants are:
+# - ros: when true, build the overlay with ros support for the relevant packages (robot descriptions, mc-rtc, etc)
+# - ccache: when true, add a ccache overlay
+# - private: when true, adds the private overlay containing private software requiring specific access
+#   WARNING: these packages should never be pushed into the public cache. This is ensured in this workflow by
+#            removing the authToken for cachix in the private case (read-only access) and adding a private attic cache.
+#            Tokens for the private cache are handled by Arnaud TANGUY and can be provided to team members upon request
+#
+# For now, on Macos we only build the private/public ros-free version.
+#
 name: "Nix"
 on:
   push:
@@ -8,95 +19,174 @@ on:
       - main
 jobs:
   populate-cache:
-    if: false
-    name: "${{ matrix.build }} on ${{ matrix.os }}"
+    # - This condition allows the job to run if:
+    #   - The workflow is not triggered by a pull request (`github.event_name != 'pull_request'`), or
+    #   - The PR's source repo is the same as the base repo.
+    # This is done to make sure that the required secrets are available to the CI
+    if: github.event_name != 'pull_request' || github.repository == github.event.pull_request.head.repo.full_name
+    name: "${{ matrix.ccache == true && 'ccache' || 'no-ccache' }}-${{ matrix.ros == true && 'ros' || 'ros-free' }}: ${{ matrix.build }} on ${{ matrix.os }}"
     runs-on: "${{ matrix.os }}"
     strategy:
       fail-fast: false
-      matrix:
-        # os: TODO [macos-15, ubuntu-24.04]
-        os: [ubuntu-24.04]
-        build:
-          - "devShells.x86_64-linux.mc-rtc-superbuild-full"
+      matrix: &matrix
+        private: [true, false]
+        # Define an explicit list of valid configurations
+        include:
+          # --- Linux Configurations (All 4 combinations) ---
+          - os: ubuntu-24.04
+            ccache: true
+            ros: true
+            build: "devShells.x86_64-linux.mc-rtc-superbuild-full"
+
+          - os: ubuntu-24.04
+            ccache: true
+            ros: false
+            build: "devShells.x86_64-linux.mc-rtc-superbuild-full"
+
+          - os: ubuntu-24.04
+            ccache: false
+            ros: true
+            build: "devShells.x86_64-linux.mc-rtc-superbuild-full"
+
+          - os: ubuntu-24.04
+            ccache: false
+            ros: false
+            build: "devShells.x86_64-linux.mc-rtc-superbuild-full"
+
+          # --- macOS Configuration (Only 1 combination allowed) ---
+          - os: macos-latest
+            ccache: false
+            ros: false
+            build: "devShells.aarch64-darwin.mc-rtc-superbuild-full"
     steps:
       - uses: actions/checkout@v6
       - uses: cachix/install-nix-action@v31
-      - uses: cachix/cachix-action@v17
+      - &configure-variants 
+        name: "Determine Variant Arguments"
+        id: flags
+        run: |
+          ARGS=""
+
+          # Handle private trigger
+          if [ "${{ matrix.private }}" = "true" ]; then
+            ARGS="$ARGS --override-input private-trigger github:boolean-option/true"
+          else
+            ARGS="$ARGS --override-input private-trigger github:boolean-option/false"
+          fi
+          
+          
+          # Handle ccache trigger
+          if [ "${{ matrix.ccache }}" = "true" ]; then
+            ARGS="$ARGS --override-input ccache-trigger github:boolean-option/true"
+          else
+            ARGS="$ARGS --override-input ccache-trigger github:boolean-option/false"
+          fi
+          
+          # Handle ros trigger (ros-free is the inverse of with-ros)
+          if [ "${{ matrix.ros }}" = "true" ]; then
+            ARGS="$ARGS --override-input with-ros-trigger github:boolean-option/true"
+          else
+            ARGS="$ARGS --override-input with-ros-trigger github:boolean-option/false"
+          fi
+          
+          # Trim leading space and export
+          echo "args=$(echo "$ARGS" | xargs)" >> "$GITHUB_OUTPUT"
+      # Configures ssh-agent if SSH_KEY secret exists
+      - &confiure-ssh-agent
+        if: ${{ matrix.private == true }}
+        name: Configure ssh-agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+      - &add-known-hosts 
+        if: ${{ matrix.private == true }}
+        name: Add gite.lirmm.fr to known_hosts
+        run: |
+          ssh-keyscan gite.lirmm.fr >> ~/.ssh/known_hosts
+      # read-write access to cachix in the public case
+      - &cachix-action-public
+        if: ${{ matrix.private == false }}
+        uses: cachix/cachix-action@v17
         with:
           name: mc-rtc-nix
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
           extraPullNames: "ros,gepetto"
-      - run: nix build -L ".#${{ matrix.build }}" --cores 4
+      # read-only use of cachix in case of "private" flake
+      # Do NOT add authToken here
+      - &cachix-action-private
+        if: ${{ matrix.private == true }}
+        uses: cachix/cachix-action@v17
+        with:
+          name: mc-rtc-nix
+          extraPullNames: "ros,gepetto"
+      # for "private" flake, push to token-protected attic
+      # only paths not already in the public cache are pushed
+      - &setup-private-attic 
+        if: ${{ matrix.private == true }}
+        name: Setup Attic cache (private)
+        uses: ryanccn/attic-action@v0
+        with:
+          endpoint: https://attic.arntanguy.fr
+          cache: mc-rtc-nix-private
+          token: ${{ secrets.ATTIC_TOKEN }}
+      - &setup-ccache
+        if: ${{ matrix.ccache == true }}
+        name: Setup ccache environment
+        run: |
+          sudo mkdir -m0770 -p '/var/cache/ccache'
+          sudo chown --reference=/nix/store '/var/cache/ccache'
+          mkdir -p ~/.config/nix
+          echo 'extra-sandbox-paths = /var/cache/ccache' | sudo tee -a /etc/nix/nix.conf
+          sudo systemctl restart nix-daemon.service
+          sudo ls -ld /var/cache/ccache
+      - run: nix build -L ${{ steps.flags.outputs.args }} ".#${{ matrix.build }}" --cores 4
   complete:
-    if: false
     needs: populate-cache
     name: "complete ${{ matrix.os }}"
-    runs-on: "${{ matrix.os }}-latest"
+    runs-on: "${{ matrix.os }}"
     strategy:
       fail-fast: false
-      matrix:
-        os: [ubuntu] # TODO: macos
+      matrix: *matrix
     steps:
       - uses: jlumbroso/free-disk-space@main
         if: ${{ matrix.os == 'ubuntu' }}
       - uses: actions/checkout@v6
       - uses: cachix/install-nix-action@v31
-      - uses: cachix/cachix-action@v17
-        with:
-          name: mc-rtc-nix
-          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-          extraPullNames: "ros,gepetto"
-      - run: nix flake check -L
+      - *confiure-ssh-agent
+      - *add-known-hosts
+      - *configure-variants
+      - *cachix-action-public
+      - *cachix-action-private
+      - *setup-private-attic
+      - *setup-ccache
+      - run: nix flake check -L ${{ steps.flags.outputs.args }}
   fallback:
-    if: false
     needs: complete
     if: always() && needs.complete.result == 'failure'
-    name: "fallback ${{ matrix.os }}"
-    runs-on: "${{ matrix.os }}-latest"
+    name: "fallback ${{matrix.variant}}: ${{ matrix.build }} on ${{ matrix.os }}"
+    runs-on: "${{ matrix.os }}"
     strategy:
       fail-fast: false
-      matrix:
-        os: [ubuntu] # TODO: macos
+      matrix: *matrix
     steps:
       - uses: jlumbroso/free-disk-space@main
         if: ${{ matrix.os == 'ubuntu' }}
       - uses: actions/checkout@v6
       - uses: cachix/install-nix-action@v31
-      - uses: cachix/cachix-action@v17
-        with:
-          name: mc-rtc-nix
-          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-          extraPullNames: "ros,gepetto"
-      - run: nix flake check -L -j 1 --cores 1
-  # system:
-  #   runs-on: "ubuntu-latest"
-  #   steps:
-  #     - uses: actions/checkout@v6
-  #     - uses: cachix/install-nix-action@v31
-  #     - uses: cachix/cachix-action@v17
-  #       with:
-  #         name: mc-rtc-nix
-  #         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-  #         extraPullNames: ros
-  #     - run: nix build -L .#systemConfigs.default
-  # home:
-  #   runs-on: "ubuntu-latest"
-  #   steps:
-  #     - uses: actions/checkout@v6
-  #     - uses: cachix/install-nix-action@v31
-  #     - uses: cachix/cachix-action@v17
-  #       with:
-  #         name: mc-rtc-nix
-  #         extraPullNames: "ros,gepetto"
-  #     - run: nix build -L .#homeConfigurations.cpene.activationPackage
+      - *confiure-ssh-agent
+      - *add-known-hosts
+      - *configure-variants
+      - *cachix-action-public
+      - *cachix-action-private
+      - *setup-private-attic
+      - *setup-ccache
+      - run: nix build -L ${{ steps.flags.outputs.args }} ".#${{ matrix.build }}" --cores 1
   check:
     if: always()
     name: check-macos-linux-nix
     runs-on: ubuntu-latest
     needs:
       - fallback
-      # - system
-      # - home
     steps:
       - uses: re-actors/alls-green@release/v1
         with:
