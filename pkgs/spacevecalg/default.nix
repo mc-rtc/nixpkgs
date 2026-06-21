@@ -9,8 +9,12 @@
   boost,
   fetchFromGitHub,
   python3Packages,
+  with-python ? true,
 }:
 
+let
+  use-python = with-python && !stdenv.hostPlatform.isDarwin;
+in
 stdenv.mkDerivation {
   pname = "spacevecalg";
   version = "1.2.10";
@@ -29,6 +33,8 @@ stdenv.mkDerivation {
     cmake
     pkg-config
     doxygen
+  ]
+  ++ lib.optionals use-python [
     python3Packages.cython
     python3Packages.python
     python3Packages.distutils
@@ -38,14 +44,15 @@ stdenv.mkDerivation {
   propagatedBuildInputs = [
     eigen
     boost
+  ]
+  ++ lib.optionals use-python [
     python3Packages.numpy
     python3Packages.eigen3-to-python
   ];
 
-  # cmakeFlags = [
-  #   "-DBUILD_TESTING=OFF"
-  #   "-DINSTALL_DOCUMENTATION=OFF"
-  # ];
+  cmakeFlags = [
+    (lib.cmakeBool "PYTHON_BINDING" use-python)
+  ];
 
   doCheck = true;
 

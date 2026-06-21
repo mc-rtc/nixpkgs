@@ -11,6 +11,7 @@
 # where this module was imported.
 {
   lib,
+  stdenv,
   config,
   ...
 }:
@@ -21,6 +22,12 @@
       type = lib.types.bool;
       default = true;
       description = "Whether to build with ROS support.";
+    };
+
+    with-python = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Whether to build with Python (bindings) support.";
     };
 
     overlays = {
@@ -60,7 +67,9 @@
           name = "mc-rtc-pkgs";
           value = import ./overlay.nix {
             inherit lib;
+            inherit stdenv;
             with-ros = cfg.with-ros;
+            with-python = cfg.with-python;
           };
         }
         {
@@ -70,7 +79,10 @@
       ]
       ++ (lib.optional cfg.overlays.private {
         name = "mc-rtc-private";
-        value = import ./overlay-private.nix { with-ros = cfg.with-ros; };
+        value = import ./overlay-private.nix {
+          with-ros = cfg.with-ros;
+          with-python = cfg.with-python;
+        };
       })
       ++ [
         {

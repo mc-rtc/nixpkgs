@@ -1,5 +1,6 @@
 {
   with-ros ? true,
+  with-python ? true,
   ...
 }:
 (
@@ -25,6 +26,7 @@
 
     tasks-lssol = prev.callPackage ./pkgs/tasks {
       with-lssol = true;
+      inherit with-python;
     };
     # make tasks with lssol the new default
     tasks = final.tasks-lssol;
@@ -32,6 +34,7 @@
     # mc-rtc with lssol
     mc-rtc = prev.mc-rtc.override {
       tasks = final.tasks-lssol;
+      inherit with-python;
     };
     # TODO ask I2S Bordeaux to make it public
     # Hugo's dependencies

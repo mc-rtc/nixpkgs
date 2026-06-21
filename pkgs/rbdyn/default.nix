@@ -9,8 +9,12 @@
   boost,
   fetchFromGitHub,
   python3Packages,
+  with-python ? true,
 }:
 
+let
+  use-python = with-python && !stdenv.hostPlatform.isDarwin;
+in
 stdenv.mkDerivation {
   pname = "rbyn";
   version = "1.9.5";
@@ -25,6 +29,8 @@ stdenv.mkDerivation {
   nativeBuildInputs = [
     cmake
     jrl-cmakemodules
+  ]
+  ++ lib.optionals use-python [
     python3Packages.cython
     python3Packages.python
     python3Packages.distutils
@@ -36,21 +42,17 @@ stdenv.mkDerivation {
     yaml-cpp
     tinyxml-2
     boost
+  ]
+  ++ lib.optionals use-python [
     python3Packages.spacevecalg
-  ]; # Add other dependencies here
+  ];
+
+  cmakeFlags = [
+    (lib.cmakeBool "PYTHON_BINDING" use-python)
+  ];
 
   # XXX: Without this fixupPhase fails due to RPATHS references to /build/
-  preFixup = if stdenv.hostPlatform.isDarwin then ''
-    echo "Running macOS postFixup..."
-    for binary in "$out/${python3Packages.python.sitePackages}"/rbdyn/{rbdyn,parsers/parsers}.so; do
-      if [ -f "$binary" ]; then
-        otool -l "$binary" | grep "path /build" | sed -E 's/^[[:space:]]*path (.*) \(offset .*\)$/\1/' | while read -r bad_path; do
-          install_name_tool -delete_rpath "$bad_path" "$binary" || true
-        done
-      fi
-    done
-  '' else ''
-    # Complete Linux-only block
+  preFixup = lib.optionalString use-python ''
     echo "Running Linux postFixup..."
     patchelf --shrink-rpath --allowed-rpath-prefixes "$NIX_STORE" $out/${python3Packages.python.sitePackages}/rbdyn/rbdyn.so
     patchelf --shrink-rpath --allowed-rpath-prefixes "$NIX_STORE" $out/${python3Packages.python.sitePackages}/rbdyn/parsers/parsers.so

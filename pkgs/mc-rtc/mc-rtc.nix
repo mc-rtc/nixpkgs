@@ -29,6 +29,7 @@
   doxygen,
   bundler, # Ruby for bundle dependencies
   with-ros ? false,
+  with-python ? false,
   rclcpp ? null,
   nav-msgs ? null,
   sensor-msgs ? null,
@@ -42,6 +43,7 @@ let
   common = import ./mc-rtc-common.nix {
     inherit fetchFromGitHub;
   };
+  use-python = with-python && !stdenv.hostPlatform.isDarwin;
 in
 
 (if with-ros then buildRosPackage else stdenv.mkDerivation) {
@@ -62,15 +64,15 @@ in
   nativeBuildInputs = [
     cmake
     qt5.wrapQtAppsHook
+    # for documentation
+    doxygen
+    bundler
+  ]
+  ++ lib.optionals use-python [
     python3Packages.distutils
     python3Packages.pytest
     python3Packages.cython
     python3Packages.python
-  ]
-  ++ [
-    # for documentation
-    doxygen
-    bundler
   ];
 
   propagatedBuildInputs = [
@@ -90,15 +92,18 @@ in
     boost
     mesh-sampling
     fmt
-    python3Packages.tasks
   ]
   ++
-    # for python utils (mc_rtc_new_fsm_controller, mc_log_ui, etc)
-    [
-      python3Packages.gitpython
-      python3Packages.pyqt5
-      python3Packages.matplotlib
+    # for cython bindings
+    lib.optionals use-python [
+      python3Packages.tasks
     ]
+  # for python utils (mc_rtc_new_fsm_controller, mc_log_ui, etc)
+  ++ lib.optionals use-python [
+    python3Packages.gitpython
+    python3Packages.pyqt5
+    python3Packages.matplotlib
+  ]
   ++ lib.optional (with-ros && rclcpp != null) rclcpp
   ++ lib.optional (with-ros && nav-msgs != null) nav-msgs
   ++ lib.optional (with-ros && sensor-msgs != null) sensor-msgs
@@ -113,21 +118,24 @@ in
   '';
 
   cmakeFlags = [
-    "-DBUILD_MC_RTC_PYTHON_UTILS=ON"
-    "-DBUILD_TESTING=OFF"
-    "-DINSTALL_DOCUMENTATION=ON"
+    (lib.cmakeBool "PYTHON_BINDING" use-python)
+    (lib.cmakeBool "BUILD_MC_RTC_PYTHON_UTILS" use-python) # does not need bindings
+    "-DBUILD_TESTING=OFF" # FIXME
+    "-DINSTALL_DOCUMENTATION=ON" # Use a different output
   ];
 
   doCheck = true;
 
-  with-ros = with-ros;
+  passthru = {
+    inherit with-ros use-python;
+  };
 
-  postInstall = ''
+  postInstall = lib.optionalString use-python ''
     wrapQtApp $out/bin/mc_log_ui
   '';
 
   # XXX: Without this fixupPhase fails due to RPATHS references to /build/
-  preFixup = ''
+  preFixup = lib.optionalString use-python ''
     find "$out/${python3Packages.python.sitePackages}" -name "*.so" -type f | while read -r binary; do
       echo "Shrinking RPATH for $binary"
       patchelf --shrink-rpath --allowed-rpath-prefixes "$NIX_STORE" "$binary"
