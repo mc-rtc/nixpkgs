@@ -181,8 +181,10 @@
               extends = [ "default-all-robots" ];
               runtime = {
                 plugins = [
-                  pkgs.mc-force-shoe-plugin
                   pkgs.mc-robot-model-update
+                ]
+                ++ lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [
+                  pkgs.mc-force-shoe-plugin
                 ];
                 apps = lib.optionals cfg.overlays.private [ pkgs.mc-mujoco-full ];
               };
