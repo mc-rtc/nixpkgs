@@ -146,8 +146,8 @@
                 observers = [ pkgs.mc-state-observation ];
                 apps = [
                   pkgs.mc-rtc-magnum
-                  pkgs.mc-mujoco
                 ]
+                ++ lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [ pkgs.mc-mujoco ]
                 ++ lib.optionals cfg.with-ros [ pkgs.mc-rtc-ticker ];
               };
             };
