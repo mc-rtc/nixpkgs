@@ -60,7 +60,7 @@ jobs:
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
           extraPullNames: "ros,gepetto"
       - &setup-ccache
-        if: ${{ matrix.ccahe == true }}
+        if: ${{ matrix.ccache == true }}
         name: Setup ccache environment
         run: |
           sudo mkdir -m0770 -p '/var/cache/ccache'
