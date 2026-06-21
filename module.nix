@@ -292,8 +292,6 @@
               inherit (pkgs)
                 mc-rtc-magnum
                 mc-rtc-ticker
-                mc-franka
-                mc-udp
                 ;
 
               # Main robots
@@ -325,6 +323,12 @@
                 mc-mujoco-full
                 ;
               inherit (pkgs) panda-prosthesis mc-force-shoe-plugin sphinx-cmake;
+            })
+            (lib.mkIf (!pkgs.stdenv.hostPlatform.isDarwin) {
+              inherit (pkgs)
+                mc-franka
+                mc-udp
+                ;
             })
             (lib.mkIf (cfg.packages && cfg.overlays.private) {
               inherit (pkgs)
