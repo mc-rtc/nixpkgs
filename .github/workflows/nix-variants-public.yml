@@ -19,18 +19,34 @@ jobs:
     strategy:
       fail-fast: false
       matrix: &matrix
-        os: [ubuntu-24.04, macos-latest]
-        ccache: [true, false]
-        ros: [true, false]
-        exclude:
-          # Avoid ROS builds on macos
-          - os: macos-latest
-            ros: true
-          # Avoid ccache builds on macOS
-          - os: macos-latest
+        # Define an explicit list of valid configurations
+        include:
+          # --- Linux Configurations (All 4 combinations) ---
+          - os: ubuntu-24.04
             ccache: true
-        build:
-          - "devShells.x86_64-linux.mc-rtc-superbuild-full"
+            ros: true
+            build: "devShells.x86_64-linux.mc-rtc-superbuild-full"
+
+          - os: ubuntu-24.04
+            ccache: true
+            ros: false
+            build: "devShells.x86_64-linux.mc-rtc-superbuild-full"
+
+          - os: ubuntu-24.04
+            ccache: false
+            ros: true
+            build: "devShells.x86_64-linux.mc-rtc-superbuild-full"
+
+          - os: ubuntu-24.04
+            ccache: false
+            ros: false
+            build: "devShells.x86_64-linux.mc-rtc-superbuild-full"
+
+          # --- macOS Configuration (Only 1 combination allowed) ---
+          - os: macos-latest
+            ccache: false
+            ros: false
+            build: "devShells.aarch64-darwin.mc-rtc-superbuild-full"
     steps:
       - &variants 
         name: "Determine Variant Arguments"
