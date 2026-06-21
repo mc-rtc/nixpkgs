@@ -29,7 +29,8 @@ jobs:
         build:
           - "devShells.x86_64-linux.mc-rtc-superbuild-full"
     steps:
-      - name: "Determine Variant Arguments"
+      - &variants 
+        name: "Determine Variant Arguments"
         id: flags
         run: |
           ARGS=""
@@ -72,16 +73,16 @@ jobs:
   complete:
     needs: populate-cache
     name: "complete ${{ matrix.os }}"
-    runs-on: "${{ matrix.os }}-latest"
+    runs-on: "${{ matrix.os }}"
     strategy:
       fail-fast: false
-      matrix:
-        os: [ubuntu] # TODO: macos
+      matrix: *matrix
     steps:
       - uses: jlumbroso/free-disk-space@main
         if: ${{ matrix.os == 'ubuntu' }}
       - uses: actions/checkout@v6
       - uses: cachix/install-nix-action@v31
+      - *variants
       - *cachix-step
       - *setup-ccache
       - run: nix flake check -L ${{ steps.flags.outputs.args }}
@@ -94,15 +95,7 @@ jobs:
       fail-fast: false
       matrix: *matrix
     steps:
-      - name: "Determine Variant Arguments"
-        id: flags
-        run: |
-          if [ "${{ matrix.variant }}" = "ccache" ]; then
-            echo "args=--override-input ccache-trigger github:boolean-option/true" >> "$GITHUB_OUTPUT"
-          else
-            echo "Unsupported variant: ${{ matrix.variant }}"
-            exit 42
-          fi
+      - *variants
       - uses: jlumbroso/free-disk-space@main
         if: ${{ matrix.os == 'ubuntu' }}
       - uses: actions/checkout@v6
