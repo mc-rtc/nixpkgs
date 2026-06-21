@@ -20,7 +20,7 @@ stdenv.mkDerivation {
 
   src = builtins.fetchGit {
     url = "git@github.com:isri-aist/mc_hrp5_p";
-    rev = "f6837bad37c39ea7de7feaa56189fb0489e6836b";
+    rev = "3b5341abaeefde63981372183bd4fada4848b201";
   };
 
   nativeBuildInputs = [ cmake ];
