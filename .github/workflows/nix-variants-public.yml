@@ -23,9 +23,12 @@ jobs:
         ccache: [true, false]
         ros: [true, false]
         exclude:
-          # only build on macos for non-ros and avoid ccache builds
+          # Avoid ROS builds on macos
           - os: macos-latest
             ros: true
+          # Avoid ccache builds on macOS
+          - os: macos-latest
+            ccache: true
         build:
           - "devShells.x86_64-linux.mc-rtc-superbuild-full"
     steps:
