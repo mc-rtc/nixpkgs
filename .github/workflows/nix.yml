@@ -24,7 +24,7 @@ jobs:
     #   - The PR's source repo is the same as the base repo.
     # This is done to make sure that the required secrets are available to the CI
     if: github.event_name != 'pull_request' || github.repository == github.event.pull_request.head.repo.full_name
-    name: "Nix (os: ${{ matrix.os }} | ccache: ${{ matrix.ccache }} | ros: ${{ matrix.ros }} | private: ${{ matrix.private }}"
+    name: "Populate (os: ${{ matrix.os }} | private: ${{ matrix.private }} | ros: ${{ matrix.ros }} | ccache: ${{ matrix.ccache }})"
     runs-on: "${{ matrix.os }}"
     strategy:
       fail-fast: false
@@ -132,7 +132,7 @@ jobs:
       - run: nix build -L ${{ steps.flags.outputs.args }} ".#${{ matrix.build }}" --cores 4
   complete:
     needs: populate-cache
-    name: "complete ${{ matrix.os }}"
+    name: "Complete (os: ${{ matrix.os }} | private: ${{ matrix.private }} | ros: ${{ matrix.ros }} | ccache: ${{ matrix.ccache }})"
     runs-on: "${{ matrix.os }}"
     strategy:
       fail-fast: false
@@ -153,7 +153,7 @@ jobs:
   fallback:
     needs: complete
     if: always() && needs.complete.result == 'failure'
-    name: "fallback ${{matrix.variant}}: ${{ matrix.build }} on ${{ matrix.os }}"
+    name: "Fallback (os: ${{ matrix.os }} | private: ${{ matrix.private }} | ros: ${{ matrix.ros }} | ccache: ${{ matrix.ccache }})"
     runs-on: "${{ matrix.os }}"
     strategy:
       fail-fast: false

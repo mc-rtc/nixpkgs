@@ -147,7 +147,6 @@
                 apps = [
                   pkgs.mc-rtc-magnum
                 ]
-                ++ lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [ pkgs.mc-mujoco ]
                 ++ lib.optionals cfg.with-ros [ pkgs.mc-rtc-ticker ];
               };
             };
@@ -186,7 +185,9 @@
                 ++ lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [
                   pkgs.mc-force-shoe-plugin
                 ];
-                apps = lib.optionals cfg.overlays.private [ pkgs.mc-mujoco-full ];
+                apps = lib.optionals (cfg.overlays.private && !pkgs.stdenv.hostPlatform.isDarwin) [
+                  pkgs.mc-mujoco-full
+                ];
               };
             };
           };
