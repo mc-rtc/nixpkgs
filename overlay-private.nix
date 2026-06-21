@@ -34,7 +34,8 @@
     # mc-rtc with lssol
     mc-rtc = prev.mc-rtc.override {
       tasks = final.tasks-lssol;
-      inherit with-python;
+      with-python-bindings = with-python;
+      with-python-tools = true;
     };
     # TODO ask I2S Bordeaux to make it public
     # Hugo's dependencies

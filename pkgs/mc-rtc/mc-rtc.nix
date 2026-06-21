@@ -29,7 +29,8 @@
   doxygen,
   bundler, # Ruby for bundle dependencies
   with-ros ? false,
-  with-python ? false,
+  with-python-bindings ? true,
+  with-python-tools ? true,
   rclcpp ? null,
   nav-msgs ? null,
   sensor-msgs ? null,
@@ -43,7 +44,7 @@ let
   common = import ./mc-rtc-common.nix {
     inherit fetchFromGitHub;
   };
-  use-python = with-python && !stdenv.hostPlatform.isDarwin;
+  use-python-bindings = with-python-bindings && !stdenv.hostPlatform.isDarwin;
 in
 
 (if with-ros then buildRosPackage else stdenv.mkDerivation) {
@@ -68,11 +69,11 @@ in
     doxygen
     bundler
   ]
-  ++ lib.optionals use-python [
+  ++ lib.optionals (use-python-bindings || with-python-tools) [ python3Packages.python ]
+  ++ lib.optionals use-python-bindings [
     python3Packages.distutils
     python3Packages.pytest
     python3Packages.cython
-    python3Packages.python
   ];
 
   propagatedBuildInputs = [
@@ -95,11 +96,11 @@ in
   ]
   ++
     # for cython bindings
-    lib.optionals use-python [
+    lib.optionals use-python-bindings [
       python3Packages.tasks
     ]
   # for python utils (mc_rtc_new_fsm_controller, mc_log_ui, etc)
-  ++ lib.optionals use-python [
+  ++ lib.optionals with-python-tools [
     python3Packages.gitpython
     python3Packages.pyqt5
     python3Packages.matplotlib
@@ -118,8 +119,8 @@ in
   '';
 
   cmakeFlags = [
-    (lib.cmakeBool "PYTHON_BINDING" use-python)
-    (lib.cmakeBool "BUILD_MC_RTC_PYTHON_UTILS" use-python) # does not need bindings
+    (lib.cmakeBool "PYTHON_BINDING" use-python-bindings)
+    (lib.cmakeBool "BUILD_MC_RTC_PYTHON_UTILS" with-python-tools) # does not need bindings
     "-DBUILD_TESTING=OFF" # FIXME
     "-DINSTALL_DOCUMENTATION=ON" # Use a different output
   ];
@@ -127,15 +128,16 @@ in
   doCheck = true;
 
   passthru = {
-    inherit with-ros use-python;
+    inherit with-ros with-python-tools;
+    with-python-bindings = use-python-bindings;
   };
 
-  postInstall = lib.optionalString use-python ''
+  postInstall = lib.optionalString with-python-tools ''
     wrapQtApp $out/bin/mc_log_ui
   '';
 
   # XXX: Without this fixupPhase fails due to RPATHS references to /build/
-  preFixup = lib.optionalString use-python ''
+  preFixup = lib.optionalString use-python-bindings ''
     find "$out/${python3Packages.python.sitePackages}" -name "*.so" -type f | while read -r binary; do
       echo "Shrinking RPATH for $binary"
       patchelf --shrink-rpath --allowed-rpath-prefixes "$NIX_STORE" "$binary"
