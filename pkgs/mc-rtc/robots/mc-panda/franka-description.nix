@@ -32,7 +32,7 @@ buildRosPackage {
     description = "URDF, meshes, and other description files for Franka robots";
     homepage = "https://github.com/frankarobotics/franka_description";
     license = lib.licenses.asl20;
-    platforms = lib.platforms.linux;
+    platforms = lib.platforms.all;
     maintainers = [ ];
   };
 }
