@@ -8,8 +8,8 @@ let
   src = fetchFromGitHub {
     owner = "jrl-umi3218";
     repo = "mc_rtc";
-    rev = "cb1850732afa034ef99e42c6e1158a1a0f3bbb0c";
-    hash = "sha256-rmIRRFqiToZTdGPt24VYYGk+UsdkRRrixR4F3heeH0s=";
+    rev = "c09df00517a18f53236ce4b66599e9e6b68e3c08";
+    hash = "sha256-HpgoiO8cvYeocr+t7eYN3imb7Oi5C+EYlEZ0GQzu4IA=";
   };
 in
 {

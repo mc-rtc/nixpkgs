@@ -24,4 +24,3 @@ queue_rules:
   - name: default
     merge_conditions:
       - check-success = "check-macos-linux-nix"
-      - check-success = "check-macos-linux-nix-private"

@@ -18,6 +18,7 @@
     private-trigger.url = "github:boolean-option/false";
     ccache-trigger.url = "github:boolean-option/false";
     with-ros-trigger.url = "github:boolean-option/true";
+    with-python-trigger.url = "github:boolean-option/true";
   };
 
   nixConfig = {
@@ -42,6 +43,7 @@
       inputTriggers = {
         buildPrivate = inputs.private-trigger.value or false;
         with-ros = inputs.with-ros-trigger.value or true;
+        with-python = inputs.with-python-trigger.value or true;
         ccache = inputs.ccache-trigger.value or false;
       };
 
@@ -67,6 +69,7 @@
           mc-rtc-nix = {
             packages = true;
             with-ros = inputTriggers.with-ros;
+            with-python = inputTriggers.with-python;
             # gepetto.packages = true;
             # gepetto.devShells = true;
             overlays = {
