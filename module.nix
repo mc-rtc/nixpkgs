@@ -291,7 +291,6 @@
               # Main GUIs and applications
               inherit (pkgs)
                 mc-rtc-magnum
-                mc-rtc-ticker
                 ;
 
               # Main robots
@@ -319,6 +318,11 @@
                 ;
 
               inherit (pkgs) panda-prosthesis mc-force-shoe-plugin sphinx-cmake;
+            })
+            (lib.mkIf cfg.with-ros {
+              inherit (pkgs)
+                mc-rtc-ticker
+                ;
             })
             # TODO: support these on darwin
             (lib.mkIf (!pkgs.stdenv.hostPlatform.isDarwin) {
