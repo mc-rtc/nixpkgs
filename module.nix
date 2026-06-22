@@ -11,6 +11,7 @@
 # where this module was imported.
 {
   lib,
+  stdenv,
   config,
   ...
 }:
@@ -21,6 +22,12 @@
       type = lib.types.bool;
       default = true;
       description = "Whether to build with ROS support.";
+    };
+
+    with-python = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Whether to build with Python (bindings) support.";
     };
 
     overlays = {
@@ -60,7 +67,9 @@
           name = "mc-rtc-pkgs";
           value = import ./overlay.nix {
             inherit lib;
+            inherit stdenv;
             with-ros = cfg.with-ros;
+            with-python = cfg.with-python;
           };
         }
         {
@@ -70,7 +79,10 @@
       ]
       ++ (lib.optional cfg.overlays.private {
         name = "mc-rtc-private";
-        value = import ./overlay-private.nix { with-ros = cfg.with-ros; };
+        value = import ./overlay-private.nix {
+          with-ros = cfg.with-ros;
+          with-python = cfg.with-python;
+        };
       })
       ++ [
         {
@@ -134,7 +146,6 @@
                 observers = [ pkgs.mc-state-observation ];
                 apps = [
                   pkgs.mc-rtc-magnum
-                  pkgs.mc-mujoco
                 ]
                 ++ lib.optionals cfg.with-ros [ pkgs.mc-rtc-ticker ];
               };
@@ -169,10 +180,14 @@
               extends = [ "default-all-robots" ];
               runtime = {
                 plugins = [
-                  pkgs.mc-force-shoe-plugin
                   pkgs.mc-robot-model-update
+                ]
+                ++ lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [
+                  pkgs.mc-force-shoe-plugin
                 ];
-                apps = lib.optionals cfg.overlays.private [ pkgs.mc-mujoco-full ];
+                apps = lib.optionals (cfg.overlays.private && !pkgs.stdenv.hostPlatform.isDarwin) [
+                  pkgs.mc-mujoco-full
+                ];
               };
             };
           };
@@ -276,9 +291,6 @@
               # Main GUIs and applications
               inherit (pkgs)
                 mc-rtc-magnum
-                mc-rtc-ticker
-                mc-franka
-                mc-udp
                 ;
 
               # Main robots
@@ -305,11 +317,23 @@
                 env-mj-description
                 ;
 
+              inherit (pkgs) panda-prosthesis mc-force-shoe-plugin sphinx-cmake;
+            })
+            (lib.mkIf cfg.with-ros {
+              inherit (pkgs)
+                mc-rtc-ticker
+                ;
+            })
+            # TODO: support these on darwin
+            (lib.mkIf (!pkgs.stdenv.hostPlatform.isDarwin) {
+              inherit (pkgs)
+                mc-franka
+                mc-udp
+                ;
               inherit (pkgs)
                 mc-mujoco
                 mc-mujoco-full
                 ;
-              inherit (pkgs) panda-prosthesis mc-force-shoe-plugin sphinx-cmake;
             })
             (lib.mkIf (cfg.packages && cfg.overlays.private) {
               inherit (pkgs)

@@ -49,6 +49,18 @@ stdenv.mkDerivation {
       --set WAYLAND_DISPLAY ""
   '';
 
+  # FIXME upstream
+  # On macos plugins are built as MH_BUNDLE and we cannot link against them,
+  # they are only meant to be used with dlopen
+  # We can remove them on linux to for builds against dynamic libraries
+  postPatch = ''
+    substituteInPlace src/CMakeLists.txt \
+      --replace "Magnum::AnyImageImporter" "" \
+      --replace "Magnum::AnySceneImporter" "" \
+      --replace "MagnumPlugins::AssimpImporter" "" \
+      --replace "MagnumPlugins::StbImageImporter" ""
+  '';
+
   cmakeFlags = [
     "-DMAGNUM_WITH_PLUGINS_LIBDIR=${magnum-with-plugins}/lib/magnum/importers"
   ];

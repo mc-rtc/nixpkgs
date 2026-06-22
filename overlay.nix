@@ -8,6 +8,7 @@
 {
   lib,
   with-ros ? false,
+  with-python ? true,
   ...
 }:
 (
@@ -47,15 +48,15 @@
     });
 
     eigen3-to-python = prev.callPackage ./pkgs/eigen3-to-python { };
-    spacevecalg = prev.callPackage ./pkgs/spacevecalg { };
-    rbdyn = prev.callPackage ./pkgs/rbdyn { };
+    spacevecalg = prev.callPackage ./pkgs/spacevecalg { inherit with-python; };
+    rbdyn = prev.callPackage ./pkgs/rbdyn { inherit with-python; };
     eigen-qld = prev.callPackage ./pkgs/eigen-qld { };
     eigen-quadprog = prev.callPackage ./pkgs/eigen-quadprog { };
     sch-core = prev.callPackage ./pkgs/sch-core { };
     sch-core-python = prev.callPackage ./pkgs/sch-core-python { };
     #sch-visualization = prev.callPackage ./pkgs/sch-visualization {};
     sch-visualization = prev.callPackage ./pkgs/sch-visualization { };
-    tasks-qld = prev.callPackage ./pkgs/tasks { };
+    tasks-qld = prev.callPackage ./pkgs/tasks { inherit with-python; };
     tasks = final.tasks-qld;
     # mc-rtc-data = prev.callPackage ./pkgs/mc-rtc-data { with-ros = false; };
     mc-rtc-data = callWithRos ./pkgs/mc-rtc-data { };
@@ -116,7 +117,10 @@
     # 1.12.0 against fmt_9 (technically it supports fmt_10 but nixpkgs used to build it against fmt_9 on purpose). To avoid rebuilding the world, we leave fmt_12 everywhere else,
     # this might cause some headache down the line.
     # TODO: patch mc-rtc and eigen-fmt with fmt_12 support
-    mc-rtc = callWithRos ./pkgs/mc-rtc/mc-rtc.nix { };
+    mc-rtc = callWithRos ./pkgs/mc-rtc/mc-rtc.nix {
+      with-python-bindings = with-python;
+      with-python-tools = true;
+    };
     mc-rtc-python-utils = prev.callPackage ./pkgs/mc-rtc/mc-rtc-python-utils.nix { };
     #mc-rtc = callWithRos ./pkgs/mc-rtc/mc-rtc.nix {};
     # mc-rtc-rviz-panel = prev.libsForQt5.callPackage ./pkgs/mc-rtc/ros/mc-rtc-rviz-panel.nix { inherit useLocal; inherit localWorkspace; };

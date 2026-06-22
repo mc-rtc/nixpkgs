@@ -65,7 +65,7 @@ buildRosPackage {
     description = "Tools for the mc_rtc framework built around ROS (rviz panel, etc)";
     homepage = "https://github.com/jrl-umi3218/mc_rtc_ros";
     license = lib.licenses.bsd2;
-    platforms = lib.platforms.linux;
+    platforms = lib.platforms.all;
     maintainers = [ ];
   };
 }
