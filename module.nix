@@ -318,16 +318,17 @@
                 env-mj-description
                 ;
 
-              inherit (pkgs)
-                mc-mujoco
-                mc-mujoco-full
-                ;
               inherit (pkgs) panda-prosthesis mc-force-shoe-plugin sphinx-cmake;
             })
+            # TODO: support these on darwin
             (lib.mkIf (!pkgs.stdenv.hostPlatform.isDarwin) {
               inherit (pkgs)
                 mc-franka
                 mc-udp
+                ;
+              inherit (pkgs)
+                mc-mujoco
+                mc-mujoco-full
                 ;
             })
             (lib.mkIf (cfg.packages && cfg.overlays.private) {
