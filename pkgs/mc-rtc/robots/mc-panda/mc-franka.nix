@@ -1,12 +1,12 @@
 {
   stdenv,
   lib,
-  fetchgit,
+  fetchFromGitHub,
   cmake,
   mc-rtc,
-  libfranka,
+  libfranka_0_9_2,
   mc-panda,
-  with-rt ? true,
+  with-rt ? false,
   sudo ? null,
   libcap ? null,
 }:
@@ -22,14 +22,13 @@ stdenv.mkDerivation {
   pname = "mc-franka";
   version = "1.0.0";
 
-  src =
-    # TODO: release mc-franka
-    fetchgit {
-      url = "https://github.com/jrl-umi3218/mc_franka";
-      # topic/nix
-      rev = "a1ee4100b489d50f1c9cbe7e5913183939678ef3";
-      sha256 = "sha256-CXh2wCVIC3FxZ+bBmHXNGXYGqiqFStITFj9NRgGT5EU=";
-    };
+  # TODO: release mc-franka
+  src = fetchFromGitHub {
+    owner = "jrl-umi3218";
+    repo = "mc_franka";
+    rev = "1d2e73df4c830ea950d15afaba659c8f470435e1";
+    hash = "sha256-N4pUjpGqoMuzllfZF5B0Sva+sP71LszY/AXarEO9mAw=";
+  };
 
   nativeBuildInputs = [
     cmake
@@ -40,14 +39,13 @@ stdenv.mkDerivation {
   ];
   propagatedBuildInputs = [
     mc-rtc
-    libfranka
+    libfranka_0_9_2
     mc-panda
   ];
 
   cmakeFlags = [
     (lib.cmakeBool "USE_REALTIME" use-rt)
     "-DPYTHON_BINDING=OFF"
-    "-DINSTALL_DOCUMENTATION=OFF"
     "-DMC_RTC_HONOR_INSTALL_PREFIX=ON"
   ];
 

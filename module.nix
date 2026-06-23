@@ -314,6 +314,7 @@ in
                 # Main GUIs and applications
                 inherit (pkgs)
                   mc-rtc-magnum
+                  libfranka_0_9_2
                   mc-franka
                   ;
 

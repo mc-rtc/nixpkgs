@@ -107,20 +107,12 @@
     mc-panda-lirmm = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/mc-panda-lirmm.nix { };
     mc-robogami = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-robogami.nix { };
 
-    libfranka = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/libfranka.nix { };
+    libfranka_0_9_2 = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/libfranka.nix { };
     # mc-franka = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/mc-franka.nix {};
     mc-franka = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/mc-franka.nix { };
-    # poco = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/libpoco.nix { };
     mesh-sampling = prev.callPackage ./pkgs/mesh-sampling { };
     # mesh-sampling = prev.callPackage ./pkgs/mesh-sampling {};
 
-    # XXX
-    # The current nixpkgs input uses fmt_12
-    # This breaks both eigen-fmt and PTransformd
-    # In mc-rtc fmt is brought in through spdlog. Thus we build an older version
-    # 1.12.0 against fmt_9 (technically it supports fmt_10 but nixpkgs used to build it against fmt_9 on purpose). To avoid rebuilding the world, we leave fmt_12 everywhere else,
-    # this might cause some headache down the line.
-    # TODO: patch mc-rtc and eigen-fmt with fmt_12 support
     mc-rtc = callWithRos ./pkgs/mc-rtc/mc-rtc.nix {
       with-python-bindings = with-python;
       with-python-tools = true;

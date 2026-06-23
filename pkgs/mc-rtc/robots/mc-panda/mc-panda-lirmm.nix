@@ -13,14 +13,13 @@ stdenv.mkDerivation {
   pname = "mc-panda-lirmm";
   version = "${version}";
 
-  src =
-    # TODO: release mc-panda-lirmm
-    fetchFromGitHub {
-      owner = "jrl-umi3218";
-      repo = "mc_panda_lirmm";
-      rev = "abe9116f7fe216e30577203b6e03f44f2e3e6b58";
-      hash = "sha256-LFxQgzjKPFuZjVkVIZPw5IXtS9rpSrQqPVcbQGUkHVU=";
-    };
+  # TODO: release mc-panda-lirmm
+  src = fetchFromGitHub {
+    owner = "jrl-umi3218";
+    repo = "mc_panda_lirmm";
+    rev = "d53e7990b43fc0ed0345e9e01f808ded7e0eaf4b";
+    hash = "sha256-62sF6w2so6Q4J1Ghrn2X56xm+sjXhmF9xZ9XaEK1lUA=";
+  };
 
   nativeBuildInputs = [ cmake ];
   propagatedBuildInputs = [ mc-panda ];

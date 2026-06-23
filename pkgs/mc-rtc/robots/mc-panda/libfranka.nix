@@ -3,62 +3,41 @@
   lib,
   fetchgit,
   cmake,
-  pkg-config,
   eigen,
   poco,
   tinyxml-2,
-  # , doxygen, graphviz
 }:
 
 stdenv.mkDerivation {
-  pname = "libfranka";
+  pname = "libfranka_0_9_2";
   version = "0.9.2";
 
   src = fetchgit {
-    url = "https://github.com/frankarobotics/libfranka";
-    rev = "f3b8d775a9c847cab32684c8a316f67867761674";
-    sha256 = "sha256-xPzzJ4YlRz7MVRgcZaV3QhlOrUFlajJLaArchBylCQM=";
+    url = "https://github.com/jrl-umi3218/libfranka";
+    rev = "f3bbab62bfbbd64a59cf35d427199963630d5506";
+    hash = "sha256-AvAOY9DbzcoOHqvkfL7ADXICX40t+ke+zkunPVcEzVE=";
     fetchSubmodules = true;
   };
 
   nativeBuildInputs = [
     cmake
-    pkg-config
-  ];
-  buildInputs = [
-    eigen
-    poco
-    tinyxml-2
   ];
   propagatedBuildInputs = [
     poco
+    eigen
     tinyxml-2
   ];
 
-  # Optional: enable documentation if you want
-  # nativeBuildInputs = nativeBuildInputs ++ [ doxygen graphviz ];
-
-  patches = [ ./libfranka-cmake-version.patch ];
-
-  postPatch = lib.optionalString stdenv.hostPlatform.isDarwin ''
-    substituteInPlace src/network.cpp \
-      --replace "TCP_KEEPIDLE" "TCP_KEEPALIVE"
-  '';
-
   cmakeFlags = [
-    "-DCMAKE_CXX_STANDARD=14"
     "-DBUILD_EXAMPLES=ON"
     "-DBUILD_TESTS=OFF"
-    "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
-    "-DCMAKE_INSTALL_LIBDIR=lib"
-    "-DCMAKE_INSTALL_CMAKEDIR=lib/cmake/Franka"
   ];
 
   doCheck = false;
 
   meta = with lib; {
     description = "C++ library for Franka Robotics research robots";
-    homepage = "https://github.com/frankarobotics/libfranka";
+    homepage = "https://github.com/jrl-umi3218/libfranka";
     license = licenses.asl20;
     # platforms = platforms.linux;
     maintainers = [ ];
