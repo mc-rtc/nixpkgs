@@ -1,7 +1,7 @@
 {
   stdenv,
   lib,
-  fetchgit,
+  fetchFromGitHub,
   mc-panda,
   cmake,
 }:
@@ -15,11 +15,11 @@ stdenv.mkDerivation {
 
   src =
     # TODO: release mc-panda-lirmm
-    fetchgit {
-      url = "https://github.com/arntanguy/mc_panda_lirmm";
-      # topic/ConnectModules
-      rev = "bbc682cd18f01ee6a058971268f8d5b46bffa84f";
-      sha256 = "sha256-lEt27kzOaeN2gMFz2p2f2v7Kq97RW/JG12YbinTr2IE=";
+    fetchFromGitHub {
+      owner = "jrl-umi3218";
+      repo = "mc_panda_lirmm";
+      rev = "abe9116f7fe216e30577203b6e03f44f2e3e6b58";
+      hash = "sha256-LFxQgzjKPFuZjVkVIZPw5IXtS9rpSrQqPVcbQGUkHVU=";
     };
 
   nativeBuildInputs = [ cmake ];
