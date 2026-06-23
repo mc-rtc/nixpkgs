@@ -40,6 +40,11 @@ stdenv.mkDerivation {
 
   patches = [ ./libfranka-cmake-version.patch ];
 
+  postPatch = lib.optionalString stdenv.hostPlatform.isDarwin ''
+    substituteInPlace src/network.cpp \
+      --replace "TCP_KEEPIDLE" "TCP_KEEPALIVE"
+  '';
+
   cmakeFlags = [
     "-DCMAKE_CXX_STANDARD=14"
     "-DBUILD_EXAMPLES=ON"
