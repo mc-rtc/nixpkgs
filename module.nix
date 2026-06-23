@@ -157,9 +157,6 @@
                 robots = [
                   pkgs.mc-g1
                   pkgs.mc-h1
-                ]
-                ++ lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [
-                  # FIXME: macos support
                   pkgs.mc-panda
                   pkgs.mc-panda-lirmm
                 ]

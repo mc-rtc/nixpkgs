@@ -106,7 +106,7 @@
     libfranka = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/libfranka.nix { };
     # mc-franka = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/mc-franka.nix {};
     mc-franka = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/mc-franka.nix { };
-    poco = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/libpoco.nix { };
+    # poco = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/libpoco.nix { };
     mesh-sampling = prev.callPackage ./pkgs/mesh-sampling { };
     # mesh-sampling = prev.callPackage ./pkgs/mesh-sampling {};
 
