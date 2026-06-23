@@ -1,7 +1,7 @@
 {
   stdenv,
   lib,
-  fetchgit,
+  fetchFromGitHub,
   cmake,
   mc-rtc,
   libfranka,
@@ -16,11 +16,11 @@ stdenv.mkDerivation {
 
   src =
     # TODO: release mc-panda
-    fetchgit {
-      url = "https://github.com/arntanguy/mc_panda";
-      # topic/nix
-      rev = "34933cdd9802493627f4a0470166b87580be43ae";
-      sha256 = "sha256-bj/wGDqYwmzMqJ5wziX1x/+gXamYsCXrhB2/anN0Gmk=";
+    fetchFromGitHub {
+      owner = "jrl-umi3218";
+      repo = "mc_panda";
+      rev = "f88687e4725a75cdca5e415cc155fc570fb50629";
+      hash = "sha256-K8ENsehcDvEbceuWvsvJzdEi5DLJELVpj4KFgjFkpzA=";
     };
 
   nativeBuildInputs = [ cmake ];
