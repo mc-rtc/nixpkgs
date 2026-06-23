@@ -6,10 +6,18 @@
   mc-rtc,
   libfranka,
   mc-panda,
-  sudo,
-  libcap,
+  with-rt ? true,
+  sudo ? null,
+  libcap ? null,
 }:
 
+let
+  use-rt =
+    if (with-rt && stdenv.hostPlatform.isDarwin) then
+      builtins.trace "mc-franka: disabling with-rt option because it is currently not supported on darwin" false
+    else
+      with-rt;
+in
 stdenv.mkDerivation {
   pname = "mc-franka";
   version = "1.0.0";
@@ -25,6 +33,8 @@ stdenv.mkDerivation {
 
   nativeBuildInputs = [
     cmake
+  ]
+  ++ lib.optionals (use-rt && !stdenv.hostPlatform.isDarwin) [
     sudo
     libcap
   ];
@@ -35,7 +45,7 @@ stdenv.mkDerivation {
   ];
 
   cmakeFlags = [
-    "-DUSE_REALTIME=OFF"
+    (lib.cmakeBool "USE_REALTIME" use-rt)
     "-DPYTHON_BINDING=OFF"
     "-DINSTALL_DOCUMENTATION=OFF"
     "-DMC_RTC_HONOR_INSTALL_PREFIX=ON"
