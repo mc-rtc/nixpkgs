@@ -288,6 +288,7 @@
               # Main GUIs and applications
               inherit (pkgs)
                 mc-rtc-magnum
+                mc-franka
                 ;
 
               # Main robots
@@ -324,7 +325,6 @@
             # TODO: support these on darwin
             (lib.mkIf (!pkgs.stdenv.hostPlatform.isDarwin) {
               inherit (pkgs)
-                mc-franka
                 mc-udp
                 ;
               inherit (pkgs)
