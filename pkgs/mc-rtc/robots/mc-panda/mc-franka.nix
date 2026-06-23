@@ -1,7 +1,7 @@
 {
   stdenv,
   lib,
-  fetchgit,
+  fetchFromGitHub,
   cmake,
   mc-rtc,
   libfranka,
@@ -22,14 +22,14 @@ stdenv.mkDerivation {
   pname = "mc-franka";
   version = "1.0.0";
 
-  src =
-    # TODO: release mc-franka
-    fetchgit {
-      url = "https://github.com/jrl-umi3218/mc_franka";
-      # topic/nix
-      rev = "a1ee4100b489d50f1c9cbe7e5913183939678ef3";
-      sha256 = "sha256-CXh2wCVIC3FxZ+bBmHXNGXYGqiqFStITFj9NRgGT5EU=";
-    };
+  # TODO: release mc-franka
+  # topic/nix
+  src = fetchFromGitHub {
+    owner = "jrl-umi3218";
+    repo = "mc_franka";
+    rev = "28f38fa3c3ca0fc6d3c42ee552e2ca26bec38bf9";
+    hash = "sha256-H1J2Z74xxh2shfwlNWLxXoTWxgeUE1SErQW8WtNnCng=";
+  };
 
   nativeBuildInputs = [
     cmake
