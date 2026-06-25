@@ -19,12 +19,12 @@
 
 let
   pname = "mc-rtc-rviz-panel";
-  version = "1.6.1";
+  version = "1.7.0";
   fetched = fetchFromGitHub {
     owner = "jrl-umi3218";
     repo = "mc_rtc_ros";
-    rev = "d769df946c38f8a5befc2fe790fdba9ac739d566"; # TODO: release mc_rtc_ros
-    sha256 = "sha256-Gmxv/nYKGcK9G1r0i08kLzTc2Dj8qCAQA/S0bic1LKA=";
+    rev = "f08a371289c49e677cd5107c581569811b03117f";
+    hash = "sha256-/hWW4ETOUEGo8wFOBA97dt0ZmOB0AI7mfs35/cfIDJE=";
   };
   # fetchFromGitHub {
   #   owner = "arntanguy";

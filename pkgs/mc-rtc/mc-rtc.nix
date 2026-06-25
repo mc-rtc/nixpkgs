@@ -26,6 +26,7 @@
   mesh-sampling,
   python3Packages,
   qt5,
+  makeWrapper,
   doxygen,
   bundler, # Ruby for bundle dependencies
   with-ros ? false,
@@ -61,10 +62,12 @@ in
 
   buildInputs = [
     jrl-cmakemodules
+    qt5.qtbase
   ];
   nativeBuildInputs = [
     cmake
     qt5.wrapQtAppsHook
+    makeWrapper
     # for documentation
     doxygen
     bundler
@@ -142,6 +145,13 @@ in
       echo "Shrinking RPATH for $binary"
       patchelf --shrink-rpath --allowed-rpath-prefixes "$NIX_STORE" "$binary"
     done
+  '';
+
+  # Prevent Qt5 variables from being globally leaked or attached to other binaries
+  dontWrapQtApps = true;
+  postFixup = lib.optionalString with-python-tools ''
+    echo "Wrapping mc_log_ui with Qt5 environment variables..."
+    wrapProgram "$out/bin/mc_log_ui" "''${qtWrapperArgs[@]}"
   '';
 
   meta = with lib; {
