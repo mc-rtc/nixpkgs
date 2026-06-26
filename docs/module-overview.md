@@ -16,7 +16,7 @@ To get started, use:
 nix shell github:mc-rtc/nixpkgs#mc-rtc -c mc_rtc_new_fsm_controller TestController TestController
 cd TestController
 # adds our nix flake
-nix flake new -t github:mc-rtc/nixpkgs#controller
+nix flake init -t github:mc-rtc/nixpkgs#controller
 ```
 
 You should get (simplified here):
@@ -48,4 +48,82 @@ You should get (simplified here):
       }
     );
 }
+```
+
+This:
+- Declares the flake inputs
+- Initializes a flake using `flake-parts`
+- Declares the supported systems (`x86_64-linux`, `darwin`, etc).
+- Imports our flake module.
+
+You can configure the flake overlay with:
+
+```nix
+mc-rtc-nix
+{
+  with-ros = true; # whether to build with ROS
+  with-python = true; # whether to build with python bindings
+  overlays.private = false; # whether to include private repositories in the overlay (robots HRP, etc). You will need an SSH key and appropriate permissions to use them.
+  # ...
+}
+```
+
+To define a superbuild configuration for our example controller, we need two things:
+1. Declare how to build the package itself (since this is not upstreamed here)
+1. Tell `mc_rtc` how to use it.
+
+We furthermore want the ability to:
+1. Let nix deploy the project
+1. Build and install it from source
+
+This can be achieved as follows:
+
+```nix
+mc-rtc-superbuild =
+{ pkgs, ... }:
+{
+  enable = true; # enables the mc-rtc-superbuild module
+  project.pname = "test-controller-superbuild"; # prefix shell names
+  configurations = { # adds configurations for your controller
+    your-controller-minimal = {
+      extends = [ "minimal" ]; # adds a configuration based on the "minimal" preset
+      runtime = { # define runtime dependencies installed by nix
+        robots = [];
+
+        apps = [
+          pkgs.mc-rtc-magnum
+        ];
+        config = "lib/mc_controller/etc/your-controller/mc_rtc.yaml";
+      };
+      # define devel dependencies:
+      # - In devel shells, these are not built by Nix, you must build them from source.
+      # - In release shells, they are merged wiith the runtime configuration
+      # mc_rtc.yaml is configured to use them
+      devel = {
+        config = "lib64/mc_controller/etc/your-controller/mc_rtc.yaml";
+        controllers = [ pkgs.test-controller];
+      };
+    };
+  };
+};
+```
+
+Now you can get a developpement shell, with the current source tree built by Nix with
+
+```
+nix develop .#test-controller-superbuild-minimal
+```
+
+Or built from source, with `mc_rtc`'s runtime paths pre-configured to use-it with
+
+```
+nix develop .#test-controller-superbuild-minimal-devel
+cmake -B build $cmakeFlags -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR -G Ninja
+cmake --build build --target install
+```
+
+And execute in both cases with
+```
+(mc-rtc-magnum &) # visualization from apps category
+mc_rtc_ticker # default open-loop control of mc_rtc
 ```
