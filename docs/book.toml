@@ -1,0 +1,8 @@
+[book]
+authors = ["Arnaud Tanguy"]
+language = "en"
+src = "."
+title = "mc-rtc-nix"
+
+[output.html]
+git-repository-url = "https://github.com/mc-rtc/nixpkgs"
