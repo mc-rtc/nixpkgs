@@ -82,6 +82,7 @@
     mc-state-observation = prev.callPackage ./pkgs/mc-rtc/observers/mc-state-observation { };
     #lipm-walking-controller = prev.callPackage ./pkgs/mc-rtc/controllers/lipm-walking-controller {};
     # lipm-walking-controller = prev.callPackage ./pkgs/mc-rtc/controllers/lipm-walking-controller {};
+    robogami-controller = prev.callPackage ./pkgs/mc-rtc/controllers/robogami-controller { };
     #mc-rtc-raylib = prev.callPackage ./pkgs/mc-rtc-raylib {};
     mc-rtc-msgs = prev.callPackage ./pkgs/mc-rtc-msgs { };
     mc-udp = prev.callPackage ./pkgs/mc-udp { };
@@ -95,6 +96,7 @@
     jvrc-description = callWithRos ./pkgs/mc-rtc-data/jvrc-description.nix { };
     mc-env-description = callWithRos ./pkgs/mc-rtc-data/mc-env-description.nix { };
     mc-int-obj-description = callWithRos ./pkgs/mc-rtc-data/mc-int-obj-description.nix { };
+    robogami-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/robogami-description.nix { };
 
     # Robot modules
     mc-g1 = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-g1.nix { };
@@ -102,6 +104,7 @@
     mc-ur5e = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-ur5e.nix { };
     mc-panda = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda { };
     mc-panda-lirmm = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/mc-panda-lirmm.nix { };
+    mc-robogami = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-robogami.nix { };
 
     libfranka = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/libfranka.nix { };
     # mc-franka = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/mc-franka.nix {};
