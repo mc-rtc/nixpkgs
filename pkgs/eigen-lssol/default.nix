@@ -2,6 +2,7 @@
   stdenv,
   lib,
   cmake,
+  jrl-cmakemodules,
   pkg-config,
   doxygen,
   gfortran,
@@ -13,16 +14,16 @@ stdenv.mkDerivation (_finalAttrs: {
   pname = "eigen-lssol";
   version = "0.0.0";
 
-  src = builtins.fetchGit {
+  src = fetchGit {
     url = "git@gite.lirmm.fr:multi-contact/eigen-lssol.git";
     # Master
-    rev = "4663b177a04a2d397bb2e4e3f62ae139e911cac3";
-    submodules = true;
+    rev = "af9c2cf289935da022d405b8247616b70a717e6e";
   };
 
   nativeBuildInputs = [
     cmake
     pkg-config
+    jrl-cmakemodules
     doxygen
     gfortran
   ];
@@ -35,12 +36,6 @@ stdenv.mkDerivation (_finalAttrs: {
     "-DPYTHON_BINDING=OFF"
     "-DINSTALL_DOCUMENTATION=OFF"
   ];
-
-  postPatch = ''
-    # Require C++14 instead of C++11
-    substituteInPlace CMakeLists.txt \
-      --replace "set(CMAKE_CXX_STANDARD 11)" "set(CMAKE_CXX_STANDARD 14)"
-  '';
 
   doCheck = true;
 

@@ -351,6 +351,7 @@
                 mc-hrp4
                 mc-hrp5-p
                 mc-rhps1
+                eigen-lssol
                 tasks-lssol
                 ;
               inherit (pkgs)
