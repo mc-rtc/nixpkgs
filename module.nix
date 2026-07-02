@@ -131,6 +131,8 @@ in
     flake.flakeModules.superbuild = superbuildFlakeModule;
 
     flakoboros = {
+      # FIXME: Flakoboros pulls in qtwayland that does not exist on macos
+      enableQt = false;
       rosShellDistro = "kilted";
       extraPackages = [ "ninja" ];
       overlays = [
