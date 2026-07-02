@@ -182,9 +182,11 @@ in
               robots = [
                 mc-g1
                 mc-h1
+                mc-robogami
+              ]
+              ++ lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [
                 mc-panda
                 mc-panda-lirmm
-                mc-robogami
               ]
               ++ lib.optionals (cfg.with-ros || superbuildCfg.withRos) [
                 mc-ur5e
@@ -314,8 +316,6 @@ in
                 # Main GUIs and applications
                 inherit (pkgs)
                   mc-rtc-magnum
-                  libfranka_0_9_2
-                  mc-franka
                   ;
 
                 # Main robots
@@ -323,8 +323,6 @@ in
                   mc-g1
                   mc-h1
                   mc-ur5e
-                  mc-panda
-                  mc-panda-lirmm
                   mc-robogami
                   ;
 
@@ -354,6 +352,12 @@ in
               })
               (lib.optionalAttrs (!pkgs.stdenv.hostPlatform.isDarwin) {
                 inherit (pkgs) mc-udp mc-mujoco mc-mujoco-full;
+                inherit (pkgs)
+                  libfranka_0_9_2
+                  mc-franka
+                  mc-panda
+                  mc-panda-lirmm
+                  ;
               })
               (lib.optionalAttrs cfg.overlays.private {
                 inherit (pkgs)
