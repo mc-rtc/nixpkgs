@@ -184,7 +184,10 @@
                 ++ lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [
                   pkgs.mc-force-shoe-plugin
                 ];
-                apps = lib.optionals (cfg.overlays.private && !pkgs.stdenv.hostPlatform.isDarwin) [
+                apps = [
+                  pkgs.mc-franka
+                ]
+                ++ lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [
                   pkgs.mc-mujoco-full
                 ];
               };
