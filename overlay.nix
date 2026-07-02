@@ -9,6 +9,7 @@
   lib,
   with-ros ? false,
   with-python ? true,
+  qt, # qt5 or qt6
   ...
 }:
 (
@@ -123,11 +124,14 @@
     mc-rtc = callWithRos ./pkgs/mc-rtc/mc-rtc.nix {
       with-python-bindings = with-python;
       with-python-tools = true;
+      inherit qt;
     };
     mc-rtc-python-utils = prev.callPackage ./pkgs/mc-rtc/mc-rtc-python-utils.nix { };
     #mc-rtc = callWithRos ./pkgs/mc-rtc/mc-rtc.nix {};
     # mc-rtc-rviz-panel = prev.libsForQt5.callPackage ./pkgs/mc-rtc/ros/mc-rtc-rviz-panel.nix { inherit useLocal; inherit localWorkspace; };
-    mc-rtc-rviz-panel = prev.libsForQt5.callPackage ./pkgs/mc-rtc/ros/mc-rtc-rviz-panel.nix { };
+    mc-rtc-rviz-panel = prev.libsForQt5.callPackage ./pkgs/mc-rtc/ros/mc-rtc-rviz-panel.nix {
+      inherit qt;
+    };
     # mc-rtc-ticker = prev.callPackage ./pkgs/mc-rtc/ros/mc-rtc-ticker.nix {};
     mc-rtc-ticker = prev.callPackage ./pkgs/mc-rtc/ros/mc-rtc-ticker.nix { };
     # mc-rtc = prev.callPackage ./pkgs/mc-rtc/mc-rtc.nix { with-ros = true; };

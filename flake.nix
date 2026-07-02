@@ -38,7 +38,12 @@
     inputs:
     let
       flakeModule = inputs.flake-parts.lib.importApply ./module.nix {
-        inherit (inputs) gepetto jrl-cmakemodulesv2 make-shell;
+        inherit (inputs)
+          gepetto
+          flakoboros
+          jrl-cmakemodulesv2
+          make-shell
+          ;
       };
       inputTriggers = {
         buildPrivate = inputs.private-trigger.value or false;

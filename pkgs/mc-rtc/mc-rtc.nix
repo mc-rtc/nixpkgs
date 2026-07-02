@@ -25,8 +25,7 @@
   boost,
   mesh-sampling,
   python3Packages,
-  qt5,
-  makeWrapper,
+  qt,
   doxygen,
   bundler, # Ruby for bundle dependencies
   with-ros ? false,
@@ -46,6 +45,14 @@ let
     inherit fetchFromGitHub;
   };
   use-python-bindings = with-python-bindings && !stdenv.hostPlatform.isDarwin;
+  use-python-tools =
+    with-python-tools
+    && (
+      if lib.hasInfix "qtbase-5" qt.qtbase.name then
+        true
+      else
+        builtins.trace "warning: mc-rtc is requesting with-python-tools but it is not compatible with qt6, will build without it." false
+    );
 in
 
 (if with-ros then buildRosPackage else stdenv.mkDerivation) {
@@ -62,17 +69,16 @@ in
 
   buildInputs = [
     jrl-cmakemodules
-    qt5.qtbase
+    qt.qtbase
   ];
   nativeBuildInputs = [
     cmake
-    qt5.wrapQtAppsHook
-    makeWrapper
     # for documentation
     doxygen
     bundler
   ]
-  ++ lib.optionals (use-python-bindings || with-python-tools) [ python3Packages.python ]
+  ++ lib.optional use-python-tools qt.wrapQtAppsHook
+  ++ lib.optional (use-python-bindings || use-python-tools) python3Packages.python
   ++ lib.optionals use-python-bindings [
     python3Packages.distutils
     python3Packages.pytest
@@ -103,7 +109,7 @@ in
       python3Packages.tasks
     ]
   # for python utils (mc_rtc_new_fsm_controller, mc_log_ui, etc)
-  ++ lib.optionals with-python-tools [
+  ++ lib.optionals use-python-tools [
     python3Packages.gitpython
     python3Packages.pyqt5
     python3Packages.matplotlib
@@ -123,7 +129,7 @@ in
 
   cmakeFlags = [
     (lib.cmakeBool "PYTHON_BINDING" use-python-bindings)
-    (lib.cmakeBool "BUILD_MC_RTC_PYTHON_UTILS" with-python-tools) # does not need bindings
+    (lib.cmakeBool "BUILD_MC_RTC_PYTHON_UTILS" use-python-tools) # does not need bindings
     "-DBUILD_TESTING=OFF" # FIXME
     "-DINSTALL_DOCUMENTATION=ON" # Use a different output
   ];
@@ -131,13 +137,10 @@ in
   doCheck = true;
 
   passthru = {
-    inherit with-ros with-python-tools;
+    inherit with-ros;
+    with-python-tools = use-python-tools;
     with-python-bindings = use-python-bindings;
   };
-
-  postInstall = lib.optionalString with-python-tools ''
-    wrapQtApp $out/bin/mc_log_ui
-  '';
 
   # XXX: Without this fixupPhase fails due to RPATHS references to /build/
   preFixup = lib.optionalString use-python-bindings ''
@@ -145,13 +148,6 @@ in
       echo "Shrinking RPATH for $binary"
       patchelf --shrink-rpath --allowed-rpath-prefixes "$NIX_STORE" "$binary"
     done
-  '';
-
-  # Prevent Qt5 variables from being globally leaked or attached to other binaries
-  dontWrapQtApps = true;
-  postFixup = lib.optionalString with-python-tools ''
-    echo "Wrapping mc_log_ui with Qt5 environment variables..."
-    wrapProgram "$out/bin/mc_log_ui" "''${qtWrapperArgs[@]}"
   '';
 
   meta = with lib; {
