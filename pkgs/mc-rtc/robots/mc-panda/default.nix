@@ -4,7 +4,7 @@
   fetchFromGitHub,
   cmake,
   mc-rtc,
-  libfranka,
+  libfranka_0_9_2,
   franka-description,
   xacro,
   with-ros ? false,
@@ -12,22 +12,20 @@
 
 stdenv.mkDerivation {
   pname = "mc-panda";
-  version = "1.0.0";
+  version = "2.0.0";
 
-  src =
-    # TODO: release mc-panda
-    fetchFromGitHub {
-      owner = "jrl-umi3218";
-      repo = "mc_panda";
-      rev = "f88687e4725a75cdca5e415cc155fc570fb50629";
-      hash = "sha256-K8ENsehcDvEbceuWvsvJzdEi5DLJELVpj4KFgjFkpzA=";
-    };
+  src = fetchFromGitHub {
+    owner = "jrl-umi3218";
+    repo = "mc_panda";
+    tag = "v2.0.0";
+    hash = "sha256-CUFxcBXTsDplywrDNGyHB3ZkBIirNWeViY494h3Hxbk=";
+  };
 
   nativeBuildInputs = [ cmake ];
   propagatedBuildInputs = builtins.trace "panda with-ros: ${toString with-ros}" (
     [
       mc-rtc
-      libfranka
+      libfranka_0_9_2
     ]
     ++ lib.optional (with-ros) [
       franka-description
