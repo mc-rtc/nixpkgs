@@ -266,102 +266,98 @@
           # TODO: auto-generate
           packages = lib.mkMerge [
             (lib.mkIf cfg.gepetto.packages inputs'.gepetto.packages)
-            (lib.mkIf cfg.packages {
-              # Main dependencies
-              inherit (pkgs)
-                eigen3-to-python
-                spacevecalg
-                rbdyn
-                sch-core
-                sch-core-python
-                tasks
-                tasks-qld
-                tvm
-                eigen-quadprog
-                eigen-qld
-                state-observation
-                mesh-sampling
-                eigen-fmt
-                ;
+            (
+              lib.mkIf cfg.packages {
+                # Main dependencies
+                inherit (pkgs)
+                  eigen3-to-python
+                  spacevecalg
+                  rbdyn
+                  sch-core
+                  sch-core-python
+                  tasks
+                  tasks-qld
+                  tvm
+                  eigen-quadprog
+                  eigen-qld
+                  state-observation
+                  mesh-sampling
+                  eigen-fmt
+                  ;
 
-              # mc-rtc
-              inherit (pkgs) mc-rtc-data mc-rtc;
+                # mc-rtc
+                inherit (pkgs) mc-rtc-data mc-rtc;
 
-              # Main GUIs and applications
-              inherit (pkgs)
-                mc-rtc-magnum
-                mc-franka
-                ;
+                # Main GUIs and applications
+                inherit (pkgs)
+                  mc-rtc-magnum
+                  mc-franka
+                  ;
 
-              # Main robots
-              inherit (pkgs)
-                mc-g1
-                mc-h1
-                mc-ur5e
-                mc-panda
-                mc-panda-lirmm
-                mc-robogami
-                ;
+                # Main robots
+                inherit (pkgs)
+                  mc-g1
+                  mc-h1
+                  mc-ur5e
+                  mc-panda
+                  mc-panda-lirmm
+                  mc-robogami
+                  ;
 
-              # Robot description
-              inherit (pkgs)
-                mc-int-obj-description
-                jvrc-description
-                g1-description
-                h1-description
-                ur5e-description
-                robogami-description
-                ;
+                # Robot description
+                inherit (pkgs)
+                  mc-int-obj-description
+                  jvrc-description
+                  g1-description
+                  h1-description
+                  ur5e-description
+                  robogami-description
+                  ;
 
-              # MuJoCo Robots
-              inherit (pkgs)
-                h1-mj-description
-                jvrc1-mj-description
-                g1-mj-description
-                ur5e-mj-description
-                env-mj-description
-                ;
+                # MuJoCo Robots
+                inherit (pkgs)
+                  h1-mj-description
+                  jvrc1-mj-description
+                  g1-mj-description
+                  ur5e-mj-description
+                  env-mj-description
+                  ;
 
-              # Controllers
-              inherit (pkgs)
-                robogami-controller
-                ;
-              # lipm-walking-controller # FIXME: per-robot configuration
-
-              inherit (pkgs) panda-prosthesis mc-force-shoe-plugin sphinx-cmake;
-            })
-            (lib.mkIf cfg.with-ros {
-              inherit (pkgs)
-                mc-rtc-ticker
-                ;
-            })
-            # TODO: support these on darwin
-            (lib.mkIf (!pkgs.stdenv.hostPlatform.isDarwin) {
-              inherit (pkgs)
-                mc-udp
-                ;
-              inherit (pkgs)
-                mc-mujoco
-                mc-mujoco-full
-                ;
-            })
-            (lib.mkIf (cfg.packages && cfg.overlays.private) {
-              inherit (pkgs)
-                mc-hrp2
-                mc-hrp4
-                mc-hrp5-p
-                mc-rhps1
-                eigen-lssol
-                tasks-lssol
-                ;
-              inherit (pkgs)
-                politopix
-                mc-dynamic-polytopes
-                dcm-vrptask
-                polytopeController
-                ;
-            })
-          ];
+                inherit (pkgs) panda-prosthesis mc-force-shoe-plugin sphinx-cmake;
+              }
+              // lib.optionalAttrs (cfg.with-ros) {
+                inherit (pkgs)
+                  mc-rtc-ticker
+                  ;
+              }
+              //
+                # TODO: support these on darwin
+                lib.optionalAttrs (!pkgs.stdenv.hostPlatform.isDarwin) {
+                  inherit (pkgs)
+                    mc-udp
+                    ;
+                  inherit (pkgs)
+                    mc-mujoco
+                    mc-mujoco-full
+                    ;
+                }
+              // lib.optionalAttrs cfg.overlays.private {
+                inherit (pkgs)
+                  mc-hrp2
+                  mc-hrp4
+                  mc-hrp5-p
+                  mc-rhps1
+                  tasks-lssol
+                  ;
+                inherit (pkgs)
+                  politopix
+                  mc-dynamic-polytopes
+                  dcm-vrptask
+                  polytopeController
+                  ;
+              }
+            )
+          ]; # end mkMerge
 
           devShells = lib.mkMerge [
             (lib.mkIf cfg.gepetto.devShells inputs'.gepetto.devShells)
