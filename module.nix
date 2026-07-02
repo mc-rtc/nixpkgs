@@ -153,23 +153,25 @@
 
             default-all-robots = {
               extends = [ "default" ];
-              runtime = {
+              runtime = with pkgs; {
                 robots = [
-                  pkgs.mc-g1
-                  pkgs.mc-h1
-                  pkgs.mc-panda
-                  pkgs.mc-panda-lirmm
+                  mc-g1
+                  mc-h1
+                  mc-panda
+                  mc-panda-lirmm
+                  mc-robogami
                 ]
                 ++ lib.optionals cfg.with-ros [
-                  pkgs.mc-ur5e
+                  mc-ur5e
                 ]
                 ++ lib.optionals cfg.overlays.private [
-                  pkgs.mc-hrp2
-                  pkgs.mc-hrp4
-                  pkgs.mc-hrp5-p
+                  mc-hrp2
+                  mc-hrp4
+                  mc-hrp5-p
                   # FIXME: disable mc-rhps1 as it is too heavy
                   # pkgs.mc-rhps1
                 ];
+                controllers = [ robogami-controller ];
               };
             };
 
@@ -298,12 +300,17 @@
                 mc-ur5e
                 mc-panda
                 mc-panda-lirmm
+                mc-robogami
                 ;
 
               # Robot description
               inherit (pkgs)
                 mc-int-obj-description
                 jvrc-description
+                g1-description
+                h1-description
+                ur5e-description
+                robogami-description
                 ;
 
               # MuJoCo Robots
@@ -314,6 +321,12 @@
                 ur5e-mj-description
                 env-mj-description
                 ;
+
+              # Controllers
+              inherit (pkgs)
+                robogami-controller
+                ;
+              # lipm-walking-controller # FIXME: per-robot configuration
 
               inherit (pkgs) panda-prosthesis mc-force-shoe-plugin sphinx-cmake;
             })
@@ -338,6 +351,7 @@
                 mc-hrp4
                 mc-hrp5-p
                 mc-rhps1
+                eigen-lssol
                 tasks-lssol
                 ;
               inherit (pkgs)
