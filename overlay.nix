@@ -94,6 +94,7 @@
     h1-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/h1-description.nix { };
     ur-description = prev.callPackage ./pkgs/mc-rtc/robots/descriptions/ur-description.nix { };
     ur5e-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/ur5e-description.nix { };
+    human-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/human-description.nix { };
     jvrc-description = callWithRos ./pkgs/mc-rtc-data/jvrc-description.nix { };
     mc-env-description = callWithRos ./pkgs/mc-rtc-data/mc-env-description.nix { };
     mc-int-obj-description = callWithRos ./pkgs/mc-rtc-data/mc-int-obj-description.nix { };
@@ -103,6 +104,7 @@
     mc-g1 = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-g1.nix { };
     mc-h1 = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-h1.nix { };
     mc-ur5e = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-ur5e.nix { };
+    mc-human = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-human.nix { };
     mc-panda = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda { };
     mc-panda-lirmm = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/mc-panda-lirmm.nix { };
     mc-robogami = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-robogami.nix { };
@@ -142,6 +144,7 @@
     g1-mj-description = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/g1-mj-description.nix { };
     h1-mj-description = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/h1-mj-description.nix { };
     ur5e-mj-description = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/ur5e-mj-description.nix { };
+    human-mj-description = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/human-mj-description.nix { };
 
     env-mj-description = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/env-mj-description.nix { };
 
@@ -154,10 +157,11 @@
     mc-mujoco-robots = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/default.nix { };
     # mc-mujoco with all public robots
     mc-mujoco-robots-public = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/default.nix {
-      robots = [
-        final.g1-mj-description
-        final.h1-mj-description
-        final.ur5e-mj-description
+      robots = with final; [
+        g1-mj-description
+        h1-mj-description
+        ur5e-mj-description
+        human-mj-description
       ];
     };
 
