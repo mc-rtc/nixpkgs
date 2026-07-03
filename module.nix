@@ -182,6 +182,7 @@ in
               robots = [
                 mc-g1
                 mc-h1
+                mc-human
                 mc-robogami
               ]
               ++ lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [
@@ -323,6 +324,7 @@ in
                   mc-g1
                   mc-h1
                   mc-ur5e
+                  mc-human
                   mc-robogami
                   ;
 
@@ -333,6 +335,7 @@ in
                   g1-description
                   h1-description
                   ur5e-description
+                  human-description
                   robogami-description
                   ;
 
@@ -342,6 +345,7 @@ in
                   jvrc1-mj-description
                   g1-mj-description
                   ur5e-mj-description
+                  human-mj-description
                   env-mj-description
                   ;
 
