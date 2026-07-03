@@ -18,6 +18,10 @@ let
     if isDevel then resolver.resolved.devel.runtime else resolver.resolved.release.runtime;
   develOverlay = resolver.resolved.devel.devel;
 
+  mainRobot = resolver.resolved.mainRobot;
+  enabled = resolver.resolved.enabled;
+  timeStep = resolver.resolved.timeStep;
+
   localPath = "$PWD/${relativeLocalPath}";
   localInstallPath = "${localPath}/install";
 
@@ -167,6 +171,9 @@ in
 
         cat <<EOF_CONF > $PROJECT_DIR/mc_rtc.yaml
         ---
+        ${lib.optionalString (mainRobot != null && mainRobot != "") "MainRobot: \"${mainRobot}\""}
+        ${lib.optionalString (enabled != null && enabled != "") "Enabled: \"${enabled}\""}
+        ${lib.optionalString (timeStep != null) "Timestep: ${toString timeStep}"}
         ControllerModulePaths: [${mkModulePaths "mc_controller" shellControllers}]
         RobotModulePaths: [${mkModulePaths "mc_robots" shellRobots}]
         ObserverModulePaths: [${mkModulePaths "mc_observers" shellObservers}]
