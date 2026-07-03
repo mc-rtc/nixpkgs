@@ -196,6 +196,7 @@ in
                 mc-hrp2
                 mc-hrp4
                 mc-hrp5-p
+                mc-miroki
               ];
               controllers = [ robogami-controller ];
             };
@@ -368,10 +369,21 @@ in
               })
               (lib.optionalAttrs cfg.overlays.private {
                 inherit (pkgs)
+                  hrp2-description
+                  hrp4-description
+                  hrp5-p-description
+                  rhps1-description
+                  miroki-description
+                  ;
+                inherit (pkgs)
                   mc-hrp2
                   mc-hrp4
                   mc-hrp5-p
                   mc-rhps1
+                  mc-miroki
+                  ;
+
+                inherit (pkgs)
                   tasks-lssol
                   politopix
                   mc-dynamic-polytopes
