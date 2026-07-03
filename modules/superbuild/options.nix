@@ -77,6 +77,24 @@ in
             default = [ ];
           };
 
+          mainRobot = lib.mkOption {
+            type = lib.types.nullOr lib.types.str;
+            default = null;
+            description = "Name of the MainRobot";
+          };
+
+          enabled = lib.mkOption {
+            type = lib.types.nullOr lib.types.str;
+            default = null;
+            description = "Name of the Enabled controller";
+          };
+
+          timeStep = lib.mkOption {
+            type = lib.types.nullOr lib.types.number;
+            default = null;
+            description = "TimeStep";
+          };
+
           runtime = lib.mkOption {
             type = lib.types.submodule { options = runtimeOptions; };
             default = { };

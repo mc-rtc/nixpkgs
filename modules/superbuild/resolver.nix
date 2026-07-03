@@ -15,12 +15,17 @@ let
 
   mkRuntime = mkComponent;
 
+  # 1. Added defaults to mkPreset
   mkPreset = {
+    mainRobot = null;
+    enabled = null;
+    timeStep = null;
     runtime = mkRuntime;
     devel = mkComponent;
   };
 
   preferString = previous: next: if next != null && next != "" then next else previous;
+  preferNumber = previous: next: if next != null then next else previous;
 
   mergeComponent = left: right: {
     apps = left.apps ++ right.apps;
@@ -35,6 +40,9 @@ let
   mergeRuntime = mergeComponent;
 
   mergePreset = left: right: {
+    mainRobot = preferString (left.mainRobot or null) (right.mainRobot or null);
+    enabled = preferString (left.enabled or null) (right.enabled or null);
+    timeStep = preferNumber (left.timeStep or null) (right.timeStep or null);
     runtime = mergeRuntime left.runtime right.runtime;
     devel = mergeComponent left.devel right.devel;
   };
@@ -56,7 +64,11 @@ let
 
   project = cfg.project;
 
+  # 2. Ensured overlay includes configuration items from project top-level
   projectOverlay = {
+    mainRobot = project.mainRobot or null;
+    enabled = project.enabled or null;
+    timeStep = project.timeStep or null;
     runtime = project.runtime;
     devel = project.devel;
   };
@@ -90,7 +102,11 @@ in
     mkPreset
     selectedConfiguration
     ;
+  # 3. Made mainRobot, enabled, and timeStep directly available at the root of resolved
   resolved = {
+    mainRobot = base.mainRobot;
+    enabled = base.enabled;
+    timeStep = base.timeStep;
     inherit base release devel;
   };
 }
