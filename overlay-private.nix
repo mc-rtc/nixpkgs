@@ -14,10 +14,12 @@
     hrp4-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/hrp4-description.nix { };
     hrp5-p-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/hrp5-p-description.nix { };
     rhps1-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/rhps1-description.nix { };
+    miroki-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/miroki-description.nix { };
     mc-hrp2 = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-hrp2.nix { };
     mc-hrp4 = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-hrp4.nix { };
     mc-hrp5-p = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-hrp5-p.nix { };
     mc-rhps1 = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-rhps1.nix { };
+    mc-miroki = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-miroki.nix { };
 
     rhps1-mj-description = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/rhps1-mj-description.nix { };
     hrp4-mj-description = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/hrp4-mj-description.nix { };
