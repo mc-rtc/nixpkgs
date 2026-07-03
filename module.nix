@@ -184,6 +184,7 @@ in
                 mc-h1
                 mc-human
                 mc-robogami
+                mc-pepper
               ]
               ++ lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [
                 mc-panda
@@ -327,6 +328,7 @@ in
                   mc-ur5e
                   mc-human
                   mc-robogami
+                  mc-pepper
                   ;
 
                 # Robot description
@@ -338,6 +340,7 @@ in
                   ur5e-description
                   human-description
                   robogami-description
+                  pepper-description
                   ;
 
                 # MuJoCo Robots

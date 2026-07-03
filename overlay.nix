@@ -99,6 +99,7 @@
     mc-env-description = callWithRos ./pkgs/mc-rtc-data/mc-env-description.nix { };
     mc-int-obj-description = callWithRos ./pkgs/mc-rtc-data/mc-int-obj-description.nix { };
     robogami-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/robogami-description.nix { };
+    pepper-description = callWithRos ./pkgs/mc-rtc/robots/mc-pepper/pepper-description.nix { };
 
     # Robot modules
     mc-g1 = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-g1.nix { };
@@ -108,6 +109,7 @@
     mc-panda = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda { };
     mc-panda-lirmm = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/mc-panda-lirmm.nix { };
     mc-robogami = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-robogami.nix { };
+    mc-pepper = prev.callPackage ./pkgs/mc-rtc/robots/mc-pepper/mc-pepper.nix { };
 
     libfranka_0_9_2 = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/libfranka.nix { };
     # mc-franka = prev.callPackage ./pkgs/mc-rtc/robots/mc-panda/mc-franka.nix {};
