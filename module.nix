@@ -350,6 +350,9 @@ in
                   ;
 
                 inherit (pkgs) panda-prosthesis mc-force-shoe-plugin sphinx-cmake;
+
+                # Tools
+                inherit (pkgs) mc-robot-tools;
               }
               (lib.optionalAttrs (cfg.with-ros || superbuildCfg.withRos) {
                 inherit (pkgs) mc-rtc-ticker;

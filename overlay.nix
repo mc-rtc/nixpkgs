@@ -213,6 +213,14 @@
 
     sphinx-cmake = prev.callPackage ./pkgs/sphinx-cmake.nix { };
 
+    ##########
+    # TOOLS  #
+    ##########
+    mc-robot-tools = prev.callPackage ./pkgs/mc-rtc/tools/mc-robot-tools.nix { };
+
+    ##########
+    # PYTHON #
+    ##########
     pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
       (
         python-final: _python-prev:
