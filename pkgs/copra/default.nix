@@ -31,7 +31,6 @@ stdenv.mkDerivation rec {
   ];
 
   cmakeFlags = [
-    "-DBUILD_TESTING=OFF"
     "-DPYTHON_BINDING=OFF"
     "-DINSTALL_DOCUMENTATION=OFF"
   ];

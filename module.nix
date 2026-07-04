@@ -354,10 +354,14 @@ in
                   env-mj-description
                   ;
 
-                inherit (pkgs) panda-prosthesis mc-force-shoe-plugin sphinx-cmake;
+                # Controllers
+                inherit (pkgs) panda-prosthesis robogami-controller lipm-walking-controller;
+
+                # Plugins
+                inherit (pkgs) mc-force-shoe-plugin;
 
                 # Tools
-                inherit (pkgs) mc-robot-tools;
+                inherit (pkgs) mc-robot-tools sphinx-cmake;
               }
               (lib.optionalAttrs (cfg.with-ros || superbuildCfg.withRos) {
                 inherit (pkgs) mc-rtc-ticker;
