@@ -160,6 +160,8 @@ in
             specialArgs = { inherit pkgs; };
           }).config;
 
+        maybe-mc-mujoco = lib.optional (!pkgs.stdenv.hostPlatform.isDarwin) pkgs.mc-mujoco;
+
         builtInConfigurations = {
           minimal = {
             runtime = { };
@@ -223,9 +225,7 @@ in
             enabled = "LIPMWalking";
             runtime = {
               observers = [ mc-state-observation ];
-              apps = [
-                mc-mujoco
-              ];
+              apps = maybe-mc-mujoco;
             };
             devel = {
               controllers = [ lipm-walking-controller ];
