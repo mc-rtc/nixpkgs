@@ -311,6 +311,7 @@ in
                   state-observation
                   mesh-sampling
                   eigen-fmt
+                  copra
                   ;
 
                 # mc-rtc
