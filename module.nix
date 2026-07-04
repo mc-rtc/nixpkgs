@@ -217,6 +217,55 @@ in
               ];
             };
           };
+
+          lipm-walking = with pkgs; {
+            extends = [ "default" ];
+            enabled = "LIPMWalking";
+            runtime = {
+              observers = [ mc-state-observation ];
+              apps = [
+                mc-mujoco
+              ];
+            };
+            devel = {
+              controllers = [ lipm-walking-controller ];
+            };
+          };
+
+          robogami = with pkgs; {
+            extends = [ "default" ];
+            mainRobot = "robogami";
+            enabled = "RobogamiController";
+            runtime = {
+              robots = [
+                mc-robogami
+              ];
+            };
+            devel = {
+              controllers = [ robogami-controller ];
+            };
+          };
+
+          panda-prosthesis = with pkgs; {
+            extends = [ "minimal" ];
+            runtime = {
+              robots = [
+                mc-panda-lirmm
+                mc-panda
+              ];
+
+              apps = [
+                mc-rtc-magnum
+              ];
+              config = "lib/mc_controller/etc/panda_prosthesis/mc_rtc.yaml";
+            };
+            devel = {
+              config = "lib64/mc_controller/etc/panda_prosthesis/mc_rtc.yaml";
+              controllers = [ panda-prosthesis ];
+              plugins = [ panda-prosthesis ];
+              robots = [ panda-prosthesis ];
+            };
+          };
         };
 
         configurations = builtInConfigurations // superbuildCfg.configurations;
