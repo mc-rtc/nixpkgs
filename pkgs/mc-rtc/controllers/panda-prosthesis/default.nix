@@ -9,29 +9,25 @@
   screen,
   minicom,
   mc-panda-lirmm,
+  pkg-config,
 }:
 
 stdenv.mkDerivation {
   pname = "panda-prosthesis";
   version = "1.0.0";
 
-  src =
-    # TODO: release panda-prosthesis
-    # fetchgit {
-    #   #url = "https://github.com/ROLKNEEMATICS/panda_prosthesis";
-    #   url = "https://github.com/arntanguy/panda_prosthesis_rolkneematics";
-    #   # topic/ConnectModules
-    #   rev = "edef20d6a4b05ba5868e399d63984f18da64bac4";
-    #   sha256 = "sha256-yzIjxDpD0ry6j9+a5n6y+PAgYmtrtwUeZDFC0/M7aR4=";
-    # };
-    fetchFromGitHub {
-      owner = "arntanguy";
-      repo = "panda_prosthesis_rolkneematics";
-      rev = "734a0a3496042a33ba1ec74cb771c6fa17415e6e";
-      hash = "sha256-w3o5mYrwPic1/9ZkNPpwCtQ958L1e8vNoOBPx34+CxI=";
-    };
+  # TODO: release panda-prosthesis
+  src = fetchFromGitHub {
+    owner = "rolkneematics";
+    repo = "panda_prosthesis";
+    rev = "1653b020ae5ea207659fecc4ec0b0eaff65e369a";
+    hash = "sha256-ZOaSpVhhxuWGaRaE5JSgpc05FptT6eX8A07/yhdCi1k=";
+  };
 
-  nativeBuildInputs = [ cmake ];
+  nativeBuildInputs = [
+    cmake
+    pkg-config
+  ];
   propagatedBuildInputs = [
     mc-rtc
     mc-panda-lirmm

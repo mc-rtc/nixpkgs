@@ -160,6 +160,8 @@ in
             specialArgs = { inherit pkgs; };
           }).config;
 
+        maybe-mc-mujoco = lib.optional (!pkgs.stdenv.hostPlatform.isDarwin) pkgs.mc-mujoco;
+
         builtInConfigurations = {
           minimal = {
             runtime = { };
@@ -215,6 +217,53 @@ in
               apps = lib.optionals (cfg.overlays.private && !pkgs.stdenv.hostPlatform.isDarwin) [
                 pkgs.mc-mujoco-full
               ];
+            };
+          };
+
+          lipm-walking = with pkgs; {
+            extends = [ "default" ];
+            enabled = "LIPMWalking";
+            runtime = {
+              observers = [ mc-state-observation ];
+              apps = maybe-mc-mujoco;
+            };
+            devel = {
+              controllers = [ lipm-walking-controller ];
+            };
+          };
+
+          robogami = with pkgs; {
+            extends = [ "default" ];
+            mainRobot = "robogami";
+            enabled = "RobogamiController";
+            runtime = {
+              robots = [
+                mc-robogami
+              ];
+            };
+            devel = {
+              controllers = [ robogami-controller ];
+            };
+          };
+
+          panda-prosthesis = with pkgs; {
+            extends = [ "minimal" ];
+            runtime = {
+              robots = [
+                mc-panda-lirmm
+                mc-panda
+              ];
+
+              apps = [
+                mc-rtc-magnum
+              ];
+              config = "lib/mc_controller/etc/panda_prosthesis/mc_rtc.yaml";
+            };
+            devel = {
+              config = "lib64/mc_controller/etc/panda_prosthesis/mc_rtc.yaml";
+              controllers = [ panda-prosthesis ];
+              plugins = [ panda-prosthesis ];
+              robots = [ panda-prosthesis ];
             };
           };
         };
@@ -311,6 +360,7 @@ in
                   state-observation
                   mesh-sampling
                   eigen-fmt
+                  copra
                   ;
 
                 # mc-rtc
@@ -353,10 +403,14 @@ in
                   env-mj-description
                   ;
 
-                inherit (pkgs) panda-prosthesis mc-force-shoe-plugin sphinx-cmake;
+                # Controllers
+                inherit (pkgs) panda-prosthesis robogami-controller lipm-walking-controller;
+
+                # Plugins
+                inherit (pkgs) mc-force-shoe-plugin;
 
                 # Tools
-                inherit (pkgs) mc-robot-tools;
+                inherit (pkgs) mc-robot-tools sphinx-cmake;
               }
               (lib.optionalAttrs (cfg.with-ros || superbuildCfg.withRos) {
                 inherit (pkgs) mc-rtc-ticker;

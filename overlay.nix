@@ -81,8 +81,7 @@
     };
     # mc-state-observation = prev.callPackage ./pkgs/mc-rtc/observers/mc-state-observation;
     mc-state-observation = prev.callPackage ./pkgs/mc-rtc/observers/mc-state-observation { };
-    #lipm-walking-controller = prev.callPackage ./pkgs/mc-rtc/controllers/lipm-walking-controller {};
-    # lipm-walking-controller = prev.callPackage ./pkgs/mc-rtc/controllers/lipm-walking-controller {};
+    lipm-walking-controller = prev.callPackage ./pkgs/mc-rtc/controllers/lipm-walking-controller { };
     robogami-controller = prev.callPackage ./pkgs/mc-rtc/controllers/robogami-controller { };
     #mc-rtc-raylib = prev.callPackage ./pkgs/mc-rtc-raylib {};
     mc-rtc-msgs = prev.callPackage ./pkgs/mc-rtc-msgs { };

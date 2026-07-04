@@ -1,23 +1,29 @@
 {
   stdenv,
   lib,
-  fetchurl,
+  fetchFromGitHub,
   cmake,
   boost,
   eigen-qld,
   eigen-quadprog,
+  jrl-cmakemodules,
 }:
 
-stdenv.mkDerivation {
+stdenv.mkDerivation rec {
   pname = "copra";
-  version = "1.2.2";
+  version = "1.3.3";
 
-  src = fetchurl {
-    url = "https://github.com/jrl-umi3218/copra/releases/download/v1.2.2/copra-v1.2.2.tar.gz";
-    sha256 = "1765z58rqgikkf9kp7f59skx45xbhlab6kxdp2kyvnqhn953gmvr";
+  src = fetchFromGitHub {
+    owner = "jrl-umi3218";
+    repo = "copra";
+    tag = "v${version}";
+    hash = "sha256-KD7Fu10JEkgVXjsfC6zE028U3yBJw/cFvW9o8NEHCVM=";
   };
 
-  nativeBuildInputs = [ cmake ];
+  nativeBuildInputs = [
+    cmake
+    jrl-cmakemodules
+  ];
   propagatedBuildInputs = [
     boost
     eigen-qld
@@ -25,7 +31,6 @@ stdenv.mkDerivation {
   ];
 
   cmakeFlags = [
-    "-DBUILD_TESTING=OFF"
     "-DPYTHON_BINDING=OFF"
     "-DINSTALL_DOCUMENTATION=OFF"
   ];
