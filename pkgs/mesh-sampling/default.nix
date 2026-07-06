@@ -12,15 +12,15 @@
   libz,
 }:
 
-stdenv.mkDerivation {
+stdenv.mkDerivation rec {
   pname = "mesh-sampling";
-  version = "1.1.0";
+  version = "1.2.0";
 
   src = fetchFromGitHub {
     owner = "jrl-umi3218";
     repo = "mesh_sampling";
-    rev = "6dbc4e4c3a4ecb57df03ca2467d4451d1afcd878";
-    hash = "sha256-w1z137pUR3LbkblVhfNaKBmMQytSti4HlAOJiZyH1Ms=";
+    tag = "v${version}";
+    hash = "sha256-M0YRXR4a4jhP074n7PMWUhUqLpU/P4jDuTH4G76YQdo=";
   };
 
   buildInputs = [
