@@ -19,8 +19,8 @@ stdenv.mkDerivation {
   src = fetchFromGitHub {
     owner = "jrl-umi3218";
     repo = "mesh_sampling";
-    tag = "v1.1.0";
-    hash = "sha256-hZ8v42g0+Kw0aQtOa9id8WQ/pwDMpn8QxxBXVXpPpJU=";
+    rev = "6dbc4e4c3a4ecb57df03ca2467d4451d1afcd878";
+    hash = "sha256-w1z137pUR3LbkblVhfNaKBmMQytSti4HlAOJiZyH1Ms=";
   };
 
   buildInputs = [
@@ -40,7 +40,8 @@ stdenv.mkDerivation {
   ];
 
   cmakeFlags = [
-    "-DINSTALL_DOCUMENTATION=OFF"
+    (lib.cmakeBool "USE_LEGACY_QHULL_STREAM" false)
+    (lib.cmakeBool "DINSTALL_DOCUMENTATION" false)
   ];
 
   doCheck = true;
