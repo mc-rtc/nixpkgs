@@ -222,8 +222,6 @@ in
         echo ""
 
         echo -e "mc_rtc will use the following configuration files $MC_RTC_CONTROLLER_CONFIG\n"
-        export MC_RTC_DISABLE_CONVEX_GENERATION_PATCH="ON"
-        echo -e "Warning:\n- MC_RTC_DISABLE_CONVEX_GENERATION_PATCH is set to ON, this will disable convex hull generation in mc_rtc\n"
         echo "--------"
       '';
   };
