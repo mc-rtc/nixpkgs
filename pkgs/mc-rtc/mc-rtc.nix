@@ -29,6 +29,7 @@
   doxygen,
   bundler, # Ruby for bundle dependencies
   with-ros ? false,
+  mc-rtc-ros-compat, # for both ros-free and ros version
   with-python-bindings ? true,
   with-python-tools ? true,
   rclcpp ? null,
@@ -101,6 +102,7 @@ in
     rapidjson
     boost
     mesh-sampling
+    mc-rtc-ros-compat
     fmt
   ]
   ++
