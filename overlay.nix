@@ -121,6 +121,9 @@
       with-python-tools = true;
       inherit qt;
     };
+    mc-rtc-ros-compat = callWithRos ./pkgs/mc-rtc/mc-rtc-ros-compat.nix {
+      jrl-cmakemodules = final.jrl-cmakemodulesv2;
+    };
     mc-rtc-python-utils = prev.callPackage ./pkgs/mc-rtc/mc-rtc-python-utils.nix { };
     #mc-rtc = callWithRos ./pkgs/mc-rtc/mc-rtc.nix {};
     # mc-rtc-rviz-panel = prev.libsForQt5.callPackage ./pkgs/mc-rtc/ros/mc-rtc-rviz-panel.nix { inherit useLocal; inherit localWorkspace; };
