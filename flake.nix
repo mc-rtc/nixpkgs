@@ -9,7 +9,7 @@
     systems.follows = "gepetto/systems";
     jrl-cmakemodulesv2 = {
       url = "github:jrl-umi3218/jrl-cmakemodules";
-      gepetto.follows = "gepetto/nixpkgs";
+      inputs.gepetto.follows = "gepetto";
     };
     make-shell.url = "github:nicknovitski/make-shell";
 
