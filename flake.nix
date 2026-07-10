@@ -8,7 +8,8 @@
     nixpkgs.follows = "gepetto/nixpkgs";
     systems.follows = "gepetto/systems";
     jrl-cmakemodulesv2 = {
-      url = "github:ahoarau/jrl-cmakemodules?ref=jrl-next";
+      url = "github:jrl-umi3218/jrl-cmakemodules";
+      gepetto.follows = "gepetto/nixpkgs";
     };
     make-shell.url = "github:nicknovitski/make-shell";
 
@@ -101,6 +102,14 @@
           flakoboros = {
             path = ./templates/flakoboros;
             description = "A flakoboros template for simple projects";
+          };
+          flakoboros-new-package = {
+            path = ./templates/flakoboros-new-package;
+            description = "A flakoboros template for simple projects";
+          };
+          flakoboros-new-cpp-package = {
+            path = ./templates/flakoboros-new-cpp-package;
+            description = "A flakoboros template for C++ projects (cmake + catch2 + jrl-cmakemodules)";
           };
           ros = {
             path = ./templates/ros;
