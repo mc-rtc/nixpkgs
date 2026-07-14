@@ -37,8 +37,8 @@ stdenv.mkDerivation (_finalAttrs: {
   src = fetchFromGitHub {
     owner = "arntanguy";
     repo = "mc_mujoco";
-    rev = "8ca3efe89478c96abf74bd30675ccdc424bcf178";
-    hash = "sha256-GDJKEOyRjPF5eTpXA7x82K86fjLyx3N3eTt2ZSmcYv4=";
+    rev = "1624553f835e022eacf747e0eee8da2aaf0af466";
+    hash = "sha256-d4SWYnSuB3Su+TJ6vBADthnTRd92slsYIEh7o/d10nw=";
   };
 
   buildInputs = [
