@@ -160,7 +160,7 @@ in
             specialArgs = { inherit pkgs; };
           }).config;
 
-        maybe-mc-mujoco = lib.optional (!pkgs.stdenv.hostPlatform.isDarwin) pkgs.mc-mujoco;
+        maybe-mc-mujoco = mujoco-pkg: lib.optional (!pkgs.stdenv.hostPlatform.isDarwin) mujoco-pkg;
 
         builtInConfigurations = {
           minimal = {
@@ -214,9 +214,7 @@ in
               ++ lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [
                 pkgs.mc-force-shoe-plugin
               ];
-              apps = lib.optionals (cfg.overlays.private && !pkgs.stdenv.hostPlatform.isDarwin) [
-                pkgs.mc-mujoco-full
-              ];
+              apps = maybe-mc-mujoco pkgs.mc-mujoco-full;
             };
           };
 
@@ -225,7 +223,7 @@ in
             enabled = "LIPMWalking";
             runtime = {
               observers = [ mc-state-observation ];
-              apps = maybe-mc-mujoco;
+              apps = maybe-mc-mujoco mc-mujoco;
             };
             devel = {
               controllers = [ lipm-walking-controller ];
