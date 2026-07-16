@@ -6,27 +6,31 @@
 (
   final: prev:
   let
-    callWithRos = pkg: args: prev.callPackage pkg (args // { inherit with-ros; });
+    callWithRos = pkg: args: final.callPackage pkg (args // { inherit with-ros; });
   in
   {
-    eigen-lssol = prev.callPackage ./pkgs/eigen-lssol/default.nix { };
+    eigen-lssol = final.callPackage ./pkgs/eigen-lssol/default.nix { };
     hrp2-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/hrp2-description.nix { };
     hrp4-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/hrp4-description.nix { };
     hrp5-p-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/hrp5-p-description.nix { };
     rhps1-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/rhps1-description.nix { };
     miroki-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/miroki-description.nix { };
-    mc-hrp2 = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-hrp2.nix { };
-    mc-hrp4 = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-hrp4.nix { };
-    mc-hrp5-p = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-hrp5-p.nix { };
-    mc-rhps1 = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-rhps1.nix { };
-    mc-miroki = prev.callPackage ./pkgs/mc-rtc/robots/modules/mc-miroki.nix { };
+    mc-hrp2 = final.callPackage ./pkgs/mc-rtc/robots/modules/mc-hrp2.nix { };
+    mc-hrp4 = final.callPackage ./pkgs/mc-rtc/robots/modules/mc-hrp4.nix { };
+    mc-hrp5-p = final.callPackage ./pkgs/mc-rtc/robots/modules/mc-hrp5-p.nix { };
+    mc-rhps1 = final.callPackage ./pkgs/mc-rtc/robots/modules/mc-rhps1.nix { };
+    mc-miroki = final.callPackage ./pkgs/mc-rtc/robots/modules/mc-miroki.nix { };
 
-    rhps1-mj-description = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/rhps1-mj-description.nix { };
-    hrp4-mj-description = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/hrp4-mj-description.nix { };
-    hrp5p-mj-description = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/hrp5p-mj-description.nix { };
+    rhps1-mj-description =
+      final.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/rhps1-mj-description.nix
+        { };
+    hrp4-mj-description = final.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/hrp4-mj-description.nix { };
+    hrp5p-mj-description =
+      final.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/hrp5p-mj-description.nix
+        { };
     # TODO: hrp2-mj-description does not exist
 
-    tasks-lssol = prev.callPackage ./pkgs/tasks {
+    tasks-lssol = final.callPackage ./pkgs/tasks {
       with-lssol = true;
       inherit with-python;
     };
@@ -41,30 +45,30 @@
     };
     # TODO ask I2S Bordeaux to make it public
     # Hugo's dependencies
-    politopix = prev.callPackage ./pkgs/3rd-party/politopix.nix { };
+    politopix = final.callPackage ./pkgs/3rd-party/politopix.nix { };
 
     # FIXME: { won't build as-is here as it requires a branch of mc-rtc for now
     # See https://github.com/Hugo-L3174/polytopeController's flake.nix
     # As they are currently not in the flake.nix's package set, this is probably ok to
     # have non-building versions in the overlay (?)
     mc-dynamic-polytopes =
-      prev.callPackage ./pkgs/mc-rtc/controllers/polytopeController/mc-dynamic-polytopes.nix
+      final.callPackage ./pkgs/mc-rtc/controllers/polytopeController/mc-dynamic-polytopes.nix
         {
           jrl-cmakemodules = final.jrl-cmakemodulesv2;
           # mc-rtc = final.mc-rtc-hugo;
         };
-    dcm-vrptask = prev.callPackage ./pkgs/mc-rtc/controllers/polytopeController/dcm-vrptask.nix {
+    dcm-vrptask = final.callPackage ./pkgs/mc-rtc/controllers/polytopeController/dcm-vrptask.nix {
       # mc-rtc = final.mc-rtc-hugo;
       jrl-cmakemodules = final.jrl-cmakemodulesv2;
     };
-    polytopeController = prev.callPackage ./pkgs/mc-rtc/controllers/polytopeController/default.nix {
+    polytopeController = final.callPackage ./pkgs/mc-rtc/controllers/polytopeController/default.nix {
       # mc-rtc = final.mc-rtc-hugo;
     };
     # End of Hugo's dependencies
     # } end of FIXME
 
     # mc-mujoco with private robots
-    mc-mujoco-robots-private = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/default.nix {
+    mc-mujoco-robots-private = final.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/default.nix {
       robots = [
         final.rhps1-mj-description
         final.hrp4-mj-description
@@ -73,9 +77,9 @@
       ];
     };
 
-    mc-mujoco-full = prev.callPackage ./pkgs/mc-rtc/mc-mujoco {
+    mc-mujoco-full = final.callPackage ./pkgs/mc-rtc/mc-mujoco {
       jrl-cmakemodules = final.jrl-cmakemodulesv2;
-      mc-mujoco-robots = prev.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/default.nix {
+      mc-mujoco-robots = final.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/default.nix {
         robots = final.mc-mujoco-robots-public.robots ++ final.mc-mujoco-robots-private.robots;
       };
     };
