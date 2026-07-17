@@ -136,12 +136,14 @@ in
       rosShellDistro = "kilted";
       extraPackages = [ "ninja" ];
       overlays = [
-        mcRtcPkgsOverlay
-        make-shell.overlays.default
+        (builtins.trace "using overlay mc-rtc-pkgs (public)" mcRtcPkgsOverlay)
+        (builtins.trace "using overlay make-shell" make-shell.overlays.default)
       ]
-      ++ lib.optional cfg.overlays.private mcRtcPrivateOverlay
+      ++ lib.optional cfg.overlays.private (
+        builtins.trace "using overlay mc-rtc-private" mcRtcPrivateOverlay
+      )
       ++ [ jrlCmakeModulesOverlay ]
-      ++ lib.optional cfg.overlays.ccache mcRtcCcacheOverlay;
+      ++ lib.optional cfg.overlays.ccache (builtins.trace "using overlay ccache" mcRtcCcacheOverlay);
 
       nixpkgsConfig = {
         permittedInsecurePackages = [ "openssl-1.1.1w" ];
@@ -402,7 +404,16 @@ in
                   ;
 
                 # Controllers
-                inherit (pkgs) panda-prosthesis robogami-controller lipm-walking-controller;
+                inherit (pkgs)
+                  panda-prosthesis
+                  robogami-controller
+                  lipm-walking-controller
+                  # ismpc
+                  footsteps-planner-plugin
+                  pendulum-feasibility-solver
+                  ismpc-walking-controller
+                  mc-joystick-plugin
+                  ;
 
                 # Plugins
                 inherit (pkgs) mc-force-shoe-plugin;

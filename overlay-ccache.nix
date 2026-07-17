@@ -8,9 +8,134 @@ let
     listToAttrs (
       map (name: {
         inherit name;
-        value = (getAttr name prev).override { stdenv = prev.ccacheStdenv; };
+        value =
+          builtins.trace "overriding stdenv with ccacheStdenv for package ${name}"
+            (getAttr name prev).override
+            { stdenv = prev.ccacheStdenv; };
       }) packages
     );
+  # usually this mean they don't have stdenv as an agument
+  # if they are built with buildRosPackages they will use ccache anyways
+  # XXX: Can we automate this?
+  skipCcahePackages = [
+    "mc-rtc-msgs"
+    "magnum-with-plugins"
+    "mc-rtc-ticker"
+    "mc-rtc-rviz-panel"
+    "mc-mujoco-robots-public"
+    "mc-mujoco-robots-private"
+    "mc-mujoco-robots"
+    "ur-description"
+  ];
+  allPublicPackages = [
+    "nanomsg"
+    "eigen3-to-python"
+    "spacevecalg"
+    "rbdyn"
+    "eigen-qld"
+    "eigen-quadprog"
+    "sch-core"
+    "sch-core-python"
+    "sch-visualization"
+    "tasks-qld"
+    "tasks"
+    "mc-rtc-data"
+    "state-observation"
+    "mc-rbdyn-urdf"
+    "tvm"
+    "copra"
+    "omniorb"
+    "openrtm-aist"
+    "openrtm-aist-python"
+    "mc-state-observation"
+    "lipm-walking-controller"
+    "pendulum-feasibility-solver"
+    "footsteps-planner-plugin"
+    "mc-joystick-plugin"
+    "ismpc-walking-controller"
+    "robogami-controller"
+    "mc-udp"
+    "franka-description"
+    "g1-description"
+    "h1-description"
+    "ur-description"
+    "ur5e-description"
+    "human-description"
+    "jvrc-description"
+    "mc-env-description"
+    "mc-int-obj-description"
+    "robogami-description"
+    "pepper-description"
+    "mc-g1"
+    "mc-h1"
+    "mc-ur5e"
+    "mc-human"
+    "mc-panda"
+    "mc-panda-lirmm"
+    "mc-robogami"
+    "mc-pepper"
+    "libfranka_0_9_2"
+    "mc-franka"
+    "mesh-sampling"
+    "mc-rtc"
+    "mc-rtc-ros-compat"
+    "mc-rtc-python-utils"
+    "mc-rtc-rviz-panel"
+    "mc-rtc-ticker"
+    "gram-savitzky-golay"
+    "mujoco"
+    "jvrc1-mj-description"
+    "g1-mj-description"
+    "h1-mj-description"
+    "ur5e-mj-description"
+    "human-mj-description"
+    "env-mj-description"
+    "mc-mujoco"
+    "mc-mujoco-robots"
+    "mc-mujoco-robots-public"
+    "mc-mujoco-full"
+    "panda-prosthesis"
+    "mc-force-shoe-plugin"
+    "mc-robot-model-update"
+    "eigen-fmt"
+    "imguizmo"
+    "corrade"
+    "magnum"
+    "magnum-integration"
+    "magnum-plugins"
+    "magnum-with-plugins"
+    "mc-rtc-imgui"
+    "mc-rtc-magnum"
+    "sphinx-cmake"
+    "mc-robot-tools"
+  ];
+  allPivatePackages = [
+    "eigen-lssol"
+    "hrp2-description"
+    "hrp4-description"
+    "hrp5-p-description"
+    "rhps1-description"
+    "miroki-description"
+    "mc-hrp2"
+    "mc-hrp4"
+    "mc-hrp5-p"
+    "mc-rhps1"
+    "mc-miroki"
+    "rhps1-mj-description"
+    "hrp4-mj-description"
+    "hrp5p-mj-description"
+    "tasks-lssol"
+    "tasks"
+    "mc-rtc"
+    "politopix"
+    "mc-dynamic-polytopes"
+    "dcm-vrptask"
+    "polytopeController"
+    "mc-mujoco-robots-private"
+    "mc-mujoco-full"
+  ];
+  allPackages = allPublicPackages ++ allPivatePackages;
+  ccachePackages = builtins.filter (name: !(builtins.elem name skipCcahePackages)) allPackages;
 in
 {
   ccacheWrapper = prev.ccacheWrapper.override {
@@ -37,42 +162,15 @@ in
         echo "  echo 'extra-sandbox-paths = /var/cache/ccache' >> ~/.config/nix/nix.conf"
         echo "  sudo systemctl restart nix-daemon.service"
         echo "====="
-        exit 1
       fi
       if [ ! -w "$CCACHE_DIR" ]; then
         echo "====="
         echo "Directory '$CCACHE_DIR' is not accessible for user $(whoami)"
         echo "Please verify its access permissions"
         echo "====="
-        exit 1
       fi
     '';
   };
 }
-// withCCache [
-  "spacevecalg"
-  "rbdyn"
-  "sch-core"
-  "eigen-qld"
-  "eigen-quadprog"
-  "tasks"
-  "tvm"
-  "mc-rtc-magnum"
-  "mc-rtc-magnum-standalone"
-  "mc-panda"
-  "mc-panda-lirmm"
-  "libpoco"
-  "libfranka"
-  "mc-franka"
-  "panda-prosthesis"
-
-  "mc-force-shoe-plugin"
-
-  "magnum"
-  "magnum-integration"
-  "magnum-plugins"
-  "mc_rtc-imgui"
-
-  # "mc-rtc-rviz-panel" # how to make it work for buildRosPackage?
-  "mc-rtc"
-]
+// withCCache [ "buildRosPackage" ]
+// withCCache ccachePackages

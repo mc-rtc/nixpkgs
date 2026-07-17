@@ -17,7 +17,7 @@
     # This is used by CI to activate the private overlay while remaining in pure evaluation mode
     # Use as nix build . --override-input private-trigger github:boolean-option/true
     private-trigger.url = "github:boolean-option/false";
-    ccache-trigger.url = "github:boolean-option/false";
+    ccache-trigger.url = "github:boolean-option/true";
     with-ros-trigger.url = "github:boolean-option/true";
     with-python-trigger.url = "github:boolean-option/true";
   };
