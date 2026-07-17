@@ -20,6 +20,12 @@ let
   skipCcahePackages = [
     "mc-rtc-msgs"
     "magnum-with-plugins"
+    "mc-rtc-ticker"
+    "mc-rtc-rviz-panel"
+    "mc-mujoco-robots-public"
+    "mc-mujoco-robots-private"
+    "mc-mujoco-robots"
+    "ur-description"
   ];
   allPackages = [
     "nanomsg"
