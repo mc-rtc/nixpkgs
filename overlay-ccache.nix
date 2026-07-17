@@ -27,7 +27,7 @@ let
     "mc-mujoco-robots"
     "ur-description"
   ];
-  allPackages = [
+  allPublicPackages = [
     "nanomsg"
     "eigen3-to-python"
     "spacevecalg"
@@ -109,6 +109,32 @@ let
     "sphinx-cmake"
     "mc-robot-tools"
   ];
+  allPivatePackages = [
+    "eigen-lssol"
+    "hrp2-description"
+    "hrp4-description"
+    "hrp5-p-description"
+    "rhps1-description"
+    "miroki-description"
+    "mc-hrp2"
+    "mc-hrp4"
+    "mc-hrp5-p"
+    "mc-rhps1"
+    "mc-miroki"
+    "rhps1-mj-description"
+    "hrp4-mj-description"
+    "hrp5p-mj-description"
+    "tasks-lssol"
+    "tasks"
+    "mc-rtc"
+    "politopix"
+    "mc-dynamic-polytopes"
+    "dcm-vrptask"
+    "polytopeController"
+    "mc-mujoco-robots-private"
+    "mc-mujoco-full"
+  ];
+  allPackages = allPublicPackages ++ allPivatePackages;
   ccachePackages = builtins.filter (name: !(builtins.elem name skipCcahePackages)) allPackages;
 in
 {
