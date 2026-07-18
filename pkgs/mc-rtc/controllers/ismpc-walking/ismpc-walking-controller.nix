@@ -35,6 +35,20 @@ stdenv.mkDerivation rec {
       footsteps-planner-plugin
       mc-joystick-plugin
     ];
+    controller = {
+      Enabled = "ismpc_walking";
+      MainRobot = "JVRC1";
+    };
+    suggests = {
+      robots = [
+        "mc-hrp4"
+        "mc-hrp2"
+        "mc-hrp5-p"
+        "mc-rhps1"
+        "mc-hrp4cr"
+      ];
+      apps = [ "mc-mujoco" ];
+    };
   };
 
   cmakeFlags = [
