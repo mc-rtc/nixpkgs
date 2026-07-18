@@ -31,7 +31,7 @@ stdenv.mkDerivation rec {
 
   # XXX(mc-rtc-passthru)
   passthru = {
-    mc-rtc.plugins = [
+    plugins = [
       footsteps-planner-plugin
       mc-joystick-plugin
     ];
