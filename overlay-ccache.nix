@@ -9,9 +9,8 @@ let
       map (name: {
         inherit name;
         value =
-          builtins.trace "overriding stdenv with ccacheStdenv for package ${name}"
-            (getAttr name prev).override
-            { stdenv = prev.ccacheStdenv; };
+          # builtins.trace "overriding stdenv with ccacheStdenv for package ${name}"
+          (getAttr name prev).override { stdenv = prev.ccacheStdenv; };
       }) packages
     );
   # usually this mean they don't have stdenv as an agument
