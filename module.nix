@@ -63,7 +63,10 @@ let
     jrl-cmakemodulesv2 = jrl-cmakemodulesv2.packages.${prev.system}.default;
   };
 
-  mcRtcCcacheOverlay = import ./overlay-ccache.nix { };
+  mcRtcCcacheOverlay = import ./overlay-ccache.nix {
+    inherit lib;
+    with-private = cfg.overlays.private;
+  };
 
   superbuildFlakeModule = ./modules/superbuild/superbuild.nix;
 in

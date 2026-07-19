@@ -1,4 +1,7 @@
-{ }:
+{
+  lib,
+  with-private ? false,
+}:
 
 _final: prev:
 let
@@ -9,8 +12,12 @@ let
       map (name: {
         inherit name;
         value =
-          # builtins.trace "overriding stdenv with ccacheStdenv for package ${name}"
-          (getAttr name prev).override { stdenv = prev.ccacheStdenv; };
+          if hasAttr name prev && (getAttr name prev) ? override then
+            (getAttr name prev).override { stdenv = prev.ccacheStdenv; }
+          else if hasAttr name prev then
+            getAttr name prev
+          else
+            trace "withCCache: package '${name}' missing in overlay, skipping" null;
       }) packages
     );
   # usually this mean they don't have stdenv as an agument
@@ -51,7 +58,7 @@ let
     "pendulum-feasibility-solver"
     "footsteps-planner-plugin"
     "mc-joystick-plugin"
-    "ismpc-walking-controller"
+    # "ismpc-walking-controller" already handed by mkMcRtcController
     "robogami-controller"
     "mc-udp"
     "franka-description"
@@ -133,7 +140,7 @@ let
     "mc-mujoco-robots-private"
     "mc-mujoco-full"
   ];
-  allPackages = allPublicPackages ++ allPivatePackages;
+  allPackages = allPublicPackages ++ (lib.optionals with-private allPivatePackages);
   ccachePackages = builtins.filter (name: !(builtins.elem name skipCcahePackages)) allPackages;
 in
 {
