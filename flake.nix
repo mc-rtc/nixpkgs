@@ -23,7 +23,7 @@
   };
 
   outputs =
-    inputs:
+    { self, ... }@inputs:
     let
       flakeModule = inputs.flake-parts.lib.importApply ./module.nix {
         inherit (inputs)
@@ -32,6 +32,7 @@
           jrl-cmakemodulesv2
           make-shell
           ;
+        mc-rtc-lib = self.lib;
       };
       inputTriggers = {
         buildPrivate = inputs.private-trigger.value or false;

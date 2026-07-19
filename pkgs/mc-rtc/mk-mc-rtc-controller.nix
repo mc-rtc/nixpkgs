@@ -1,7 +1,7 @@
 /**
   # mkMcRtcController
 
-  A wrapper for `stdenv.mkDerivation` that adds mc-rtc-specific metadata, generates a `mc_rtc.yaml` configuration file in the Nix store, and exposes all mc-rtc-related attributes under a single `mcRtc` attribute set in `passthru`.
+  A wrapper for `stdenv.mkDerivation` that adds mc-rtc-specific metadata, generates a `mc_rtc.yaml` configuration file in the Nix store, and exposes all mc-rtc-related attributes under a single `mc-rtc` attribute set in `passthru`.
 
   ## Usage
 
@@ -36,7 +36,7 @@
       license = licenses.bsd2;
       platforms = platforms.all;
     };
-    mcRtc = {
+    passthru.mc-rtc = {
       plugins = [
         footsteps-planner-plugin
         mc-joystick-plugin
@@ -63,7 +63,7 @@
   ## Arguments
 
   - All standard `stdenv.mkDerivation` arguments are supported.
-  - `mcRtc` (attribute set): mc-rtc-specific metadata.
+  - `mc-rtc` (attribute set): mc-rtc-specific metadata.
     - `plugins` (list): List of plugin derivations or names.
     - `observers` (list): List of observer derivations or names.
     - `controller` (attribute set): Controller configuration (e.g., `Enabled`, `MainRobot`).
@@ -71,12 +71,12 @@
 
   ## Output
 
-  The returned derivation has a `passthru.mcRtc` attribute set containing:
+  The returned derivation has a `passthru.mc-rtc` attribute set containing:
   - `plugins`
   - `observers`
   - `controller`
   - `suggests`
-  - `mcRtcYaml`: Path to the generated `mc_rtc.yaml` file in the Nix store.
+  - `mc-rtcYaml`: Path to the generated `mc_rtc.yaml` file in the Nix store.
   - `shellHook`: A shell hook that sets `MC_RTC_CONTROLLER_CONFIG` and `LD_LIBRARY_PATH`.
 
   ## Example
@@ -93,41 +93,61 @@
   lib,
 }:
 
+# excepts mc-rtc in passthru
 {
-  mcRtc,
+  passthru ? { },
   ...
 }@args:
 
 let
+  mc-rtc = passthru.mc-rtc;
   isStrOrDrv = x: lib.isString x || lib.isDerivation x;
 
   assertValidMcRtc =
-    mcRtc:
+    mc-rtc:
     lib.assertMsg (lib.all isStrOrDrv (
-      mcRtc.plugins or [ ]
-    )) "mcRtc.plugins must be a list of strings or derivations"
+      mc-rtc.plugins or [ ]
+    )) "mc-rtc.plugins must be a list of strings or derivations"
     && lib.assertMsg (lib.all lib.isString (
-      mcRtc.observers or [ ]
-    )) "mcRtc.observers must be a list of strings"
+      mc-rtc.observers or [ ]
+    )) "mc-rtc.observers must be a list of strings"
     && lib.assertMsg (lib.all isStrOrDrv (
-      (mcRtc.suggests or { }).robots or [ ]
-    )) "mcRtc.suggests.robots must be a list of strings or derivations"
+      (mc-rtc.suggests or { }).robots or [ ]
+    )) "mc-rtc.suggests.robots must be a list of strings or derivations"
     && lib.assertMsg (lib.all isStrOrDrv (
-      (mcRtc.suggests or { }).apps or [ ]
-    )) "mcRtc.suggests.apps must be a list of strings or derivations"
+      (mc-rtc.suggests or { }).apps or [ ]
+    )) "mc-rtc.suggests.apps must be a list of strings or derivations"
     && lib.assertMsg (lib.all isStrOrDrv (
-      mcRtc.runApps or [ ]
-    )) "mcRtc.runApps must be a list of strings or derivations";
+      mc-rtc.runApps or [ ]
+    )) "mc-rtc.runApps must be a list of strings or derivations";
 
-  args' = removeAttrs args [ "mcRtc" ];
+  args' = removeAttrs args [ "mc-rtc" ];
 in
 stdenv.mkDerivation (
   args'
   // {
     passthru = {
-      mcRtc = mcRtc // {
+      mc-rtc = mc-rtc // {
+        isController = true;
+
+        runAllAppsScript = ''
+          #!/usr/bin/env bash
+          set -e
+          if [ "$#" -eq 0 ]; then
+            echo "Usage: $0 app1 [app2 ...]"
+            exit 1
+          fi
+          pids=""
+          trap 'echo "Stopping apps..."; [ -n "$pids" ] && kill $pids 2>/dev/null || true; exit' INT
+          for app in "$@"; do
+            echo "Starting $app"
+            "$app" &
+            pids="$pids $!"
+          done
+          wait
+        '';
       };
     };
-    __asserts = assertValidMcRtc mcRtc;
+    __asserts = assertValidMcRtc mc-rtc;
   }
 )

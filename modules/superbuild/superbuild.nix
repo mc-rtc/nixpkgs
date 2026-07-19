@@ -1,3 +1,4 @@
+{ mc-rtc-lib }:
 {
   lib,
   pkgs,
@@ -105,6 +106,40 @@ let
   ++ lib.optional (activeConfigPath != null) activeConfigPath
   ++ extraConfigPaths;
 
+  # Generate a runAllAppsScript for each controller
+  runAllAppsScripts = lib.listToAttrs (
+    map (
+      controller:
+      let
+        name = controller.pname or controller.name or "controller";
+        apps = mc-rtc-lib.convertListToDrvs pkgs (controller.mc-rtc.runApps or [ ]);
+        appPaths = lib.forEach apps (
+          app:
+          if lib.isDerivation app && app ? meta && app.meta ? mainProgram then
+            "${app}/bin/${app.meta.mainProgram}"
+          else
+            null
+        );
+        filteredAppPaths = lib.filter (x: x != null) appPaths;
+        scriptBin = pkgs.writeShellScriptBin "run-${name}" ''
+          set -e
+          pids=""
+          trap 'echo "Stopping apps..."; [ -n "$pids" ] && kill -9 $pids 2>/dev/null || true; exit' INT
+          ${lib.concatMapStringsSep "\n" (appPath: ''
+            echo "Starting ${appPath}"
+            "${appPath}" &
+            pids="$pids $!"
+          '') filteredAppPaths}
+          wait
+        '';
+      in
+      {
+        inherit name;
+        value = scriptBin;
+      }
+    ) (lib.filter (c: (c.mc-rtc.runApps or [ ]) != [ ]) activeRuntime.controllers)
+  );
+
 in
 {
   options.mc-rtc-superbuild = import ./options.nix { inherit lib; };
@@ -126,6 +161,7 @@ in
         gdb
         mc-rtc
       ]
+      ++ (lib.attrValues runAllAppsScripts)
       ++ traceGroup "apps" activeRuntime.apps
       ++ traceGroup "robots" activeRuntime.robots
       ++ traceGroup "plugins" activeRuntime.plugins
@@ -225,6 +261,17 @@ in
 
         echo -e "mc_rtc will use the following configuration files $MC_RTC_CONTROLLER_CONFIG\n"
         echo "--------"
+
+
+        # Add run_<controller> shell functions for each controller
+        echo "Added run-<controller> scripts to your PATH:"
+        ls ${
+          lib.concatStringsSep " " (
+            map (c: "${runAllAppsScripts.${c.pname or c.name or "controller"}}/bin") activeRuntime.controllers
+          )
+        }
+
+          echo "Added run_<controller> shell functions for each controller."
       '';
   };
 }

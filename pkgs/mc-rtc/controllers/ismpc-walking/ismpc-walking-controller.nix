@@ -37,7 +37,7 @@ mkMcRtcController {
     license = licenses.bsd2;
     platforms = platforms.all;
   };
-  mcRtc = {
+  passthru.mc-rtc = {
     plugins = [
       footsteps-planner-plugin
       mc-joystick-plugin
@@ -57,5 +57,6 @@ mkMcRtcController {
       ];
       apps = [ "mc-mujoco" ];
     };
+    runApps = [ "mc-mujoco" ];
   };
 }

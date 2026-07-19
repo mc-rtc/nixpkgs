@@ -5,6 +5,7 @@
   flakoboros,
   jrl-cmakemodulesv2,
   make-shell,
+  mc-rtc-lib,
   ...
 }: # localFlake
 
@@ -41,6 +42,7 @@ let
       stdenv = prev.stdenv;
       with-ros = cfg.with-ros;
       with-python = cfg.with-python;
+      inherit mc-rtc-lib;
       inherit qt;
     })
       final
@@ -68,7 +70,7 @@ let
     with-private = cfg.overlays.private;
   };
 
-  superbuildFlakeModule = ./modules/superbuild/superbuild.nix;
+  superbuildFlakeModule = import ./modules/superbuild/superbuild.nix { inherit mc-rtc-lib; };
 in
 {
   options.mc-rtc-nix = {

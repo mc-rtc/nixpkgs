@@ -69,6 +69,7 @@ rec {
     @example
     ```nix
     lib.convertListToDrvsStrict pkgs [ pkgs.human-mj-description "human-mj-description" ]
+    lib.convertListToDrvsStrict pkgs [ "mc-hrp4" ]
     ```
 
     Type:
@@ -95,6 +96,7 @@ rec {
     @example
     ```nix
     lib.convertListToDrvs pkgs [ pkgs.human-mj-description "human-mj-description" ]
+    lib.convertListToDrvs pkgs [ "mc-hrp4" ]
     ```
 
     Type:
@@ -192,20 +194,24 @@ rec {
       with-suggested ? true,
     }:
     let
-      c = controller-drv.mcRtc or { };
+      c = controller-drv.mc-rtc or { };
     in
     {
       extends = extends;
-      runtime =
-        builtins.trace "mcRtcYaml is ${c.mcRtcYaml or "not set"}" {
-          controllers = [ controller-drv ];
-          plugins = convertListToDrvsStrict pkgs (c.plugins or [ ]);
-          observers = convertListToDrvsStrict pkgs (c.observers or [ ]);
+      runtime = {
+        controllers = [ controller-drv ];
+        plugins = convertListToDrvsStrict pkgs (c.plugins or [ ]);
+        observers = convertListToDrvsStrict pkgs (c.observers or [ ]);
+      }
+      // lib.optionalAttrs with-suggested (
+        let
+          s = c.suggests or { };
+        in
+        {
+          apps = convertListToDrvs pkgs (s.apps or [ ]);
+          robots = convertListToDrvs pkgs (s.robots or [ ]);
         }
-        // lib.optionalAttrs with-suggested {
-          apps = convertListToDrvs pkgs (c.apps or [ ]);
-          robots = convertListToDrvs pkgs (c.robots or [ ]);
-        };
+      );
       devel = {
         controllers = [ controller-drv ];
       };
