@@ -79,6 +79,32 @@ let
 
   title = "  ${pname} interactive shell" + lib.optionalString isDevel " (devel)" + "  ";
   line = lib.concatStrings (builtins.genList (_: "=") (builtins.stringLength title));
+
+  # Prepare devPrefix and shell* variables for use in mcRtcYaml
+  devPrefix = lib.optional isDevel localInstallPath;
+  shellControllers = devPrefix ++ activeRuntime.controllers;
+  shellRobots = devPrefix ++ activeRuntime.robots;
+  shellObservers = devPrefix ++ activeRuntime.observers;
+  shellPlugins = devPrefix ++ activeRuntime.plugins;
+
+  mcRtcYaml = pkgs.writeText "mc_rtc.yaml" ''
+    ---
+    ${lib.optionalString (mainRobot != null && mainRobot != "") "MainRobot: \"${mainRobot}\""}
+    ${lib.optionalString (enabled != null && enabled != "") "Enabled: \"${enabled}\""}
+    ${lib.optionalString (timeStep != null) "Timestep: ${toString timeStep}"}
+    ControllerModulePaths: [${mkModulePaths "mc_controller" shellControllers}]
+    RobotModulePaths: [${mkModulePaths "mc_robots" shellRobots}]
+    ObserverModulePaths: [${mkModulePaths "mc_observers" shellObservers}]
+    GlobalPluginPaths: [${mkModulePaths "mc_plugins" shellPlugins}]
+    LoadUserConfiguration: false
+  '';
+
+  shellConfigs = [
+    mcRtcYaml
+  ]
+  ++ lib.optional (activeConfigPath != null) activeConfigPath
+  ++ extraConfigPaths;
+
 in
 {
   options.mc-rtc-superbuild = import ./options.nix { inherit lib; };
@@ -122,18 +148,6 @@ in
 
     shellHook =
       let
-        devPrefix = lib.optional isDevel localInstallPath;
-        shellControllers = devPrefix ++ activeRuntime.controllers;
-        shellRobots = devPrefix ++ activeRuntime.robots;
-        shellObservers = devPrefix ++ activeRuntime.observers;
-        shellPlugins = devPrefix ++ activeRuntime.plugins;
-
-        shellConfigs = [
-          "${localPath}/mc_rtc.yaml"
-        ]
-        ++ lib.optional (activeConfigPath != null) activeConfigPath
-        ++ extraConfigPaths;
-
         printRuntimeDeps =
           showPaths: listGroup:
           let
@@ -168,18 +182,6 @@ in
         export PROJECT_DIR="$(pwd)/${relativeLocalPath}"
         export INSTALL_DIR="$PROJECT_DIR/install"
         mkdir -p $INSTALL_DIR
-
-        cat <<EOF_CONF > $PROJECT_DIR/mc_rtc.yaml
-        ---
-        ${lib.optionalString (mainRobot != null && mainRobot != "") "MainRobot: \"${mainRobot}\""}
-        ${lib.optionalString (enabled != null && enabled != "") "Enabled: \"${enabled}\""}
-        ${lib.optionalString (timeStep != null) "Timestep: ${toString timeStep}"}
-        ControllerModulePaths: [${mkModulePaths "mc_controller" shellControllers}]
-        RobotModulePaths: [${mkModulePaths "mc_robots" shellRobots}]
-        ObserverModulePaths: [${mkModulePaths "mc_observers" shellObservers}]
-        GlobalPluginPaths: [${mkModulePaths "mc_plugins" shellPlugins}]
-        LoadUserConfiguration: false
-        EOF_CONF
 
         export MC_RTC_PATH=${pkgs.mc-rtc}
         export MC_RTC_JEKYLL_PLUGINS=${pkgs.mc-rtc}/share/doc/mc-rtc/jekyll/plugins

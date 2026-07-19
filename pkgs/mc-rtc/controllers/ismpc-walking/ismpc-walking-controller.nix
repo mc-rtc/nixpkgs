@@ -35,6 +35,7 @@ stdenv.mkDerivation rec {
       footsteps-planner-plugin
       mc-joystick-plugin
     ];
+    observers = [ "mc-state-observation" ];
     controller = {
       Enabled = "ismpc_walking";
       MainRobot = "JVRC1";
