@@ -83,7 +83,9 @@ in
 
     overlays = {
       private = lib.mkEnableOption "enables the private repository overlay";
-      ccache = lib.mkEnableOption "enables the ccache overlay";
+      ccache = lib.mkEnableOption "enables the ccache overlay" // {
+        default = true;
+      };
     };
 
     gepetto = {

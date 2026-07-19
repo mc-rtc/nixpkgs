@@ -14,10 +14,10 @@ mkMcRtcController {
   pname = "ismpc-walking-controller";
   version = "0.1.0";
   src = fetchFromGitHub {
-    owner = "jrl-umi3218";
-    repo = "lipm_walking_controller";
-    tag = "v0.1.0";
-    hash = "sha256-tPWzbxuJbJm5zlUzU8jQJSdTIOsW8mb/Ci2DOeFdr4M=";
+    owner = "isri-aist";
+    repo = "ismpc_walking";
+    rev = "6cb5dfc280265fe06068accac79227fdc7bed39c";
+    hash = "sha256-4m7o/ujtHKbonxmV57QvZ7IY4lDQVP1dBSosbZlB92Y=";
   };
   buildInputs = [ jrl-cmakemodulesv2 ];
   nativeBuildInputs = [ cmake ];

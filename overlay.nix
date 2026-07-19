@@ -41,11 +41,7 @@
       xacro
       ;
 
-    mkMcRtcController = import ./pkgs/mc-rtc/mk-mc-rtc-controller.nix {
-      inherit lib;
-      pkgs = final.pkgs;
-      stdenv = final.pkgs.stdenv;
-    };
+    mkMcRtcController = final.callPackage ./pkgs/mc-rtc/mk-mc-rtc-controller.nix { };
 
     nanomsg = prev.nanomsg.overrideAttrs (_old: rec {
       postPatch = ''

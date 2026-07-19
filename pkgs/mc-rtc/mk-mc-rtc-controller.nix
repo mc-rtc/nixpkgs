@@ -91,42 +91,43 @@
 {
   stdenv,
   lib,
-  pkgs,
 }:
 
 {
-  mcRtc ? { },
+  mcRtc,
   ...
 }@args:
 
 let
-  controller = mcRtc.controller or { };
+  isStrOrDrv = x: lib.isString x || lib.isDerivation x;
 
-  mcRtcYamlTemplate = pkgs.writeText "${args.pname or "controller"}-mc_rtc.yaml.in" ''
-    ---
-    ${lib.optionalString (controller ? MainRobot) "MainRobot: \"${controller.MainRobot}\""}
-    ${lib.optionalString (controller ? Enabled) "Enabled: \"${controller.Enabled}\""}
-    ControllerModulePaths: ["@out@/lib/mc_controller"]
-    RobotModulePaths: ["@out@/lib/mc_robots"]
-    ObserverModulePaths: ["@out@/lib/mc_observers"]
-    GlobalPluginPaths: ["@out@/lib/mc_plugins"]
-    LoadUserConfiguration: false
-  '';
-  args' = builtins.removeAttrs args [ "mcRtc" ];
+  assertValidMcRtc =
+    mcRtc:
+    lib.assertMsg (lib.all isStrOrDrv (
+      mcRtc.plugins or [ ]
+    )) "mcRtc.plugins must be a list of strings or derivations"
+    && lib.assertMsg (lib.all lib.isString (
+      mcRtc.observers or [ ]
+    )) "mcRtc.observers must be a list of strings"
+    && lib.assertMsg (lib.all isStrOrDrv (
+      (mcRtc.suggests or { }).robots or [ ]
+    )) "mcRtc.suggests.robots must be a list of strings or derivations"
+    && lib.assertMsg (lib.all isStrOrDrv (
+      (mcRtc.suggests or { }).apps or [ ]
+    )) "mcRtc.suggests.apps must be a list of strings or derivations"
+    && lib.assertMsg (lib.all isStrOrDrv (
+      mcRtc.runApps or [ ]
+    )) "mcRtc.runApps must be a list of strings or derivations";
+
+  args' = removeAttrs args [ "mcRtc" ];
 in
 stdenv.mkDerivation (
   args'
   // {
     passthru = {
       mcRtc = mcRtc // {
-        # access it as ${drv}/${mcRtcYaml}
-        mcRtcYaml = "share/mc_rtc.yaml";
       };
     };
-
-    postInstall = ''
-      mkdir -p $out/share
-      sed "s|@out@|$out|g" ${mcRtcYamlTemplate} > $out/share/mc_rtc.yaml
-    '';
+    __asserts = assertValidMcRtc mcRtc;
   }
 )
