@@ -28,13 +28,13 @@ let
   preferNumber = previous: next: if next != null then next else previous;
 
   mergeComponent = left: right: {
-    apps = left.apps ++ right.apps;
-    robots = left.robots ++ right.robots;
-    controllers = left.controllers ++ right.controllers;
-    observers = left.observers ++ right.observers;
-    plugins = left.plugins ++ right.plugins;
+    apps = lib.unique (left.apps ++ right.apps);
+    robots = lib.unique (left.robots ++ right.robots);
+    controllers = lib.unique (left.controllers ++ right.controllers);
+    observers = lib.unique (left.observers ++ right.observers);
+    plugins = lib.unique (left.plugins ++ right.plugins);
     config = preferString left.config right.config;
-    extraConfigFiles = left.extraConfigFiles ++ right.extraConfigFiles;
+    extraConfigFiles = lib.unique (left.extraConfigFiles ++ right.extraConfigFiles);
   };
 
   mergeRuntime = mergeComponent;
