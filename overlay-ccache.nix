@@ -171,5 +171,8 @@ in
     '';
   };
 }
-// withCCache [ "buildRosPackage" ]
+// withCCache [
+  "buildRosPackage"
+  "mkMcRtcController"
+]
 // withCCache ccachePackages

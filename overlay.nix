@@ -41,6 +41,12 @@
       xacro
       ;
 
+    mkMcRtcController = import ./pkgs/mc-rtc/mk-mc-rtc-controller.nix {
+      inherit lib;
+      pkgs = final.pkgs;
+      stdenv = final.pkgs.stdenv;
+    };
+
     nanomsg = prev.nanomsg.overrideAttrs (_old: rec {
       postPatch = ''
         substituteInPlace cmake/nanomsg-config.cmake.in \

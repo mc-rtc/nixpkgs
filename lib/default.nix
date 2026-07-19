@@ -191,23 +191,27 @@ rec {
       extends ? [ ],
       with-suggested ? true,
     }:
+    let
+      c = controller-drv.mcRtc or { };
+    in
     {
       extends = extends;
-      runtime = {
-        controllers = [ controller-drv ];
-        plugins = convertListToDrvsStrict pkgs (controller-drv.plugins or [ ]);
-        observers = convertListToDrvsStrict pkgs (controller-drv.observers or [ ]);
-      }
-      // lib.optionalAttrs with-suggested {
-        apps = convertListToDrvs pkgs (controller-drv.suggests.apps or [ ]);
-        robots = convertListToDrvs pkgs (controller-drv.suggests.robots or [ ]);
-      };
+      runtime =
+        builtins.trace "mcRtcYaml is ${c.mcRtcYaml or "not set"}" {
+          controllers = [ controller-drv ];
+          plugins = convertListToDrvsStrict pkgs (c.plugins or [ ]);
+          observers = convertListToDrvsStrict pkgs (c.observers or [ ]);
+        }
+        // lib.optionalAttrs with-suggested {
+          apps = convertListToDrvs pkgs (c.apps or [ ]);
+          robots = convertListToDrvs pkgs (c.robots or [ ]);
+        };
       devel = {
         controllers = [ controller-drv ];
       };
     }
-    // lib.optionalAttrs (
-      controller-drv.controller.Enabled != null && controller-drv.controller.Enabled != ""
-    ) { enabled = controller-drv.controller.Enabled; };
+    // lib.optionalAttrs (c.controller.Enabled != null && c.controller.Enabled != "") {
+      enabled = c.controller.Enabled;
+    };
 
 }
