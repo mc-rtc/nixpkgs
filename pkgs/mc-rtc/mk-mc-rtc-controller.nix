@@ -129,23 +129,6 @@ stdenv.mkDerivation (
     passthru = {
       mc-rtc = mc-rtc // {
         isController = true;
-
-        runAllAppsScript = ''
-          #!/usr/bin/env bash
-          set -e
-          if [ "$#" -eq 0 ]; then
-            echo "Usage: $0 app1 [app2 ...]"
-            exit 1
-          fi
-          pids=""
-          trap 'echo "Stopping apps..."; [ -n "$pids" ] && kill $pids 2>/dev/null || true; exit' INT
-          for app in "$@"; do
-            echo "Starting $app"
-            "$app" &
-            pids="$pids $!"
-          done
-          wait
-        '';
       };
     };
     __asserts = assertValidMcRtc mc-rtc;

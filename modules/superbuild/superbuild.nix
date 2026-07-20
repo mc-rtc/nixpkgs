@@ -106,39 +106,68 @@ let
   ++ lib.optional (activeConfigPath != null) activeConfigPath
   ++ extraConfigPaths;
 
-  # Generate a runAllAppsScript for each controller
-  runAllAppsScripts = lib.listToAttrs (
-    map (
-      controller:
-      let
-        name = controller.pname or controller.name or "controller";
-        apps = mc-rtc-lib.convertListToDrvs pkgs (controller.mc-rtc.runApps or [ ]);
-        appPaths = lib.forEach apps (
-          app:
-          if lib.isDerivation app && app ? meta && app.meta ? mainProgram then
-            "${app}/bin/${app.meta.mainProgram}"
-          else
-            null
-        );
-        filteredAppPaths = lib.filter (x: x != null) appPaths;
-        scriptBin = pkgs.writeShellScriptBin "run-${name}" ''
-          set -e
-          pids=""
-          trap 'echo "Stopping apps..."; [ -n "$pids" ] && kill -9 $pids 2>/dev/null || true; exit' INT
-          ${lib.concatMapStringsSep "\n" (appPath: ''
-            echo "Starting ${appPath}"
-            "${appPath}" &
-            pids="$pids $!"
-          '') filteredAppPaths}
-          wait
-        '';
-      in
+  /**
+    `runAllAppsScripts`
+
+    Attribute set mapping controller names to shell script derivations that launch all associated apps for each controller.
+
+    Only includes controllers where `isController = true` and `mc-rtc.runApps` is non-empty.
+
+    Example output:
       {
-        inherit name;
-        value = scriptBin;
+        controller1 = <derivation /nix/store/...-run-controller1>;
+        controller2 = <derivation /nix/store/...-run-controller2>;
       }
-    ) (lib.filter (c: (c.mc-rtc.runApps or [ ]) != [ ]) activeRuntime.controllers)
-  );
+
+    Each script:
+      - Starts all apps listed in `mc-rtc.runApps` for the controller.
+      - Runs each app in the background and waits for all to finish.
+      - Handles SIGINT (Ctrl+C) to kill all started apps.
+
+    If no controllers match, the result is an empty attribute set: `{}`.
+  */
+  runAllAppsScripts =
+    let
+      res = lib.listToAttrs (
+        map
+          (
+            controller:
+            let
+              name = controller.pname or controller.name or "controller";
+              apps = mc-rtc-lib.convertListToDrvs pkgs (controller.mc-rtc.runApps or [ ]);
+              appPaths = lib.forEach apps (
+                app:
+                if lib.isDerivation app && app ? meta && app.meta ? mainProgram then
+                  "${app}/bin/${app.meta.mainProgram}"
+                else
+                  null
+              );
+              filteredAppPaths = lib.filter (x: x != null) appPaths;
+              scriptBin = pkgs.writeShellScriptBin "run-${name}" ''
+                set -e
+                pids=""
+                trap 'echo "Stopping apps..."; [ -n "$pids" ] && kill -9 $pids 2>/dev/null || true; exit' INT
+                ${lib.concatMapStringsSep "\n" (appPath: ''
+                  echo "Starting ${appPath}"
+                  "${appPath}" &
+                  pids="$pids $!"
+                '') filteredAppPaths}
+                wait
+              '';
+            in
+            {
+              inherit name;
+              value = scriptBin;
+            }
+          )
+          (
+            lib.filter (
+              c: (c.mc-rtc.runApps or [ ]) != [ ] && (c.mc-rtc.isController or false)
+            ) activeRuntime.controllers
+          )
+      );
+    in
+    builtins.trace (builtins.toJSON res) res;
 
 in
 {
@@ -259,12 +288,14 @@ in
         echo -e "mc_rtc will use the following configuration files MC_RTC_CONTROLLER_CONFIG=$MC_RTC_CONTROLLER_CONFIG\n"
         echo "You can list more convenience environment variables with $ mc_rtc_env"
         alias mc_rtc_env="env | grep '^MC_RTC_'"
-        echo "You can run the default apps for this controllers with:"
-        ls ${
-          lib.concatStringsSep " " (
-            map (c: "${runAllAppsScripts.${c.pname or c.name or "controller"}}/bin") activeRuntime.controllers
-          )
-        }
+        ${lib.optionalString (runAllAppsScripts != { }) ''
+          echo "You can run the default apps for these controllers with:"
+          ls ${
+            lib.concatStringsSep " " (
+              map (name: "${runAllAppsScripts.${name}}/bin") (builtins.attrNames runAllAppsScripts)
+            )
+          }
+        ''}
         echo ""
         echo "--------"
       '';
