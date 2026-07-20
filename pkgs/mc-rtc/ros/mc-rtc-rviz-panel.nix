@@ -61,7 +61,7 @@ buildRosPackage {
     export ROS_VERSION=2
   '';
 
-  passthu = {
+  passthru = {
     inherit fetched;
   };
 
