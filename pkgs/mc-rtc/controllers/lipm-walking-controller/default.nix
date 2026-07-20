@@ -43,8 +43,9 @@ mkMcRtcController rec {
         "mc-hrp4"
         "mc-hrp2"
         "mc-hrp5-p"
-        "mc-rhps1"
         "mc-hrp4cr"
+        # FIXME(mc-rhps1): too large for now
+        # "mc-rhps1"
       ];
       apps = [
         "mc-mujoco"

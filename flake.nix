@@ -46,14 +46,50 @@
           localInputs,
           localFlakeModule ? flakeModule,
         }:
-        flakoborosModule:
+        mcRtcFlakeModule:
         inputs.flake-parts.lib.mkFlake { inputs = localInputs; } (args: {
           systems = import inputs.systems;
           imports = [
             localFlakeModule
-            { flakoboros = flakoborosModule args; }
+            { flakoboros = mcRtcFlakeModule args; }
           ];
         });
+
+      mkMcRtcModule =
+        {
+          localInputs,
+          defaultAttrs ? { },
+          localFlakeModule ? flakeModule, # mc-rtc-nix flakeModule
+        }:
+        mcRtcFlakeModule:
+        inputs.flake-parts.lib.mkFlake { inputs = localInputs; } (args: {
+          systems = import inputs.systems;
+          imports = [
+            localFlakeModule # inputs.mc-rtc-nix.flakeModule
+            ((mcRtcFlakeModule args) // defaultAttrs)
+          ];
+        });
+
+      mkMcRtcController =
+        {
+          localInputs,
+          controllerName,
+          mkControllerSuperbuild,
+          localFlakeModule ? flakeModule, # mc-rtc-nix flakeModule
+        }:
+        mkMcRtcModule {
+          inherit localInputs localFlakeModule;
+          defaultAttrs = {
+            mc-rtc-superbuild =
+              { pkgs, ... }:
+              {
+                enable = true;
+                configurations = {
+                  "${controllerName}" = (mkControllerSuperbuild pkgs (builtins.getAttr controllerName pkgs) { });
+                };
+              };
+          };
+        };
     in
     inputs.flake-parts.lib.mkFlake { inherit inputs; } (
       { lib, ... }:
@@ -83,18 +119,51 @@
         flake = {
           inherit flakeModule;
 
-          lib = import ./lib { inherit lib; } // {
+          lib =
+            let
+              mc-rtc-lib = import ./lib { inherit lib; };
+            in
+            mc-rtc-lib
+            // {
+              # lib.mkFlakoboros
+              #   Usage: lib.mkFlakoboros localInputs module
+              #   Description: Creates a flake using the default flakeModule
+              #   Arguments:
+              #     - localInputs: The flake inputs set.
+              #     - flakoborosModule: The flake-parts module to use.
+              #                         See https://gepetto.github.io/flakoboros/index.html
+              mkFlakoboros =
+                localInputs: flakoborosModule:
+                builtins.trace "mkFlakoboros is deprecated, please use mkMcRtcModule instead" mkFlakoboros {
+                  inherit localInputs;
+                } flakoborosModule;
 
-            # lib.mkFlakoboros
-            #   Usage: lib.mkFlakoboros localInputs module
-            #   Description: Creates a flake using the default flakeModule (public, with-ros).
-            #   Arguments:
-            #     - localInputs: The flake inputs set.
-            #     - flakoborosModule: The flake-parts module to use.
-            #                         See https://gepetto.github.io/flakoboros/index.html
-            mkFlakoboros =
-              localInputs: flakoborosModule: mkFlakoboros { inherit localInputs; } flakoborosModule;
-          };
+              # lib.mkMcRtcModule
+              #   Usage: lib.mkFlakoboros localInputs module
+              #   Description: Creates a flake using the default flakeModule (public, with-ros).
+              #   Arguments:
+              #     - localInputs: The flake inputs set.
+              #     - flakoborosModule: The flake-parts module to use.
+              #                         See https://gepetto.github.io/flakoboros/index.html
+              mkMcRtcModule = localInputs: mcRtcModule: mkMcRtcModule { inherit localInputs; } mcRtcModule;
+
+              # lib.mkMcRtcController
+              #   Same as mkMcRtcModule but adds a default configuration for the controller (defined in ${controller}.passthru.mc-rtc)
+              #   Usage: lib.mkMcRtcController localInputs "controller-name" module
+              #   Description: Creates a flake using the default flakeModule and configures mc-rtc-superbuild with
+              #      a default configuration for the controller (defined in ${controller}.passthru.mc-rtc)
+              #   Arguments:
+              #     - localInputs: The flake inputs set.
+              #     - controllerName: Name of the controller
+              #     - flakoborosModule: The flake-parts module to use.
+              #                         See https://gepetto.github.io/flakoboros/index.html
+              mkMcRtcController =
+                localInputs: controllerName: flakoborosModule:
+                mkMcRtcController {
+                  inherit localInputs controllerName;
+                  mkControllerSuperbuild = mc-rtc-lib.mkControllerSuperbuild;
+                } flakoborosModule;
+            };
 
           templates = {
             default = {
