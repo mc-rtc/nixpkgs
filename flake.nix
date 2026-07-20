@@ -172,7 +172,11 @@
             };
             controller = {
               path = ./templates/controller;
-              description = "A template with superbuild configuration for use with mc-rtc/nixpkgs";
+              description = "Simplified template with an auto-generated mc-rtc-superbuild configuration to build a controller";
+            };
+            superbuild = {
+              path = ./templates/superbuild;
+              description = "A template with a manual mc-rtc-superbuild configuration";
             };
             flakoboros = {
               path = ./templates/flakoboros;
