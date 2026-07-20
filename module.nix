@@ -227,31 +227,9 @@ in
             };
           };
 
-          lipm-walking = with pkgs; {
-            extends = [ "default" ];
-            enabled = "LIPMWalking";
-            runtime = {
-              observers = [ mc-state-observation ];
-              apps = maybe-mc-mujoco mc-mujoco;
-            };
-            devel = {
-              controllers = [ lipm-walking-controller ];
-            };
-          };
-
-          robogami = with pkgs; {
-            extends = [ "default" ];
-            mainRobot = "robogami";
-            enabled = "RobogamiController";
-            runtime = {
-              robots = [
-                mc-robogami
-              ];
-            };
-            devel = {
-              controllers = [ robogami-controller ];
-            };
-          };
+          # auto-generated configs from controller's passthru.mc-rtc
+          lipm-walking = mc-rtc-lib.mkControllerSuperbuild pkgs pkgs.lipm-walking-controller { };
+          robogami = mc-rtc-lib.mkControllerSuperbuild pkgs pkgs.robogami-controller { };
 
           panda-prosthesis = with pkgs; {
             extends = [ "minimal" ];

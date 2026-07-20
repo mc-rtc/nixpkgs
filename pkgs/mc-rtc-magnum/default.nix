@@ -50,6 +50,7 @@ stdenv.mkDerivation {
   meta = with lib; {
     description = "Magnum-based standalone viewer for mc-rtc";
     homepage = "https://github.com/mc-rtc/mc_rtc-magnum";
+    mainProgram = "mc-rtc-magnum";
     license = licenses.bsd2;
     maintainers = [ ];
     platforms = platforms.all;

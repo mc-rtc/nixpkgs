@@ -33,6 +33,10 @@ let
     "mc-mujoco-robots-private"
     "mc-mujoco-robots"
     "ur-description"
+    # already handed by mkMcRtcController
+    "ismpc-walking-controller"
+    "robogami-controller"
+    "lipm-walking-controller"
   ];
   allPublicPackages = [
     "nanomsg"
@@ -55,12 +59,9 @@ let
     "openrtm-aist"
     "openrtm-aist-python"
     "mc-state-observation"
-    "lipm-walking-controller"
     "pendulum-feasibility-solver"
     "footsteps-planner-plugin"
     "mc-joystick-plugin"
-    # "ismpc-walking-controller" already handed by mkMcRtcController
-    "robogami-controller"
     "mc-udp"
     "franka-description"
     "g1-description"

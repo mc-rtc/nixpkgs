@@ -195,29 +195,29 @@ rec {
     }:
     let
       c = controller-drv.mc-rtc or { };
+      s = c.suggests or { };
+      convertStrict = attr: name: convertListToDrvsStrict pkgs (attr.${name} or [ ]);
+      convertSuggested =
+        attr: name: convertListToDrvs pkgs (lib.optionals with-suggested (attr.${name} or [ ]));
     in
     {
       extends = extends;
       runtime = {
         controllers = [ controller-drv ];
-        plugins = convertListToDrvsStrict pkgs (c.plugins or [ ]);
-        observers = convertListToDrvsStrict pkgs (c.observers or [ ]);
-      }
-      // lib.optionalAttrs with-suggested (
-        let
-          s = c.suggests or { };
-        in
-        {
-          apps = convertListToDrvs pkgs (s.apps or [ ]);
-          robots = convertListToDrvs pkgs (s.robots or [ ]);
-        }
-      );
+        robots = convertStrict c "robots" ++ convertSuggested s "robots";
+        plugins = convertStrict c "plugins" ++ convertSuggested s "plugins";
+        observers = convertStrict c "observers" ++ convertSuggested s "observers";
+        apps = convertStrict c "apps" ++ convertSuggested s "apps";
+      };
       devel = {
         controllers = [ controller-drv ];
       };
     }
     // lib.optionalAttrs (c.controller.Enabled != null && c.controller.Enabled != "") {
       enabled = c.controller.Enabled;
+    }
+    // lib.optionalAttrs (c.controller.MainRobot != null && c.controller.MainRobot != "") {
+      mainRobot = c.controller.MainRobot;
     };
 
 }

@@ -1,5 +1,5 @@
 {
-  stdenv,
+  mkMcRtcController,
   lib,
   fetchFromGitHub,
   cmake,
@@ -7,7 +7,7 @@
   copra,
 }:
 
-stdenv.mkDerivation rec {
+mkMcRtcController rec {
   pname = "lipm-walking-controller";
   version = "1.7.1";
 
@@ -30,6 +30,29 @@ stdenv.mkDerivation rec {
   ];
 
   doCheck = true;
+
+  passthru.mc-rtc = {
+    plugins = [ ]; # todo add external footstep planner plugins
+    observers = [ "mc-state-observation" ];
+    controller = {
+      Enabled = "LIPMWalking";
+      MainRobot = "JVRC1";
+    };
+    suggests = {
+      robots = [
+        "mc-hrp4"
+        "mc-hrp2"
+        "mc-hrp5-p"
+        "mc-rhps1"
+        "mc-hrp4cr"
+      ];
+      apps = [
+        "mc-mujoco"
+        "mc-rtc-magnum"
+      ];
+    };
+    runApps = [ "mc-mujoco" ];
+  };
 
   meta = with lib; {
     description = "Walking controller based on linear inverted pendulum tracking";

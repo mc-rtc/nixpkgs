@@ -71,5 +71,6 @@ stdenv.mkDerivation {
     license = licenses.bsd2;
     maintainers = [ ];
     platforms = platforms.all;
+    mainProgram = "mc-rtc-magnum";
   };
 }

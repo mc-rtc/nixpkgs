@@ -255,23 +255,18 @@ in
         ''}
 
         echo ""
-        echo "The following convenience environment variables are set:"
-        env | grep '^MC_RTC_'
-        echo ""
 
-        echo -e "mc_rtc will use the following configuration files $MC_RTC_CONTROLLER_CONFIG\n"
-        echo "--------"
-
-
-        # Add run_<controller> shell functions for each controller
-        echo "Added run-<controller> scripts to your PATH:"
+        echo -e "mc_rtc will use the following configuration files MC_RTC_CONTROLLER_CONFIG=$MC_RTC_CONTROLLER_CONFIG\n"
+        echo "You can list more convenience environment variables with $ mc_rtc_env"
+        alias mc_rtc_env="env | grep '^MC_RTC_'"
+        echo "You can run the default apps for this controllers with:"
         ls ${
           lib.concatStringsSep " " (
             map (c: "${runAllAppsScripts.${c.pname or c.name or "controller"}}/bin") activeRuntime.controllers
           )
         }
-
-          echo "Added run_<controller> shell functions for each controller."
+        echo ""
+        echo "--------"
       '';
   };
 }
