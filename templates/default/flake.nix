@@ -5,6 +5,8 @@
     mc-rtc-nix.url = "github:mc-rtc/nixpkgs";
     flake-parts.follows = "mc-rtc-nix/flake-parts";
     systems.follows = "mc-rtc-nix/systems";
+
+    ccache-trigger.url = "github:boolean-option/true";
   };
 
   outputs =
@@ -18,7 +20,9 @@
           {
             # Configuration for the mc-rtc-nix module
             # Activate overlays, disable ros, etc
-            mc-rtc-nix = { };
+            mc-rtc-nix = {
+              overlays.ccache = inputs.ccache-trigger.value;
+            };
 
             # If you need a superbuild environment configure it here
             mc-rtc-superbuild = { };

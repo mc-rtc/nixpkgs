@@ -6,6 +6,8 @@
     flake-parts.follows = "mc-rtc-nix/flake-parts";
     systems.follows = "mc-rtc-nix/systems";
 
+    ccache-trigger.url = "github:boolean-option/true";
+
     # You can override dependencies from a commit/pull request by:
     # Adding it as input
     # your-repository.url = "github:username/repository/pull/ID/head";
@@ -32,6 +34,7 @@
     inputs.mc-rtc-nix.lib.mkMcRtcModule inputs (
       { lib, ... }:
       {
+        mc-rtc-nix.overlays.ccache = inputs.ccache-trigger.value;
         #
         # As always, individual packages can be overridden using flakoboros
         mc-rtc-superbuild =
