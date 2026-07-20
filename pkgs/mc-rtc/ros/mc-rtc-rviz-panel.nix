@@ -61,6 +61,10 @@ buildRosPackage {
     export ROS_VERSION=2
   '';
 
+  passthu = {
+    inherit fetched;
+  };
+
   meta = {
     description = "Tools for the mc_rtc framework built around ROS (rviz panel, etc)";
     homepage = "https://github.com/jrl-umi3218/mc_rtc_ros";

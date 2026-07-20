@@ -183,7 +183,7 @@ in
               apps = [
                 pkgs.mc-rtc-magnum
               ]
-              ++ lib.optionals (cfg.with-ros || superbuildCfg.withRos) [ pkgs.mc-rtc-ticker ];
+              ++ lib.optionals (cfg.with-ros || superbuildCfg.withRos) [ pkgs.mc-rtc-rviz ];
             };
           };
 
@@ -375,6 +375,7 @@ in
 
                 # Main GUIs and applications
                 inherit (pkgs)
+                  mc-rtc-ticker
                   mc-rtc-magnum
                   ;
 
@@ -429,7 +430,7 @@ in
                 inherit (pkgs) mc-robot-tools sphinx-cmake;
               }
               (lib.optionalAttrs (cfg.with-ros || superbuildCfg.withRos) {
-                inherit (pkgs) mc-rtc-ticker;
+                inherit (pkgs) mc-rtc-rviz;
               })
               (lib.optionalAttrs (!pkgs.stdenv.hostPlatform.isDarwin) {
                 inherit (pkgs) mc-udp mc-mujoco mc-mujoco-full;

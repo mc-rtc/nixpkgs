@@ -188,7 +188,7 @@ Presets are extensible with `extends` and merge with these semantics:
   - devel shell: devel components are added as `inputsFrom` and expected in `.superbuild/install`
 
 Conditional defaults:
-- ROS defaults (e.g. `mc-rtc-ticker`) are only added when `mc-rtc-nix.with-ros = true`
+- ROS defaults (e.g. `mc-rtc-rviz`) are only added when `mc-rtc-nix.with-ros = true`
 - private robots are only added to `full` when `mc-rtc-nix.overlays.private = true`
 
 Additional config fragments can be provided with `extraConfigFiles` (instead of overloading `config`).

@@ -26,8 +26,9 @@ let
   skipCcahePackages = [
     "mc-rtc-msgs"
     "magnum-with-plugins"
-    "mc-rtc-ticker"
+    "mc-rtc-rviz"
     "mc-rtc-rviz-panel"
+    "mc-rtc-ticker"
     "mc-mujoco-robots-public"
     "mc-mujoco-robots-private"
     "mc-mujoco-robots"
@@ -87,7 +88,6 @@ let
     "mc-rtc-ros-compat"
     "mc-rtc-python-utils"
     "mc-rtc-rviz-panel"
-    "mc-rtc-ticker"
     "gram-savitzky-golay"
     "mujoco"
     "jvrc1-mj-description"
