@@ -22,6 +22,11 @@ stdenv.mkDerivation (finalAttrs: {
     "-DHONOR_INSTALL_PREFIX=ON"
   ];
 
+  passthru = {
+    # FIXME: does not exist yet
+    robot.module = "mc-hrp4cr";
+  };
+
   doCheck = true;
 
   meta = with lib; {

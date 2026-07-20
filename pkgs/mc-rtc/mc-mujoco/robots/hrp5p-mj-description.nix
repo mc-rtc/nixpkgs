@@ -23,6 +23,10 @@ stdenv.mkDerivation (_finalAttrs: {
     "-DHONOR_INSTALL_PREFIX=ON"
   ];
 
+  passthru = {
+    robot.module = "mc-hrp5-p";
+  };
+
   doCheck = true;
 
   meta = with lib; {

@@ -18,6 +18,7 @@
     callWithRos = pkg: args: final.callPackage pkg (args // { inherit with-ros; });
   in
   {
+    # FIXME ros version
     inherit (prev.rosPackages.jazzy)
       buildRosPackage
       ament-cmake
@@ -40,6 +41,8 @@
       geometry-msgs
       xacro
       ;
+
+    mkMcRtcController = final.callPackage ./pkgs/mc-rtc/mk-mc-rtc-controller.nix { };
 
     nanomsg = prev.nanomsg.overrideAttrs (_old: rec {
       postPatch = ''
@@ -138,16 +141,11 @@
       jrl-cmakemodules = final.jrl-cmakemodulesv2;
     };
     mc-rtc-python-utils = final.callPackage ./pkgs/mc-rtc/mc-rtc-python-utils.nix { };
-    #mc-rtc = callWithRos ./pkgs/mc-rtc/mc-rtc.nix {};
-    # mc-rtc-rviz-panel = prev.libsForQt5.callPackage ./pkgs/mc-rtc/ros/mc-rtc-rviz-panel.nix { inherit useLocal; inherit localWorkspace; };
     mc-rtc-rviz-panel = prev.libsForQt5.callPackage ./pkgs/mc-rtc/ros/mc-rtc-rviz-panel.nix {
       inherit qt;
     };
-    # mc-rtc-ticker = final.callPackage ./pkgs/mc-rtc/ros/mc-rtc-ticker.nix {};
-    mc-rtc-ticker = final.callPackage ./pkgs/mc-rtc/ros/mc-rtc-ticker.nix { };
-    # mc-rtc = final.callPackage ./pkgs/mc-rtc/mc-rtc.nix { with-ros = true; };
-    # mc-rtc = final.callPackage ./pkgs/mc-rtc/mc-rtc.nix { };
-    # mc-rtc-magnum = final.callPackage ./pkgs/mc-rtc-magnum {};
+    mc-rtc-rviz = final.callPackage ./pkgs/mc-rtc/ros/mc-rtc-rviz.nix { };
+    mc-rtc-ticker = final.callPackage ./pkgs/mc-rtc/mc-rtc-ticker.nix { };
     gram-savitzky-golay = final.callPackage ./pkgs/gram-savitzky-golay { };
 
     ##########

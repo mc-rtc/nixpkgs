@@ -1,4 +1,7 @@
-{ }:
+{
+  lib,
+  with-private ? false,
+}:
 
 _final: prev:
 let
@@ -9,9 +12,12 @@ let
       map (name: {
         inherit name;
         value =
-          builtins.trace "overriding stdenv with ccacheStdenv for package ${name}"
-            (getAttr name prev).override
-            { stdenv = prev.ccacheStdenv; };
+          if hasAttr name prev && (getAttr name prev) ? override then
+            (getAttr name prev).override { stdenv = prev.ccacheStdenv; }
+          else if hasAttr name prev then
+            getAttr name prev
+          else
+            trace "withCCache: package '${name}' missing in overlay, skipping" null;
       }) packages
     );
   # usually this mean they don't have stdenv as an agument
@@ -20,12 +26,17 @@ let
   skipCcahePackages = [
     "mc-rtc-msgs"
     "magnum-with-plugins"
-    "mc-rtc-ticker"
+    "mc-rtc-rviz"
     "mc-rtc-rviz-panel"
+    "mc-rtc-ticker"
     "mc-mujoco-robots-public"
     "mc-mujoco-robots-private"
     "mc-mujoco-robots"
     "ur-description"
+    # already handed by mkMcRtcController
+    "ismpc-walking-controller"
+    "robogami-controller"
+    "lipm-walking-controller"
   ];
   allPublicPackages = [
     "nanomsg"
@@ -48,12 +59,9 @@ let
     "openrtm-aist"
     "openrtm-aist-python"
     "mc-state-observation"
-    "lipm-walking-controller"
     "pendulum-feasibility-solver"
     "footsteps-planner-plugin"
     "mc-joystick-plugin"
-    "ismpc-walking-controller"
-    "robogami-controller"
     "mc-udp"
     "franka-description"
     "g1-description"
@@ -81,7 +89,6 @@ let
     "mc-rtc-ros-compat"
     "mc-rtc-python-utils"
     "mc-rtc-rviz-panel"
-    "mc-rtc-ticker"
     "gram-savitzky-golay"
     "mujoco"
     "jvrc1-mj-description"
@@ -134,7 +141,7 @@ let
     "mc-mujoco-robots-private"
     "mc-mujoco-full"
   ];
-  allPackages = allPublicPackages ++ allPivatePackages;
+  allPackages = allPublicPackages ++ (lib.optionals with-private allPivatePackages);
   ccachePackages = builtins.filter (name: !(builtins.elem name skipCcahePackages)) allPackages;
 in
 {
@@ -172,5 +179,8 @@ in
     '';
   };
 }
-// withCCache [ "buildRosPackage" ]
+// withCCache [
+  "buildRosPackage"
+  "mkMcRtcController"
+]
 // withCCache ccachePackages

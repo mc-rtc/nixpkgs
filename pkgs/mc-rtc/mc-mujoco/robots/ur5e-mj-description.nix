@@ -17,3 +17,10 @@ import ./mj-description-base.nix {
   version = "1.0.0";
   hash = "sha256-HYz9fESWwenMopBHyZIbZWuu2YEwmAEBjjcsSzHgZR0=";
 }
+// {
+  passthru = {
+    robot = {
+      module = "mc-ur5e";
+    };
+  };
+}

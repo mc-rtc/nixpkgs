@@ -5,6 +5,7 @@
   flakoboros,
   jrl-cmakemodulesv2,
   make-shell,
+  mc-rtc-lib,
   ...
 }: # localFlake
 
@@ -41,6 +42,7 @@ let
       stdenv = prev.stdenv;
       with-ros = cfg.with-ros;
       with-python = cfg.with-python;
+      inherit mc-rtc-lib;
       inherit qt;
     })
       final
@@ -63,9 +65,12 @@ let
     jrl-cmakemodulesv2 = jrl-cmakemodulesv2.packages.${prev.system}.default;
   };
 
-  mcRtcCcacheOverlay = import ./overlay-ccache.nix { };
+  mcRtcCcacheOverlay = import ./overlay-ccache.nix {
+    inherit lib;
+    with-private = cfg.overlays.private;
+  };
 
-  superbuildFlakeModule = ./modules/superbuild/superbuild.nix;
+  superbuildFlakeModule = import ./modules/superbuild/superbuild.nix { inherit mc-rtc-lib; };
 in
 {
   options.mc-rtc-nix = {
@@ -83,7 +88,9 @@ in
 
     overlays = {
       private = lib.mkEnableOption "enables the private repository overlay";
-      ccache = lib.mkEnableOption "enables the ccache overlay";
+      ccache = lib.mkEnableOption "enables the ccache overlay" // {
+        default = true;
+      };
     };
 
     gepetto = {
@@ -176,7 +183,7 @@ in
               apps = [
                 pkgs.mc-rtc-magnum
               ]
-              ++ lib.optionals (cfg.with-ros || superbuildCfg.withRos) [ pkgs.mc-rtc-ticker ];
+              ++ lib.optionals (cfg.with-ros || superbuildCfg.withRos) [ pkgs.mc-rtc-rviz ];
             };
           };
 
@@ -220,31 +227,10 @@ in
             };
           };
 
-          lipm-walking = with pkgs; {
-            extends = [ "default" ];
-            enabled = "LIPMWalking";
-            runtime = {
-              observers = [ mc-state-observation ];
-              apps = maybe-mc-mujoco mc-mujoco;
-            };
-            devel = {
-              controllers = [ lipm-walking-controller ];
-            };
-          };
-
-          robogami = with pkgs; {
-            extends = [ "default" ];
-            mainRobot = "robogami";
-            enabled = "RobogamiController";
-            runtime = {
-              robots = [
-                mc-robogami
-              ];
-            };
-            devel = {
-              controllers = [ robogami-controller ];
-            };
-          };
+          # auto-generated configs from controller's passthru.mc-rtc
+          ismpc-walking = mc-rtc-lib.mkControllerSuperbuild pkgs pkgs.ismpc-walking-controller { };
+          lipm-walking = mc-rtc-lib.mkControllerSuperbuild pkgs pkgs.lipm-walking-controller { };
+          robogami = mc-rtc-lib.mkControllerSuperbuild pkgs pkgs.robogami-controller { };
 
           panda-prosthesis = with pkgs; {
             extends = [ "minimal" ];
@@ -368,6 +354,7 @@ in
 
                 # Main GUIs and applications
                 inherit (pkgs)
+                  mc-rtc-ticker
                   mc-rtc-magnum
                   ;
 
@@ -422,7 +409,7 @@ in
                 inherit (pkgs) mc-robot-tools sphinx-cmake;
               }
               (lib.optionalAttrs (cfg.with-ros || superbuildCfg.withRos) {
-                inherit (pkgs) mc-rtc-ticker;
+                inherit (pkgs) mc-rtc-rviz;
               })
               (lib.optionalAttrs (!pkgs.stdenv.hostPlatform.isDarwin) {
                 inherit (pkgs) mc-udp mc-mujoco mc-mujoco-full;

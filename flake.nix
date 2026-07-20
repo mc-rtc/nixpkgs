@@ -23,7 +23,7 @@
   };
 
   outputs =
-    inputs:
+    { self, ... }@inputs:
     let
       flakeModule = inputs.flake-parts.lib.importApply ./module.nix {
         inherit (inputs)
@@ -32,6 +32,7 @@
           jrl-cmakemodulesv2
           make-shell
           ;
+        mc-rtc-lib = self.lib;
       };
       inputTriggers = {
         buildPrivate = inputs.private-trigger.value or false;
@@ -45,77 +46,156 @@
           localInputs,
           localFlakeModule ? flakeModule,
         }:
-        flakoborosModule:
+        mcRtcFlakeModule:
         inputs.flake-parts.lib.mkFlake { inputs = localInputs; } (args: {
           systems = import inputs.systems;
           imports = [
             localFlakeModule
-            { flakoboros = flakoborosModule args; }
+            { flakoboros = mcRtcFlakeModule args; }
           ];
         });
-    in
-    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
-      systems = import inputs.systems;
-      imports = [
-        flakeModule
+
+      mkMcRtcModule =
         {
-          mc-rtc-nix = {
-            packages = true;
-            with-ros = inputTriggers.with-ros;
-            with-python = inputTriggers.with-python;
-            # gepetto.packages = true;
-            # gepetto.devShells = true;
-            overlays = {
-              private = inputTriggers.buildPrivate;
-              ccache = inputTriggers.ccache;
-            };
-          };
-          mc-rtc-superbuild = {
-            enable = true;
-            shells.defaultShells.release = true;
-          };
-        }
-      ];
+          localInputs,
+          defaultAttrs ? { },
+          localFlakeModule ? flakeModule, # mc-rtc-nix flakeModule
+        }:
+        mcRtcFlakeModule:
+        inputs.flake-parts.lib.mkFlake { inputs = localInputs; } (args: {
+          systems = import inputs.systems;
+          imports = [
+            localFlakeModule # inputs.mc-rtc-nix.flakeModule
+            ((mcRtcFlakeModule args) // defaultAttrs)
+          ];
+        });
 
-      flake = {
-        inherit flakeModule;
-
-        # lib.mkFlakoboros
-        #   Usage: lib.mkFlakoboros localInputs module
-        #   Description: Creates a flake using the default flakeModule (public, with-ros).
-        #   Arguments:
-        #     - localInputs: The flake inputs set.
-        #     - flakoborosModule: The flake-parts module to use.
-        #                         See https://gepetto.github.io/flakoboros/index.html
-        lib.mkFlakoboros =
-          localInputs: flakoborosModule: mkFlakoboros { inherit localInputs; } flakoborosModule;
-
-        templates = {
-          default = {
-            path = ./templates/default;
-            description = "A template for use with mc-rtc/nixpkgs";
-          };
-          controller = {
-            path = ./templates/controller;
-            description = "A template with superbuild configuration for use with mc-rtc/nixpkgs";
-          };
-          flakoboros = {
-            path = ./templates/flakoboros;
-            description = "A flakoboros template for simple projects";
-          };
-          flakoboros-new-package = {
-            path = ./templates/flakoboros-new-package;
-            description = "A flakoboros template for simple projects";
-          };
-          flakoboros-new-cpp-package = {
-            path = ./templates/flakoboros-new-cpp-package;
-            description = "A flakoboros template for C++ projects (cmake + catch2 + jrl-cmakemodules)";
-          };
-          ros = {
-            path = ./templates/ros;
-            description = "A template for use with mc-rtc/nixpkgs and ROS";
+      mkMcRtcController =
+        {
+          localInputs,
+          controllerName,
+          mkControllerSuperbuild,
+          localFlakeModule ? flakeModule, # mc-rtc-nix flakeModule
+        }:
+        mkMcRtcModule {
+          inherit localInputs localFlakeModule;
+          defaultAttrs = {
+            mc-rtc-superbuild =
+              { pkgs, ... }:
+              {
+                enable = true;
+                configurations = {
+                  "${controllerName}" = (mkControllerSuperbuild pkgs (builtins.getAttr controllerName pkgs) { });
+                };
+              };
           };
         };
-      };
-    };
+    in
+    inputs.flake-parts.lib.mkFlake { inherit inputs; } (
+      { lib, ... }:
+      {
+        systems = import inputs.systems;
+        imports = [
+          flakeModule
+          {
+            mc-rtc-nix = {
+              packages = true;
+              with-ros = inputTriggers.with-ros;
+              with-python = inputTriggers.with-python;
+              # gepetto.packages = true;
+              # gepetto.devShells = true;
+              overlays = {
+                private = inputTriggers.buildPrivate;
+                ccache = inputTriggers.ccache;
+              };
+            };
+            mc-rtc-superbuild = {
+              enable = true;
+              shells.defaultShells.release = true;
+            };
+          }
+        ];
+
+        flake = {
+          inherit flakeModule;
+
+          lib =
+            let
+              mc-rtc-lib = import ./lib { inherit lib; };
+            in
+            mc-rtc-lib
+            // {
+              # lib.mkFlakoboros
+              #   Usage: lib.mkFlakoboros localInputs module
+              #   Description: Creates a flake using the default flakeModule
+              #   Arguments:
+              #     - localInputs: The flake inputs set.
+              #     - flakoborosModule: The flake-parts module to use.
+              #                         See https://gepetto.github.io/flakoboros/index.html
+              mkFlakoboros =
+                localInputs: flakoborosModule:
+                builtins.trace "mkFlakoboros is deprecated, please use mkMcRtcModule instead" mkFlakoboros {
+                  inherit localInputs;
+                } flakoborosModule;
+
+              # lib.mkMcRtcModule
+              #   Usage: lib.mkFlakoboros localInputs module
+              #   Description: Creates a flake using the default flakeModule (public, with-ros).
+              #   Arguments:
+              #     - localInputs: The flake inputs set.
+              #     - flakoborosModule: The flake-parts module to use.
+              #                         See https://gepetto.github.io/flakoboros/index.html
+              mkMcRtcModule = localInputs: mcRtcModule: mkMcRtcModule { inherit localInputs; } mcRtcModule;
+
+              # lib.mkMcRtcController
+              #   Same as mkMcRtcModule but adds a default configuration for the controller (defined in ${controller}.passthru.mc-rtc)
+              #   Usage: lib.mkMcRtcController localInputs "controller-name" module
+              #   Description: Creates a flake using the default flakeModule and configures mc-rtc-superbuild with
+              #      a default configuration for the controller (defined in ${controller}.passthru.mc-rtc)
+              #   Arguments:
+              #     - localInputs: The flake inputs set.
+              #     - controllerName: Name of the controller
+              #     - flakoborosModule: The flake-parts module to use.
+              #                         See https://gepetto.github.io/flakoboros/index.html
+              mkMcRtcController =
+                localInputs: controllerName: flakoborosModule:
+                mkMcRtcController {
+                  inherit localInputs controllerName;
+                  mkControllerSuperbuild = mc-rtc-lib.mkControllerSuperbuild;
+                } flakoborosModule;
+            };
+
+          templates = {
+            default = {
+              path = ./templates/default;
+              description = "A template for use with mc-rtc/nixpkgs";
+            };
+            controller = {
+              path = ./templates/controller;
+              description = "Simplified template with an auto-generated mc-rtc-superbuild configuration to build a controller";
+            };
+            superbuild = {
+              path = ./templates/superbuild;
+              description = "A template with a manual mc-rtc-superbuild configuration";
+            };
+            flakoboros = {
+              path = ./templates/flakoboros;
+              description = "A flakoboros template for simple projects";
+            };
+            flakoboros-new-package = {
+              path = ./templates/flakoboros-new-package;
+              description = "A flakoboros template for simple projects";
+            };
+            flakoboros-new-cpp-package = {
+              path = ./templates/flakoboros-new-cpp-package;
+              description = "A flakoboros template for C++ projects (cmake + catch2 + jrl-cmakemodules)";
+            };
+            ros = {
+              path = ./templates/ros;
+              description = "A template for use with mc-rtc/nixpkgs and ROS";
+            };
+          };
+        };
+      }
+    );
 }

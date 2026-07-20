@@ -1,3 +1,4 @@
+{ mc-rtc-lib }:
 {
   lib,
   pkgs,
@@ -79,6 +80,95 @@ let
 
   title = "  ${pname} interactive shell" + lib.optionalString isDevel " (devel)" + "  ";
   line = lib.concatStrings (builtins.genList (_: "=") (builtins.stringLength title));
+
+  # Prepare devPrefix and shell* variables for use in mcRtcYaml
+  devPrefix = lib.optional isDevel localInstallPath;
+  shellControllers = devPrefix ++ activeRuntime.controllers;
+  shellRobots = devPrefix ++ activeRuntime.robots;
+  shellObservers = devPrefix ++ activeRuntime.observers;
+  shellPlugins = devPrefix ++ activeRuntime.plugins;
+
+  mcRtcYaml = pkgs.writeText "mc_rtc.yaml" ''
+    ---
+    ${lib.optionalString (mainRobot != null && mainRobot != "") "MainRobot: \"${mainRobot}\""}
+    ${lib.optionalString (enabled != null && enabled != "") "Enabled: \"${enabled}\""}
+    ${lib.optionalString (timeStep != null) "Timestep: ${toString timeStep}"}
+    ControllerModulePaths: [${mkModulePaths "mc_controller" shellControllers}]
+    RobotModulePaths: [${mkModulePaths "mc_robots" shellRobots}]
+    ObserverModulePaths: [${mkModulePaths "mc_observers" shellObservers}]
+    GlobalPluginPaths: [${mkModulePaths "mc_plugins" shellPlugins}]
+    LoadUserConfiguration: false
+  '';
+
+  shellConfigs = [
+    mcRtcYaml
+  ]
+  ++ lib.optional (activeConfigPath != null) activeConfigPath
+  ++ extraConfigPaths;
+
+  /**
+    `runAllAppsScripts`
+
+    Attribute set mapping controller names to shell script derivations that launch all associated apps for each controller.
+
+    Only includes controllers where `isController = true` and `mc-rtc.runApps` is non-empty.
+
+    Example output:
+      {
+        controller1 = <derivation /nix/store/...-run-controller1>;
+        controller2 = <derivation /nix/store/...-run-controller2>;
+      }
+
+    Each script:
+      - Starts all apps listed in `mc-rtc.runApps` for the controller.
+      - Runs each app in the background and waits for all to finish.
+      - Handles SIGINT (Ctrl+C) to kill all started apps.
+
+    If no controllers match, the result is an empty attribute set: `{}`.
+  */
+  runAllAppsScripts =
+    let
+      res = lib.listToAttrs (
+        map
+          (
+            controller:
+            let
+              name = controller.pname or controller.name or "controller";
+              apps = mc-rtc-lib.convertListToDrvs pkgs (controller.mc-rtc.runApps or [ ]);
+              appPaths = lib.forEach apps (
+                app:
+                if lib.isDerivation app && app ? meta && app.meta ? mainProgram then
+                  "${app}/bin/${app.meta.mainProgram}"
+                else
+                  null
+              );
+              filteredAppPaths = lib.filter (x: x != null) appPaths;
+              scriptBin = pkgs.writeShellScriptBin "run-${name}" ''
+                set -e
+                pids=""
+                trap 'echo "Stopping apps..."; [ -n "$pids" ] && kill -9 $pids 2>/dev/null || true; exit' INT
+                ${lib.concatMapStringsSep "\n" (appPath: ''
+                  echo "Starting ${appPath}"
+                  "${appPath}" &
+                  pids="$pids $!"
+                '') filteredAppPaths}
+                wait
+              '';
+            in
+            {
+              inherit name;
+              value = scriptBin;
+            }
+          )
+          (
+            lib.filter (
+              c: (c.mc-rtc.runApps or [ ]) != [ ] && (c.mc-rtc.isController or false)
+            ) activeRuntime.controllers
+          )
+      );
+    in
+    builtins.trace (builtins.toJSON res) res;
+
 in
 {
   options.mc-rtc-superbuild = import ./options.nix { inherit lib; };
@@ -100,6 +190,7 @@ in
         gdb
         mc-rtc
       ]
+      ++ (lib.attrValues runAllAppsScripts)
       ++ traceGroup "apps" activeRuntime.apps
       ++ traceGroup "robots" activeRuntime.robots
       ++ traceGroup "plugins" activeRuntime.plugins
@@ -122,18 +213,6 @@ in
 
     shellHook =
       let
-        devPrefix = lib.optional isDevel localInstallPath;
-        shellControllers = devPrefix ++ activeRuntime.controllers;
-        shellRobots = devPrefix ++ activeRuntime.robots;
-        shellObservers = devPrefix ++ activeRuntime.observers;
-        shellPlugins = devPrefix ++ activeRuntime.plugins;
-
-        shellConfigs = [
-          "${localPath}/mc_rtc.yaml"
-        ]
-        ++ lib.optional (activeConfigPath != null) activeConfigPath
-        ++ extraConfigPaths;
-
         printRuntimeDeps =
           showPaths: listGroup:
           let
@@ -168,18 +247,6 @@ in
         export PROJECT_DIR="$(pwd)/${relativeLocalPath}"
         export INSTALL_DIR="$PROJECT_DIR/install"
         mkdir -p $INSTALL_DIR
-
-        cat <<EOF_CONF > $PROJECT_DIR/mc_rtc.yaml
-        ---
-        ${lib.optionalString (mainRobot != null && mainRobot != "") "MainRobot: \"${mainRobot}\""}
-        ${lib.optionalString (enabled != null && enabled != "") "Enabled: \"${enabled}\""}
-        ${lib.optionalString (timeStep != null) "Timestep: ${toString timeStep}"}
-        ControllerModulePaths: [${mkModulePaths "mc_controller" shellControllers}]
-        RobotModulePaths: [${mkModulePaths "mc_robots" shellRobots}]
-        ObserverModulePaths: [${mkModulePaths "mc_observers" shellObservers}]
-        GlobalPluginPaths: [${mkModulePaths "mc_plugins" shellPlugins}]
-        LoadUserConfiguration: false
-        EOF_CONF
 
         export MC_RTC_PATH=${pkgs.mc-rtc}
         export MC_RTC_JEKYLL_PLUGINS=${pkgs.mc-rtc}/share/doc/mc-rtc/jekyll/plugins
@@ -217,11 +284,19 @@ in
         ''}
 
         echo ""
-        echo "The following convenience environment variables are set:"
-        env | grep '^MC_RTC_'
-        echo ""
 
-        echo -e "mc_rtc will use the following configuration files $MC_RTC_CONTROLLER_CONFIG\n"
+        echo -e "mc_rtc will use the following configuration files MC_RTC_CONTROLLER_CONFIG=$MC_RTC_CONTROLLER_CONFIG\n"
+        echo "You can list more convenience environment variables with $ mc_rtc_env"
+        alias mc_rtc_env="env | grep '^MC_RTC_'"
+        ${lib.optionalString (runAllAppsScripts != { }) ''
+          echo "You can run the default apps for these controllers with:"
+          ls ${
+            lib.concatStringsSep " " (
+              map (name: "${runAllAppsScripts.${name}}/bin") (builtins.attrNames runAllAppsScripts)
+            )
+          }
+        ''}
+        echo ""
         echo "--------"
       '';
   };

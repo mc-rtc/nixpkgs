@@ -3,7 +3,6 @@
   buildRosPackage,
   ament-cmake,
   runtimeShell,
-  fetchFromGitHub,
   mc-rtc-rviz-panel,
   ros2cli,
   ros2launch,
@@ -11,28 +10,11 @@
   ros2topic,
 }:
 
-let
-  pname = "mc-rtc-ticker";
-  version = "1.6.1";
-  fetched =
-    # fetchFromGitHub {
-    #   owner = "jrl-umi3218";
-    #   repo = "mc_rtc_ros";
-    #   rev = "227917d348971b3ba39e7dcef0df4ca65c6bf511";
-    #   sha256 = "sha256-40gtvLRzFi7Rd9BwiX3P/OWqH2fUCuZoUO53zYJdwzc=";
-    # };
-    fetchFromGitHub {
-      owner = "arntanguy";
-      repo = "mc_rtc_ros";
-      rev = "topic/nix";
-      hash = "sha256-Gmxv/nYKGcK9G1r0i08kLzTc2Dj8qCAQA/S0bic1LKA=";
-    };
-in
 buildRosPackage {
-  pname = "${pname}";
-  version = "${version}";
+  pname = "mc-rtc-rviz";
+  version = "${mc-rtc-rviz-panel.version}";
 
-  src = "${fetched}/mc_rtc_ticker";
+  src = "${mc-rtc-rviz-panel.fetched}/mc_rtc_ticker";
 
   buildType = "ament_cmake";
   buildInputs = [ ament-cmake ];

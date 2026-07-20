@@ -16,3 +16,10 @@ import ./mj-description-base.nix {
   repo = "g1_mj_description";
   hash = "sha256-vm03l9AWxvwJEXgrU0bv8Krf1V1AizHqMxnjXj232K4=";
 }
+// {
+  passthru = {
+    robot = {
+      module = "mc-g1";
+    };
+  };
+}

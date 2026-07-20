@@ -11,10 +11,10 @@
 <!-- - [Defining `pkgs`](./pkgs.md) -->
 <!-- - [Generating your `packages` and `devShells`](./packages-devshells.md) -->
 <!-- - [Building everything in `checks`](./checks.md) -->
-<!---->
-<!-- # Lib -->
-<!---->
-<!-- - [Plain lib](./plain-lib.md) -->
+
+# Lib
+
+- [Plain lib](./plain-lib.md)
 <!-- - [Generated lib](./generated-lib.md) -->
 <!---->
 <!-- # HOWTOs -->
@@ -25,7 +25,7 @@
 <!-- <!-- # WIP --> -->
 <!-- <!----> -->
 <!-- <!-- - [Rationale](./rationale.md) --> -->
-<!---->
-<!-- --- -->
-<!---->
-<!-- [Full module options search](./search/index.html) -->
+
+---
+
+[Full module options search](./search/index.html)

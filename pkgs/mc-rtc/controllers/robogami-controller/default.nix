@@ -1,12 +1,12 @@
 {
-  stdenv,
+  mkMcRtcController,
   lib,
   fetchFromGitHub,
   cmake,
   mc-rtc,
 }:
 
-stdenv.mkDerivation {
+mkMcRtcController {
   pname = "robogami-controller";
   version = "0.0.0";
 
@@ -28,6 +28,21 @@ stdenv.mkDerivation {
   ];
 
   doCheck = false;
+
+  passthru.mc-rtc = {
+    plugins = [ ];
+    observers = [ ];
+    controller = {
+      Enabled = "RobogamiController";
+      MainRobot = "robogami";
+    };
+    robots = [ "mc-robogami" ];
+    apps = [ "mc-rtc-magnum" ];
+    runApps = [
+      "mc-rtc-ticker"
+      "mc-rtc-magnum"
+    ];
+  };
 
   meta = with lib; {
     description = "Single Robogami module mc_rtc FSM controller";
