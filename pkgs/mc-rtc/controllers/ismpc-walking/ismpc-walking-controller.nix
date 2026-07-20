@@ -1,4 +1,5 @@
 {
+  stdenv,
   mkMcRtcController,
   lib,
   fetchFromGitHub,
@@ -56,8 +57,17 @@ mkMcRtcController {
         # FIXME(mc-rhps1): too large for now
         # "mc-rhps1"
       ];
-      apps = [ "mc-mujoco" ];
+      apps = [
+        "mc-rtc-ticker"
+        "mc-rtc-magnum"
+      ]
+      ++ lib.optional (!stdenv.hostPlatform.isDarwin) "mc-mujoco";
     };
-    runApps = [ "mc-mujoco" ];
+    runApps =
+      lib.optional (!stdenv.hostPlatform.isDarwin) "mc-mujoco"
+      ++ lib.optionals (stdenv.hostPlatform.isDarwin) [
+        "mc-rtc-ticker"
+        "mc-rtc-magnum"
+      ];
   };
 }

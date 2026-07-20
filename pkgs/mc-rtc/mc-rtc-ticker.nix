@@ -21,7 +21,6 @@
 #   };
 # }
 {
-  lib,
   writeShellApplication,
   rosPackages,
   mc-rtc,
@@ -41,9 +40,8 @@ writeShellApplication {
   text = ''
     exec mc_rtc_ticker "$@"
   '';
-  meta = with lib; {
+  meta = {
     description = "Run mc_rtc_ticker with ROS environment (no sourcing needed)";
-    platforms = platforms.linux;
     mainProgram = "mc-rtc-ticker";
   };
 }
