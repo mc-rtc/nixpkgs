@@ -26,7 +26,7 @@ rec {
     Arguments:
 
     - `pkgs`: The package set to resolve string names to derivations.
-    - `vals`: A list of strings (attribute names) or derivations.
+    - `vals`: A list of strings (attribute names) or derivations. Null elements are ignored.
     - `ignoreMissing` (optional, default: `false`): If true, missing derivations are skipped with a warning.
 
     Returns:
@@ -63,7 +63,7 @@ rec {
         else
           throw "convertListToDrvs: unsupported type: ${builtins.typeOf x}";
     in
-    builtins.filter (x: x != null) (map toDrv vals);
+    lib.unique (builtins.filter (x: x != null) (map toDrv (builtins.filter (x: x != null) vals)));
 
   /**
     Converts a list of strings or derivations into a list of derivations from `pkgs`, throwing an error if any string is not found.
@@ -163,7 +163,8 @@ rec {
     @return List of derivations. The MuJoCo robot derivations from the modules.
   */
   mujocoRobotsFromRobotModules =
-    pkgs: robots: drvsFromPassthruField pkgs (drv: drv.mujocoRobots) robots;
+    pkgs: robots:
+    drvsFromPassthruField pkgs (drv: if drv ? mujocoRobots then drv.mujocoRobots else null) robots;
 
   /**
     Replaces the mc-mujoco derivation in the apps list with a version overridden with the given MuJoCo robots.
@@ -247,7 +248,7 @@ rec {
         attr: name: convertListToDrvs pkgs (lib.optionals with-suggested (attr.${name} or [ ]));
       robots = convertStrict c "robots" ++ convertSuggested s "robots";
       # Gather corresponding mj-description derivations
-      mujocoRobots = drvsFromPassthruField pkgs (drv: drv.mujocoRobots) robots;
+      mujocoRobots = mujocoRobotsFromRobotModules pkgs robots;
       apps = convertStrict c "apps" ++ convertSuggested s "apps";
       runApps = convertStrict c "runApps";
     in

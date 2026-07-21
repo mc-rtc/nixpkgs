@@ -126,53 +126,49 @@ let
 
     If no controllers match, the result is an empty attribute set: `{}`.
   */
-  runAllAppsScripts =
-    let
-      res = lib.listToAttrs (
-        map
-          (
-            controller:
-            let
-              name = controller.pname or controller.name or "controller";
-              apps =
-                # FIXME this should be per-controller i guess
-                if activeRuntime.runApps != [ ] then
-                  activeRuntime.runApps
-                else
-                  mc-rtc-lib.convertListToDrvs pkgs (controller.mc-rtc.runApps or [ ]);
-              appPaths = lib.forEach apps (
-                app:
-                if lib.isDerivation app && app ? meta && app.meta ? mainProgram then
-                  "${app}/bin/${app.meta.mainProgram}"
-                else
-                  null
-              );
-              filteredAppPaths = lib.filter (x: x != null) appPaths;
-              scriptBin = pkgs.writeShellScriptBin "run-${name}" ''
-                set -e
-                pids=""
-                trap 'echo "Stopping apps..."; [ -n "$pids" ] && kill -9 $pids 2>/dev/null || true; exit' INT
-                ${lib.concatMapStringsSep "\n" (appPath: ''
-                  echo "Starting ${appPath}"
-                  "${appPath}" &
-                  pids="$pids $!"
-                '') filteredAppPaths}
-                wait
-              '';
-            in
-            {
-              inherit name;
-              value = scriptBin;
-            }
-          )
-          (
-            lib.filter (
-              c: (c.mc-rtc.runApps or [ ]) != [ ] && (c.mc-rtc.isController or false)
-            ) activeRuntime.controllers
-          )
-      );
-    in
-    builtins.trace (builtins.toJSON res) res;
+  runAllAppsScripts = lib.listToAttrs (
+    map
+      (
+        controller:
+        let
+          name = controller.pname or controller.name or "controller";
+          apps =
+            # FIXME this should be per-controller i guess
+            if activeRuntime.runApps != [ ] then
+              activeRuntime.runApps
+            else
+              mc-rtc-lib.convertListToDrvs pkgs (controller.mc-rtc.runApps or [ ]);
+          appPaths = lib.forEach apps (
+            app:
+            if lib.isDerivation app && app ? meta && app.meta ? mainProgram then
+              "${app}/bin/${app.meta.mainProgram}"
+            else
+              null
+          );
+          filteredAppPaths = lib.filter (x: x != null) appPaths;
+          scriptBin = pkgs.writeShellScriptBin "run-${name}" ''
+            set -e
+            pids=""
+            trap 'echo "Stopping apps..."; [ -n "$pids" ] && kill -9 $pids 2>/dev/null || true; exit' INT
+            ${lib.concatMapStringsSep "\n" (appPath: ''
+              echo "Starting ${appPath}"
+              "${appPath}" &
+              pids="$pids $!"
+            '') filteredAppPaths}
+            wait
+          '';
+        in
+        {
+          inherit name;
+          value = scriptBin;
+        }
+      )
+      (
+        lib.filter (
+          c: (c.mc-rtc.runApps or [ ]) != [ ] && (c.mc-rtc.isController or false)
+        ) activeRuntime.controllers
+      )
+  );
 
 in
 {
