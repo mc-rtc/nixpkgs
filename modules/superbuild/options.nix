@@ -7,6 +7,11 @@ let
       default = [ ];
     };
 
+    runApps = lib.mkOption {
+      type = lib.types.listOf lib.types.package;
+      default = [ ];
+    };
+
     robots = lib.mkOption {
       type = lib.types.listOf lib.types.package;
       default = [ ];

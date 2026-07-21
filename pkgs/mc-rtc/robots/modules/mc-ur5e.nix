@@ -38,6 +38,10 @@ stdenv.mkDerivation {
 
   doCheck = false;
 
+  passthru = {
+    mujocoRobots = [ "ur5e-mj-description" ];
+  };
+
   meta = with lib; {
     description = "ur5e RobotModule for mc-rtc";
     homepage = "https://github.com/isri-aist/mc_ur5e";

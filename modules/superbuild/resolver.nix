@@ -5,6 +5,7 @@ cfg:
 let
   mkComponent = {
     apps = [ ];
+    runApps = [ ];
     robots = [ ];
     controllers = [ ];
     observers = [ ];
@@ -29,6 +30,7 @@ let
 
   mergeComponent = left: right: {
     apps = lib.unique (left.apps ++ right.apps);
+    runApps = lib.unique (left.runApps ++ right.runApps);
     robots = lib.unique (left.robots ++ right.robots);
     controllers = lib.unique (left.controllers ++ right.controllers);
     observers = lib.unique (left.observers ++ right.observers);

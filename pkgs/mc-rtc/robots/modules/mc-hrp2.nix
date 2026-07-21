@@ -43,6 +43,11 @@ stdenv.mkDerivation {
     "-DMC_RTC_HONOR_INSTALL_PREFIX=ON"
   ];
 
+  passthru = {
+    # FIXME does not exist
+    # mujocoRobots = [ "hrp2-mj-description" ];
+  };
+
   doCheck = false;
 
   meta = with lib; {
