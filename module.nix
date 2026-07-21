@@ -433,7 +433,6 @@ in
                   hrp4-mj-description
                   hrp5p-mj-description
                   rhps1-mj-description
-                  hrp4cr-mj-description
                   # miroki-mj-description
                   ;
                 inherit (pkgs)
