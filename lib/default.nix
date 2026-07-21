@@ -185,7 +185,7 @@ rec {
           robots = mujocoRobots;
         };
       };
-      isMcMujoco = app: app == pkgs.mc-mujoco;
+      isMcMujoco = app: (app.pname or app.name or null) == "mc-mujoco";
     in
     map (app: if isMcMujoco app then addMujocoRobots else app) apps;
 
