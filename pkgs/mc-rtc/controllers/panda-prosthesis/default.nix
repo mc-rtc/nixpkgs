@@ -1,5 +1,5 @@
 {
-  stdenv,
+  mkMcRtcController,
   lib,
   fetchFromGitHub,
   cmake,
@@ -12,7 +12,7 @@
   pkg-config,
 }:
 
-stdenv.mkDerivation {
+mkMcRtcController {
   pname = "panda-prosthesis";
   version = "1.0.0";
 
@@ -45,6 +45,34 @@ stdenv.mkDerivation {
   ];
 
   doCheck = false;
+
+  passthru.mc-rtc = {
+    robots = [
+      "mc-panda"
+      "mc-panda-lirmm"
+      "panda-prosthesis"
+    ];
+    plugins = [ "panda-prosthesis" ];
+    config = "lib/mc_controller/etc/panda_prosthesis/mc_rtc.yaml";
+
+    devel = {
+      robots = [ "panda-prosthesis" ];
+      plugins = [ "panda-prosthesis" ];
+      config = "lib64/mc_controller/etc/panda_prosthesis/mc_rtc.yaml";
+    };
+
+    suggests = {
+      apps = [
+        "mc-rtc-ticker"
+        "mc-rtc-magnum"
+      ];
+    };
+
+    runApps = [
+      "mc-rtc-ticker"
+      "mc-rtc-magnum"
+    ];
+  };
 
   meta = with lib; {
     description = "Panda RobotModule for mc-rtc";

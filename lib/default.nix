@@ -250,26 +250,52 @@ rec {
       # Gather corresponding mj-description derivations
       mujocoRobots = mujocoRobotsFromRobotModules pkgs robots;
       apps = convertStrict c "apps" ++ convertSuggested s "apps";
-      runApps = convertStrict c "runApps";
+      runApps = builtins.trace "runapps is ${(builtins.toJSON c.runApps)}" (convertStrict c "runApps");
+      optAttr =
+        name: set:
+        lib.optionalAttrs (lib.hasAttr name set && set.${name} != null && set.${name} != "") {
+          "${name}" = set.${name};
+        };
     in
-    {
-      extends = extends;
-      runtime = {
-        inherit robots;
-        apps = replaceMcMujocoInApps apps pkgs mujocoRobots;
-        runApps = replaceMcMujocoInApps runApps pkgs mujocoRobots;
-        controllers = [ controller-drv ];
-        plugins = convertStrict c "plugins" ++ convertSuggested s "plugins";
-        observers = convertStrict c "observers" ++ convertSuggested s "observers";
-      };
-      devel = {
-        controllers = [ controller-drv ];
-      };
-    }
-    // lib.optionalAttrs (c.controller.Enabled != null && c.controller.Enabled != "") {
-      enabled = c.controller.Enabled;
-    }
-    // lib.optionalAttrs (c.controller.MainRobot != null && c.controller.MainRobot != "") {
-      mainRobot = c.controller.MainRobot;
-    };
+    if c.isController then
+      {
+        extends = extends;
+        runtime = {
+          inherit robots;
+          apps = replaceMcMujocoInApps apps pkgs mujocoRobots;
+          runApps = replaceMcMujocoInApps runApps pkgs mujocoRobots;
+          controllers = [ controller-drv ];
+          plugins = convertStrict c "plugins" ++ convertSuggested s "plugins";
+          observers = convertStrict c "observers" ++ convertSuggested s "observers";
+        }
+        // (optAttr "config" c);
+
+        devel =
+          let
+            d = c.devel or { };
+          in
+          {
+            controllers = [ controller-drv ];
+            robots = convertStrict d "robots";
+            plugins = convertStrict d "plugins";
+          }
+          // (optAttr "config" d);
+      }
+      // (
+        let
+          ctl = c.controller or { };
+        in
+        lib.optionalAttrs ((lib.hasAttr "Enabled" ctl) && ctl.Enabled != null && ctl.Enabled != "") {
+          enabled = ctl.Enabled;
+        }
+        //
+          lib.optionalAttrs ((lib.hasAttr "MainRobot" ctl) && ctl.MainRobot != null && ctl.MainRobot != "")
+            {
+              mainRobot = ctl.MainRobot;
+            }
+      )
+    else
+      throw "mkControllerSuperbuild: provided derivation is not a controller: ${
+        controller-drv.name or controller-drv.pname or controller-drv
+      }";
 }
