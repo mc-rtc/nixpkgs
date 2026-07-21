@@ -429,8 +429,17 @@ in
                   miroki-description
                   ;
                 inherit (pkgs)
+                  # hrp2-mj-description
+                  hrp4-mj-description
+                  hrp5p-mj-description
+                  rhps1-mj-description
+                  hrp4cr-mj-description
+                  # miroki-mj-description
+                  ;
+                inherit (pkgs)
                   mc-hrp2
                   mc-hrp4
+                  # mc-hrp4cr
                   mc-hrp5-p
                   mc-rhps1
                   mc-miroki

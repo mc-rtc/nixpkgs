@@ -7,6 +7,19 @@ rec {
   # :lf .
   # pkgs = packages.x86_64-linux
 
+  convertPkgNameToDrv =
+    {
+      pkgs,
+      name,
+      ignoreMissing ? false,
+    }:
+    if builtins.hasAttr name pkgs then
+      builtins.getAttr name pkgs
+    else if ignoreMissing then
+      builtins.trace "convertPkgNameToDrv: ignoring missing derivation '${name}'" null
+    else
+      throw "convertPkgNameToDrv: unsupported string or missing derivation: ${name}";
+
   /**
     Converts a list of strings or derivations into a list of derivations from `pkgs`.
 
@@ -43,12 +56,10 @@ rec {
         if builtins.isAttrs x && x ? type && x.type == "derivation" then
           x
         else if builtins.isString x then
-          if builtins.hasAttr x pkgs then
-            builtins.getAttr x pkgs
-          else if ignoreMissing then
-            builtins.trace "convertListToDrvs: ignoring missing derivation '${x}'" null
-          else
-            throw "convertListToDrvs: unsupported string or missing derivation: ${x}"
+          convertPkgNameToDrv {
+            inherit pkgs ignoreMissing;
+            name = x;
+          }
         else
           throw "convertListToDrvs: unsupported type: ${builtins.typeOf x}";
     in
@@ -143,6 +154,41 @@ rec {
     convertListToDrvs pkgs names;
 
   /**
+    Gathers MuJoCo robot derivations from a list of robot modules.
+
+    Each robot module should provide `passthru.mujocoRobots = [ "robot-mj-description" ]`.
+
+    @param pkgs Set. The package set to look up derivations.
+    @param robots List of derivations. The robot modules.
+    @return List of derivations. The MuJoCo robot derivations from the modules.
+  */
+  mujocoRobotsFromRobotModules =
+    pkgs: robots: drvsFromPassthruField pkgs (drv: drv.mujocoRobots) robots;
+
+  /**
+    Replaces the mc-mujoco derivation in the apps list with a version overridden with the given MuJoCo robots.
+
+    If an app in the list is `pkgs.mc-mujoco`, it is replaced with an overridden version using the provided `mujocoRobots`.
+    Other apps are left unchanged.
+
+    @param apps List of derivations. The applications list.
+    @param pkgs Set. The package set containing mc-mujoco and mc-mujoco-robots.
+    @param mujocoRobots List of derivations. The MuJoCo robots to use in the override.
+    @return List of derivations. The updated applications list.
+  */
+  replaceMcMujocoInApps =
+    apps: pkgs: mujocoRobots:
+    let
+      addMujocoRobots = pkgs.mc-mujoco.override {
+        mc-mujoco-robots = pkgs.mc-mujoco-robots.override {
+          robots = mujocoRobots;
+        };
+      };
+      isMcMujoco = app: app == pkgs.mc-mujoco;
+    in
+    map (app: if isMcMujoco app then addMujocoRobots else app) apps;
+
+  /**
     mkControllerSuperbuild
 
     Constructs a superbuild attribute set for a given controller derivation.
@@ -199,15 +245,21 @@ rec {
       convertStrict = attr: name: convertListToDrvsStrict pkgs (attr.${name} or [ ]);
       convertSuggested =
         attr: name: convertListToDrvs pkgs (lib.optionals with-suggested (attr.${name} or [ ]));
+      robots = convertStrict c "robots" ++ convertSuggested s "robots";
+      # Gather corresponding mj-description derivations
+      mujocoRobots = drvsFromPassthruField pkgs (drv: drv.mujocoRobots) robots;
+      apps = convertStrict c "apps" ++ convertSuggested s "apps";
+      runApps = convertStrict c "runApps";
     in
     {
       extends = extends;
       runtime = {
+        inherit robots;
+        apps = replaceMcMujocoInApps apps pkgs mujocoRobots;
+        runApps = replaceMcMujocoInApps runApps pkgs mujocoRobots;
         controllers = [ controller-drv ];
-        robots = convertStrict c "robots" ++ convertSuggested s "robots";
         plugins = convertStrict c "plugins" ++ convertSuggested s "plugins";
         observers = convertStrict c "observers" ++ convertSuggested s "observers";
-        apps = convertStrict c "apps" ++ convertSuggested s "apps";
       };
       devel = {
         controllers = [ controller-drv ];
@@ -219,5 +271,4 @@ rec {
     // lib.optionalAttrs (c.controller.MainRobot != null && c.controller.MainRobot != "") {
       mainRobot = c.controller.MainRobot;
     };
-
 }

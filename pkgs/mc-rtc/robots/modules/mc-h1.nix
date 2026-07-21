@@ -36,6 +36,10 @@ stdenv.mkDerivation {
     "-DBUILD_TESTING=OFF"
   ];
 
+  passthru = {
+    mujocoRobots = [ "h1-mj-description" ];
+  };
+
   doCheck = false;
 
   meta = with lib; {

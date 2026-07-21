@@ -134,7 +134,12 @@ let
             controller:
             let
               name = controller.pname or controller.name or "controller";
-              apps = mc-rtc-lib.convertListToDrvs pkgs (controller.mc-rtc.runApps or [ ]);
+              apps =
+                # FIXME this should be per-controller i guess
+                if activeRuntime.runApps != [ ] then
+                  activeRuntime.runApps
+                else
+                  mc-rtc-lib.convertListToDrvs pkgs (controller.mc-rtc.runApps or [ ]);
               appPaths = lib.forEach apps (
                 app:
                 if lib.isDerivation app && app ? meta && app.meta ? mainProgram then

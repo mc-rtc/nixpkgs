@@ -35,6 +35,10 @@ stdenv.mkDerivation {
     "-DINSTALL_DOCUMENTATION=OFF"
   ];
 
+  passthru = {
+    mujocoRobots = [ "hrp5p-mj-description" ];
+  };
+
   doCheck = false;
 
   meta = with lib; {

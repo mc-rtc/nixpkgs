@@ -175,7 +175,7 @@
 
     mc-mujoco-robots = final.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/default.nix { };
     # mc-mujoco with all public robots
-    mc-mujoco-robots-public = final.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/default.nix {
+    mc-mujoco-robots-public = final.mc-mujoco-robots.override {
       robots = with final; [
         g1-mj-description
         h1-mj-description
@@ -184,9 +184,9 @@
       ];
     };
 
-    mc-mujoco-full = final.callPackage ./pkgs/mc-rtc/mc-mujoco {
+    mc-mujoco-full = final.mc-mujoco.override {
       jrl-cmakemodules = final.jrl-cmakemodulesv2;
-      mc-mujoco-robots = final.callPackage ./pkgs/mc-rtc/mc-mujoco/robots/default.nix {
+      mc-mujoco-robots = final.mc-mujoco-robots.override {
         robots = final.mc-mujoco-robots-public.robots;
       };
     };
