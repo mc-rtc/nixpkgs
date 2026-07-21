@@ -195,7 +195,6 @@
     # CONTROLLERS #
     ###############
     panda-prosthesis = final.callPackage ./pkgs/mc-rtc/controllers/panda-prosthesis { };
-    # panda-prosthesis = final.callPackage ./pkgs/mc-rtc/controllers/panda-prosthesis {};
 
     ###########
     # PLUGINS #

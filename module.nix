@@ -231,27 +231,7 @@ in
           ismpc-walking = mc-rtc-lib.mkControllerSuperbuild pkgs pkgs.ismpc-walking-controller { };
           lipm-walking = mc-rtc-lib.mkControllerSuperbuild pkgs pkgs.lipm-walking-controller { };
           robogami = mc-rtc-lib.mkControllerSuperbuild pkgs pkgs.robogami-controller { };
-
-          panda-prosthesis = with pkgs; {
-            extends = [ "minimal" ];
-            runtime = {
-              robots = [
-                mc-panda-lirmm
-                mc-panda
-              ];
-
-              apps = [
-                mc-rtc-magnum
-              ];
-              config = "lib/mc_controller/etc/panda_prosthesis/mc_rtc.yaml";
-            };
-            devel = {
-              config = "lib64/mc_controller/etc/panda_prosthesis/mc_rtc.yaml";
-              controllers = [ panda-prosthesis ];
-              plugins = [ panda-prosthesis ];
-              robots = [ panda-prosthesis ];
-            };
-          };
+          panda-prosthesis = mc-rtc-lib.mkControllerSuperbuild pkgs pkgs.panda-prosthesis { };
         };
 
         configurations = builtInConfigurations // superbuildCfg.configurations;

@@ -37,6 +37,7 @@ let
     "ismpc-walking-controller"
     "robogami-controller"
     "lipm-walking-controller"
+    "panda-prosthesis"
   ];
   allPublicPackages = [
     "nanomsg"
@@ -101,7 +102,6 @@ let
     "mc-mujoco-robots"
     "mc-mujoco-robots-public"
     "mc-mujoco-full"
-    "panda-prosthesis"
     "mc-force-shoe-plugin"
     "mc-robot-model-update"
     "eigen-fmt"
