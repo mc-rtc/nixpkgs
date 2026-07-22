@@ -100,11 +100,11 @@ let
     LoadUserConfiguration: false
   '';
 
-  shellConfigs = [
-    mcRtcYaml
-  ]
-  ++ lib.optional (activeConfigPath != null) activeConfigPath
-  ++ extraConfigPaths;
+  shellConfigs =
+    (lib.optional isDevel "${localPath}/mc_rtc.yaml")
+    ++ (lib.optional (!isDevel) mcRtcYaml)
+    ++ lib.optional (activeConfigPath != null) activeConfigPath
+    ++ extraConfigPaths;
 
   /**
     `runAllAppsScripts`
@@ -244,7 +244,21 @@ in
             ${makeLoop "  - Apps" listGroup.apps}
           '';
       in
+
+      lib.optionalString isDevel ''
+        cat > ${localPath}/mc_rtc.yaml <<EOF
+        ---
+        ${lib.optionalString (mainRobot != null && mainRobot != "") "MainRobot: \"${mainRobot}\""}
+        ${lib.optionalString (enabled != null && enabled != "") "Enabled: \"${enabled}\""}
+        ${lib.optionalString (timeStep != null) "Timestep: ${toString timeStep}"}
+        ControllerModulePaths: [${mkModulePaths "mc_controller" shellControllers}]
+        RobotModulePaths: [${mkModulePaths "mc_robots" shellRobots}]
+        ObserverModulePaths: [${mkModulePaths "mc_observers" shellObservers}]
+        GlobalPluginPaths: [${mkModulePaths "mc_plugins" shellPlugins}]
+        LoadUserConfiguration: false
+        EOF
       ''
+      + ''
         export PROJECT_DIR="$(pwd)/${relativeLocalPath}"
         export INSTALL_DIR="$PROJECT_DIR/install"
         mkdir -p $INSTALL_DIR
