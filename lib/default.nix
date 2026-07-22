@@ -264,7 +264,6 @@ rec {
           inherit robots;
           apps = replaceMcMujocoInApps apps pkgs mujocoRobots;
           runApps = replaceMcMujocoInApps runApps pkgs mujocoRobots;
-          controllers = [ controller-drv ];
           plugins = convertStrict c "plugins" ++ convertSuggested s "plugins";
           observers = convertStrict c "observers" ++ convertSuggested s "observers";
         }
