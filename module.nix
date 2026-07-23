@@ -388,6 +388,7 @@ in
                 # Tools
                 inherit (pkgs) mc-robot-tools sphinx-cmake;
               }
+
               (lib.optionalAttrs (cfg.with-ros || superbuildCfg.withRos) {
                 inherit (pkgs) mc-rtc-rviz;
               })
@@ -430,6 +431,12 @@ in
                   mc-dynamic-polytopes
                   dcm-vrptask
                   polytopeController
+                  ;
+              })
+
+              (lib.mapAttrs' (n: lib.nameValuePair "py-${n}") {
+                inherit (pkgs.python3Packages)
+                  mc-rtc
                   ;
               })
             ]
