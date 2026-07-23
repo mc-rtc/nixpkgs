@@ -166,6 +166,7 @@ in
         echo "  sudo chown root:nixbld '$CCACHE_DIR'"
         echo ""
         echo "You should also add the path to the derivation sandbox by adding extra-sandbox-paths to nix.conf"
+        echo "  mkdir -p ~/.config/nix"
         echo "  echo 'extra-sandbox-paths = /var/cache/ccache' >> ~/.config/nix/nix.conf"
         echo "  sudo systemctl restart nix-daemon.service"
         echo "====="

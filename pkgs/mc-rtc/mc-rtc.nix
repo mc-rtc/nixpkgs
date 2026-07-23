@@ -54,6 +54,12 @@ let
       else
         builtins.trace "warning: mc-rtc is requesting with-python-tools but it is not compatible with qt6, will build without it." false
     );
+  # for python utils (mc_rtc_new_fsm_controller, mc_log_ui, etc)
+  pythonEnv = python3Packages.python.withPackages (ps: [
+    ps.gitpython
+    ps.pyqt5
+    ps.matplotlib
+  ]);
 in
 
 (if with-ros then buildRosPackage else stdenv.mkDerivation) {
@@ -61,12 +67,14 @@ in
   inherit (common) version src;
 
   postPatch =
-    if with-ros then
-      ''
-        sed -i 's@set(''${PACKAGE_PATH_VAR} "''${''${PACKAGE}_INSTALL_PREFIX}@\0/share/''${PACKAGE}@' CMakeLists.txt
-      ''
-    else
-      "";
+    (lib.optionalString with-ros ''
+      sed -i 's@set(''${PACKAGE_PATH_VAR} "''${''${PACKAGE}_INSTALL_PREFIX}@\0/share/''${PACKAGE}@' CMakeLists.txt
+    '')
+    + (lib.optionalString with-python-tools ''
+      substituteInPlace utils/mc_rtc_new_fsm_controller.in.py \
+        --replace '"mc_rtc_new_controller", os.path.dirname(__file__) + "/mc_rtc_new_controller"' \
+                  '"mc_rtc_new_controller", os.path.dirname(__file__) + "/mc_rtc_new_controller.py"'
+    '');
 
   buildInputs = [
     jrl-cmakemodules
@@ -79,7 +87,7 @@ in
     bundler
   ]
   ++ lib.optional use-python-tools qt.wrapQtAppsHook
-  ++ lib.optional (use-python-bindings || use-python-tools) python3Packages.python
+  ++ lib.optional (use-python-bindings || use-python-tools) pythonEnv
   ++ lib.optionals use-python-bindings [
     python3Packages.distutils
     python3Packages.pytest
@@ -110,12 +118,6 @@ in
     lib.optionals use-python-bindings [
       python3Packages.tasks
     ]
-  # for python utils (mc_rtc_new_fsm_controller, mc_log_ui, etc)
-  ++ lib.optionals use-python-tools [
-    python3Packages.gitpython
-    python3Packages.pyqt5
-    python3Packages.matplotlib
-  ]
   ++ lib.optional (with-ros && rclcpp != null) rclcpp
   ++ lib.optional (with-ros && nav-msgs != null) nav-msgs
   ++ lib.optional (with-ros && sensor-msgs != null) sensor-msgs
@@ -150,6 +152,24 @@ in
       echo "Shrinking RPATH for $binary"
       patchelf --shrink-rpath --allowed-rpath-prefixes "$NIX_STORE" "$binary"
     done
+  '';
+
+  postInstall = ''
+    # Wrap mc_log_ui with PYTHONPATH and QT_PLUGIN_PATH
+    # TODO make it a proper python project with pyproject.toml
+    wrapProgram $out/bin/mc_log_ui \
+      --set PYTHONPATH "$out/${python3Packages.python.sitePackages}:${pythonEnv}/${python3Packages.python.sitePackages}:$out/bin:$PYTHONPATH" \
+      --set QT_PLUGIN_PATH "${qt.qtbase}/${qt.qtbase.qtPluginPrefix}"
+
+    # TODO make it proper python projects
+    mv $out/bin/mc_rtc_new_controller $out/bin/mc_rtc_new_controller.py
+    makeWrapper ${python3Packages.python.interpreter} $out/bin/mc_rtc_new_controller \
+      --add-flags $out/bin/mc_rtc_new_controller.py \
+      --set PYTHONPATH "$out/${python3Packages.python.sitePackages}:${pythonEnv}/${python3Packages.python.sitePackages}:$out/bin:$PYTHONPATH"
+
+    wrapProgram $out/bin/mc_rtc_new_fsm_controller \
+      --set PYTHONPATH "$out/${python3Packages.python.sitePackages}:${pythonEnv}/${python3Packages.python.sitePackages}:$out/bin:$PYTHONPATH"
+
   '';
 
   meta = with lib; {
