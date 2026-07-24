@@ -60,11 +60,23 @@ let
     ps.pyqt5
     ps.matplotlib
   ]);
+
+  filteredSrc = lib.cleanSourceWith {
+    filter =
+      name: _type:
+      let
+        relPath = lib.removePrefix (toString common.src + "/") (toString name);
+      in
+      !(lib.hasPrefix "utils/python/mc_log_ui" relPath);
+    src = common.src;
+  };
 in
 
 (if with-ros then buildRosPackage else stdenv.mkDerivation) {
   pname = "mc-rtc";
-  inherit (common) version src;
+  inherit (common) version;
+
+  src = builtins.trace (builtins.toJSON filteredSrc) filteredSrc;
 
   postPatch =
     (lib.optionalString with-ros ''
@@ -156,12 +168,6 @@ in
   '';
 
   postInstall = ''
-    # Wrap mc_log_ui with PYTHONPATH and QT_PLUGIN_PATH
-    # TODO make it a proper python project with pyproject.toml
-    wrapProgram $out/bin/mc_log_ui \
-      --set PYTHONPATH "$out/${python3Packages.python.sitePackages}:${pythonEnv}/${python3Packages.python.sitePackages}:$out/bin:$PYTHONPATH" \
-      --set QT_PLUGIN_PATH "${qt.qtbase}/${qt.qtbase.qtPluginPrefix}"
-
     # TODO make it proper python projects
     mv $out/bin/mc_rtc_new_controller $out/bin/mc_rtc_new_controller.py
     makeWrapper ${python3Packages.python.interpreter} $out/bin/mc_rtc_new_controller \

@@ -259,6 +259,10 @@
           inherit (python-final) callPackage;
           directory = ./py-pkgs;
         }
+        // lib.filesystem.packagesFromDirectoryRecursive {
+          inherit (python-final) callPackage;
+          directory = ./pkgs/mc-rtc/py-pkgs;
+        }
       )
     ];
   }
