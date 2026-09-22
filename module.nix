@@ -89,7 +89,7 @@ in
     overlays = {
       private = lib.mkEnableOption "enables the private repository overlay";
       ccache = lib.mkEnableOption "enables the ccache overlay" // {
-        default = true;
+        default = false;
       };
     };
 
@@ -336,6 +336,8 @@ in
                 inherit (pkgs)
                   mc-rtc-ticker
                   mc-rtc-magnum
+                  mc-rtc-imgui
+                  imguizmo
                   ;
 
                 # Main robots
