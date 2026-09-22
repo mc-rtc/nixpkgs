@@ -8,7 +8,7 @@ let
     owner = "jrl-umi3218";
     repo = "mc_rtc";
     tag = "v2.15.0";
-    hash = "sha256-uA/VtebPG+ljTNpeDY2MUnOEAB3SaHrKE0XnlmaGkTo=";
+    hash = "sha256-YwE3HGdjX8scGIrS7F/zOy0KaNLQB9M1ANpwgNZNjS8=";
   };
 in
 {
