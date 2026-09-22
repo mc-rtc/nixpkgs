@@ -23,6 +23,7 @@
     hash = "sha256-Hg1XfvQMiL64BbS+9MF7qLOWvWnF8ulW6rMUyPlzOaQ=";
   };
 
+  dontWrapQtApps = true;
   buildInputs = [
     jrl-cmakemodules
   ];

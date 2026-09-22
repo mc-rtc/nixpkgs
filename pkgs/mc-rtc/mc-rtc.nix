@@ -76,17 +76,18 @@ in
                   '"mc_rtc_new_controller", os.path.dirname(__file__) + "/mc_rtc_new_controller.py"'
     '');
 
+  dontWrapQtApps = true; # we wrap mc_log_ui manually in postInstall
   buildInputs = [
     jrl-cmakemodules
     qt.qtbase
-  ];
+  ]
+  ++ lib.optional use-python-tools qt.wrapQtAppsHook;
   nativeBuildInputs = [
     cmake
     # for documentation
     doxygen
     bundler
   ]
-  ++ lib.optional use-python-tools qt.wrapQtAppsHook
   ++ lib.optional (use-python-bindings || use-python-tools) pythonEnv
   ++ lib.optionals use-python-bindings [
     python3Packages.distutils
