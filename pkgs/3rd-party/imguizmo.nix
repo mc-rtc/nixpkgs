@@ -13,6 +13,7 @@ stdenv.mkDerivation (_finalAttrs: {
   version = "0.0.0";
 
   dontBuild = true;
+  dontWrapQtApps = true;
 
   src =
     # fetchFromGitHub {

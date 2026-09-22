@@ -336,6 +336,8 @@ in
                 inherit (pkgs)
                   mc-rtc-ticker
                   mc-rtc-magnum
+                  mc-rtc-imgui
+                  imguizmo
                   ;
 
                 # Main robots

@@ -15,6 +15,7 @@ stdenv.mkDerivation (_finalAttrs: {
   version = "1.0.0";
 
   dontBuild = true;
+  dontWrapQtApps = true;
 
   # head of nix branch (for stanalone install)
   # https://github.com/mc-rtc/mc_rtc-imgui/tree/nix
