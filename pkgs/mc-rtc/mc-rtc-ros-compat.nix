@@ -12,17 +12,17 @@
   human-description ? null, # for tests
 }:
 
-builtins.trace "Building mc-rtc-ros-compat with ros support: ${lib.boolToString with-ros}"
+builtins.trace "Building mc-rtc-ros-compat (with-ros: ${lib.boolToString with-ros})"
   (if with-ros then buildRosPackage else stdenv.mkDerivation)
   {
     pname = "mc-rtc-ros-compat";
-    version = "1.0.3";
+    version = "1.1.0";
 
     src = fetchFromGitHub {
       owner = "jrl-umi3218";
       repo = "mc_rtc_ros_compat";
-      tag = "v1.0.3";
-      hash = "sha256-Hg1XfvQMiL64BbS+9MF7qLOWvWnF8ulW6rMUyPlzOaQ=";
+      tag = "v1.1.0";
+      hash = "sha256-UW3QxN86nd0072cvAl8dxkoyS9EDEHxMEBK/mWtLvek=";
     };
 
     dontWrapQtApps = true;
