@@ -137,8 +137,17 @@
       with-python-tools = true;
       inherit qt;
     };
-    mc-rtc-ros-compat = callWithRos ./pkgs/mc-rtc/mc-rtc-ros-compat.nix {
+    mc-rtc-ros-compat = final.callPackage ./pkgs/mc-rtc/mc-rtc-ros-compat.nix {
       jrl-cmakemodules = final.jrl-cmakemodulesv2;
+      inherit with-ros;
+    };
+    mc-rtc-ros-compat-noros = final.callPackage ./pkgs/mc-rtc/mc-rtc-ros-compat.nix {
+      jrl-cmakemodules = final.jrl-cmakemodulesv2;
+      with-ros = false;
+    };
+    mc-rtc-ros-compat-ros = callWithRos ./pkgs/mc-rtc/mc-rtc-ros-compat.nix {
+      jrl-cmakemodules = final.jrl-cmakemodulesv2;
+      with-ros = true;
     };
     mc-rtc-python-utils = final.callPackage ./pkgs/mc-rtc/mc-rtc-python-utils.nix { };
     mc-rtc-rviz-panel = prev.libsForQt5.callPackage ./pkgs/mc-rtc/ros/mc-rtc-rviz-panel.nix {

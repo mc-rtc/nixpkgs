@@ -330,7 +330,13 @@ in
                   ;
 
                 # mc-rtc
-                inherit (pkgs) mc-rtc-data mc-rtc mc-rtc-ros-compat;
+                inherit (pkgs)
+                  mc-rtc-data
+                  mc-rtc
+                  mc-rtc-ros-compat
+                  mc-rtc-ros-compat-noros
+                  mc-rtc-ros-compat-ros
+                  ;
 
                 # Main GUIs and applications
                 inherit (pkgs)
