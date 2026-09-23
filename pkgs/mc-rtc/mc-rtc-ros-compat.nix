@@ -12,43 +12,45 @@
   human-description ? null, # for tests
 }:
 
-(if with-ros then buildRosPackage else stdenv.mkDerivation) {
-  pname = "mc-rtc-ros-compat";
-  version = "1.0.3";
+builtins.trace "Building mc-rtc-ros-compat with ros support: ${lib.boolToString with-ros}"
+  (if with-ros then buildRosPackage else stdenv.mkDerivation)
+  {
+    pname = "mc-rtc-ros-compat";
+    version = "1.0.3";
 
-  src = fetchFromGitHub {
-    owner = "jrl-umi3218";
-    repo = "mc_rtc_ros_compat";
-    tag = "v1.0.3";
-    hash = "sha256-Hg1XfvQMiL64BbS+9MF7qLOWvWnF8ulW6rMUyPlzOaQ=";
-  };
+    src = fetchFromGitHub {
+      owner = "jrl-umi3218";
+      repo = "mc_rtc_ros_compat";
+      tag = "v1.0.3";
+      hash = "sha256-Hg1XfvQMiL64BbS+9MF7qLOWvWnF8ulW6rMUyPlzOaQ=";
+    };
 
-  dontWrapQtApps = true;
-  buildInputs = [
-    jrl-cmakemodules
-  ];
-  nativeBuildInputs = [
-    cmake
-    catch2_3
-  ]
-  # for tests
-  ++ lib.optional (human-description != null) human-description;
-  propagatedBuildInputs = lib.optionals with-ros [
-    rclcpp
-    ament-cmake
-  ];
+    dontWrapQtApps = true;
+    buildInputs = [
+      jrl-cmakemodules
+    ];
+    nativeBuildInputs = [
+      cmake
+      catch2_3
+    ]
+    # for tests
+    ++ lib.optional (human-description != null) human-description;
+    propagatedBuildInputs = lib.optionals with-ros [
+      rclcpp
+      ament-cmake
+    ];
 
-  cmakeFlags = [
-    (lib.cmakeBool "DISABLE_ROS" (!with-ros))
-    (lib.cmakeBool "BUILD_TESTS_WITH_ROS_PACKAGES" (human-description != null))
-  ];
+    cmakeFlags = [
+      (lib.cmakeBool "DISABLE_ROS" (!with-ros))
+      (lib.cmakeBool "BUILD_TESTS_WITH_ROS_PACKAGES" (human-description != null))
+    ];
 
-  doCheck = true;
+    doCheck = true;
 
-  meta = with lib; {
-    description = "mc-rtc-ros-compat: small library to keep mc-rtc ros-agnostic";
-    homepage = "https://github.com/jrl-umi3218/mc_rtc_ros_compat";
-    license = licenses.bsd2;
-    platforms = platforms.all;
-  };
-}
+    meta = with lib; {
+      description = "mc-rtc-ros-compat: small library to keep mc-rtc ros-agnostic";
+      homepage = "https://github.com/jrl-umi3218/mc_rtc_ros_compat";
+      license = licenses.bsd2;
+      platforms = platforms.all;
+    };
+  }
