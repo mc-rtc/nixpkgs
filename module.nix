@@ -445,6 +445,7 @@ in
               (lib.mapAttrs' (n: lib.nameValuePair "py-${n}") {
                 inherit (pkgs.python3Packages)
                   mc-rtc
+                  spacevecalg
                   ;
               })
             ]
