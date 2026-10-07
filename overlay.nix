@@ -155,7 +155,7 @@
       inherit qt;
     };
     mc-rtc-rviz = final.callPackage ./pkgs/mc-rtc/ros/mc-rtc-rviz.nix { };
-    mc-rtc-ticker = final.callPackage ./pkgs/mc-rtc/mc-rtc-ticker.nix { };
+    mc-rtc-ticker = final.callPackage ./pkgs/mc-rtc/mc-rtc-ticker.nix { inherit rosDistro; };
     gram-savitzky-golay = final.callPackage ./pkgs/gram-savitzky-golay { };
 
     ##########

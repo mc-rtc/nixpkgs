@@ -1,4 +1,4 @@
-{ mc-rtc-lib }:
+{ mc-rtc-lib, rosDistro }:
 {
   lib,
   pkgs,
@@ -199,7 +199,7 @@ in
       ++ traceGroup "observers" activeRuntime.observers
       ++ cfg.extraBuildInputs
       ++ lib.optionals cfg.withRos (
-        with rosPackages.jazzy;
+        with rosPackages.${rosDistro};
         [
           colcon
           rclcpp

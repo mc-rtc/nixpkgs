@@ -71,7 +71,10 @@ let
     with-private = cfg.overlays.private;
   };
 
-  superbuildFlakeModule = import ./modules/superbuild/superbuild.nix { inherit mc-rtc-lib; };
+  superbuildFlakeModule = import ./modules/superbuild/superbuild.nix {
+    inherit mc-rtc-lib;
+    inherit rosDistro;
+  };
 in
 {
   options.mc-rtc-nix = {
