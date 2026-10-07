@@ -44,6 +44,7 @@ let
       with-python = cfg.with-python;
       inherit mc-rtc-lib;
       inherit qt;
+      inherit rosDistro;
     })
       final
       prev;

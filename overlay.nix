@@ -10,6 +10,7 @@
   with-ros ? false,
   with-python ? true,
   qt, # qt5 or qt6
+  rosDistro, # "jazzy", "kilted", etc
   ...
 }:
 (
@@ -19,7 +20,7 @@
   in
   {
     # FIXME ros version
-    inherit (prev.rosPackages.jazzy)
+    inherit (prev.rosPackages.${rosDistro})
       buildRosPackage
       ament-cmake
       rclcpp
