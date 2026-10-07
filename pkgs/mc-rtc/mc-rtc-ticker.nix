@@ -24,7 +24,7 @@
   writeShellApplication,
   rosPackages,
   mc-rtc,
-  rosDistro ? "jazzy",
+  rosDistro,
 }:
 
 let

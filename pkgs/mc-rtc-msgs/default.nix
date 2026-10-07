@@ -15,7 +15,7 @@ let
   version = "1.1.2";
 in
 buildRosPackage {
-  pname = "ros-jazzy-mc-rtc-msgs";
+  pname = "ros-mc-rtc-msgs";
   version = "${version}";
 
   src = fetchurl {
