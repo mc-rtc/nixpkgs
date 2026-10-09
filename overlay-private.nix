@@ -37,6 +37,11 @@
     # make tasks with lssol the new default
     tasks = final.tasks-lssol;
 
+    tvm-lssol = final.callPackage ./pkgs/tvm {
+      with-lssol = true;
+    };
+    tvm = final.tvm-lssol;
+
     # mc-rtc with lssol
     mc-rtc = prev.mc-rtc.override {
       tasks = final.tasks-lssol;

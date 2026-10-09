@@ -5,12 +5,14 @@
   jrl-cmakemodules,
   eigen-qld,
   eigen-quadprog,
+  with-lssol ? false,
+  eigen-lssol ? null,
   boost,
   fetchgit,
 }:
 
 stdenv.mkDerivation {
-  pname = "tvm";
+  pname = if (with-lssol && eigen-lssol != null) then "tvm-lssol" else "tvm-qld";
   version = "0.9.2";
 
   # master
@@ -30,15 +32,17 @@ stdenv.mkDerivation {
     eigen-qld
     eigen-quadprog
     boost
-  ];
+  ]
+  ++ lib.optional (with-lssol && eigen-lssol != null) eigen-lssol;
 
   cmakeFlags = [
+    "-DTVM_WITH_QLD=ON"
+    "-DTVM_WITH_QUADPROG=ON"
+    (lib.cmakeBool "TVM_WITH_LSSOL" with-lssol)
+    "-DTVM_WITH_ROBOT=OFF"
     "-DBUILD_TESTING=OFF"
     "-DPYTHON_BINDING=OFF"
     "-DINSTALL_DOCUMENTATION=OFF"
-    "-DTVM_WITH_QLD=ON"
-    "-DTVM_WITH_QUADPROG=ON"
-    "-DTVM_WITH_ROBOT=OFF"
   ];
 
   doCheck = true;
