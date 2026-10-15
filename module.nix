@@ -439,6 +439,7 @@ in
 
                 inherit (pkgs)
                   tasks-lssol
+                  tvm-lssol
                   politopix
                   mc-dynamic-polytopes
                   dcm-vrptask
