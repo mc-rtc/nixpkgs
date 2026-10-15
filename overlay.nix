@@ -43,6 +43,8 @@
       xacro
       ;
 
+    inherit qt;
+
     mkMcRtcController = final.callPackage ./pkgs/mc-rtc/mk-mc-rtc-controller.nix { };
 
     nanomsg = prev.nanomsg.overrideAttrs (_old: rec {

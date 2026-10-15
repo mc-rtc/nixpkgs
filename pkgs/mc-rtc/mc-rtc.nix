@@ -54,7 +54,7 @@ let
       else
         builtins.trace "warning: mc-rtc is requesting with-python-tools but it is not compatible with qt6, will build without it." false
     );
-  # for python utils (mc_rtc_new_fsm_controller, mc_log_ui, etc)
+  # for python utils (mc_rtc_new_fsm_controller, etc)
   pythonEnv = python3Packages.python.withPackages (ps: [
     ps.gitpython
     ps.pyqt5
@@ -76,7 +76,7 @@ in
                   '"mc_rtc_new_controller", os.path.dirname(__file__) + "/mc_rtc_new_controller.py"'
     '');
 
-  dontWrapQtApps = true; # we wrap mc_log_ui manually in postInstall
+  dontWrapQtApps = true; # we wrap python programs requiring Qt manually in postInstall
   buildInputs = [
     jrl-cmakemodules
     qt.qtbase
@@ -156,12 +156,6 @@ in
   '';
 
   postInstall = ''
-    # Wrap mc_log_ui with PYTHONPATH and QT_PLUGIN_PATH
-    # TODO make it a proper python project with pyproject.toml
-    wrapProgram $out/bin/mc_log_ui \
-      --set PYTHONPATH "$out/${python3Packages.python.sitePackages}:${pythonEnv}/${python3Packages.python.sitePackages}:$out/bin:$PYTHONPATH" \
-      --set QT_PLUGIN_PATH "${qt.qtbase}/${qt.qtbase.qtPluginPrefix}"
-
     # TODO make it proper python projects
     mv $out/bin/mc_rtc_new_controller $out/bin/mc_rtc_new_controller.py
     makeWrapper ${python3Packages.python.interpreter} $out/bin/mc_rtc_new_controller \
