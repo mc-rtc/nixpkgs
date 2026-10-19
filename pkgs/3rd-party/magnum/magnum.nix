@@ -28,12 +28,8 @@ stdenv.mkDerivation (_finalAttrs: {
   src = fetchFromGitHub {
     owner = "mosra";
     repo = "magnum";
-    # up-to-date
-    rev = "2a3acc0f22f42026c04553a73c1549e577c54e2f";
-    hash = "sha256-C9WxwC02J21SMPR2wtVZfgFaCRuZceyIAEjg0oiWkH4=";
-    # orginal from mc-rtc-magnum
-    # rev = "440653dbb8815ba28fd20203acae711dbb8b14b4";
-    # hash = "sha256-65Pa7NqUMHJX80oLoJ+WpB9tj00XQSFjJIuBahrlZtg=";
+    rev = "369e9620ab22224ae66a376290b9b36e872209ce";
+    hash = "sha256-ld8liF60ImYVNr4qEbcacu/8wtaC7jZEzpamKW380TU=";
   };
 
   nativeBuildInputs = [ cmake ];
