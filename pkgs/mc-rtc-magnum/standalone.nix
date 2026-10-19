@@ -43,11 +43,11 @@ stdenv.mkDerivation {
   '';
 
   # See https://github.com/glfw/glfw/issues/2839
-  postInstall = ''
-    wrapProgram $out/bin/mc-rtc-magnum \
-      --set XDG_SESSION_TYPE "" \
-      --set WAYLAND_DISPLAY ""
-  '';
+  # postInstall = ''
+  #   wrapProgram $out/bin/mc-rtc-magnum \
+  #     --set XDG_SESSION_TYPE "" \
+  #     --set WAYLAND_DISPLAY ""
+  # '';
 
   # FIXME upstream
   # On macos plugins are built as MH_BUNDLE and we cannot link against them,
