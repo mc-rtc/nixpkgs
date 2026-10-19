@@ -18,13 +18,13 @@ let
 in
 stdenv.mkDerivation {
   pname = if (with-lssol && eigen-lssol != null) then "tasks-lssol" else "tasks-qld";
-  version = "v1.8.4";
+  version = "v1.9.2";
 
   src = fetchFromGitHub {
     owner = "jrl-umi3218";
     repo = "Tasks";
-    tag = "v1.8.4";
-    hash = "sha256-1XrRagwiMJwukbqPmlJCzp/Y11POdUdDIFjeZTCg3Ik=";
+    tag = "v1.9.2";
+    hash = "sha256-afZbxXd2uQVpDL97sXyxIrbFqa76JGc0s0ZAPzHcpsQ=";
   };
 
   buildInputs = [

@@ -8,22 +8,29 @@
   with-lssol ? false,
   eigen-lssol ? null,
   boost,
-  fetchgit,
+  doxygen,
+  gbenchmark,
+  doxygen-awesome-css,
+  fetchFromGitHub,
 }:
 
 stdenv.mkDerivation {
   pname = if (with-lssol && eigen-lssol != null) then "tvm-lssol" else "tvm-qld";
-  version = "0.9.2";
+  version = "0.9.8";
 
   # master
-  src = fetchgit {
-    url = "https://github.com/jrl-umi3218/tvm";
-    rev = "538f367bfab8621d0a315c6bca58a7186fda2832";
-    sha256 = "sha256-qse7emorGWqoWlmzaHNdbDiHFXrVOo3oz8Fah4AYmL8=";
+  src = fetchFromGitHub {
+    owner = "jrl-umi3218";
+    repo = "tvm";
+    tag = "v0.9.8";
+    hash = "sha256-1JgwB5je5qLVuSJJ7pn9iOe9TGKZSlWofulRl+SAHsE=";
   };
 
   buildInputs = [
     jrl-cmakemodules
+    doxygen
+    gbenchmark
+    doxygen-awesome-css
   ];
   nativeBuildInputs = [
     cmake
@@ -36,13 +43,13 @@ stdenv.mkDerivation {
   ++ lib.optional (with-lssol && eigen-lssol != null) eigen-lssol;
 
   cmakeFlags = [
+    (lib.cmakeBool "BUILD_DOCUMENTATION" true)
     "-DTVM_WITH_QLD=ON"
     "-DTVM_WITH_QUADPROG=ON"
     (lib.cmakeBool "TVM_WITH_LSSOL" with-lssol)
     "-DTVM_WITH_ROBOT=OFF"
-    "-DBUILD_TESTING=OFF"
     "-DPYTHON_BINDING=OFF"
-    "-DINSTALL_DOCUMENTATION=OFF"
+    "-DDOXYGEN_AWESOME_CSS_PATH=${doxygen-awesome-css}/share/doxygen-awesome-css"
   ];
 
   doCheck = true;
