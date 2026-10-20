@@ -10,14 +10,14 @@
 
 (if with-ros then buildRosPackage else stdenv.mkDerivation) {
   pname = "h1-description";
-  version = "1.0.2";
+  version = "1.1.0";
   separateDebugInfo = false;
 
   src = fetchFromGitHub {
     owner = "isri-aist";
     repo = "h1_description";
-    rev = "v1.0.2";
-    hash = "sha256-WR6E2OBRBphVl1nxHo7rSDOTyVGzje3V7XjnfLR5lQ4=";
+    tag = "v1.1.0";
+    hash = "sha256-wrM2rpIYcUyy0HWCOEnB73qwRR8jgkw8WMrp9irj5WA=";
   };
 
   buildType = "ament_cmake";

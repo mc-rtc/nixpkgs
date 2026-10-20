@@ -17,13 +17,13 @@ in
 
 stdenv.mkDerivation {
   pname = "mc-h1";
-  version = "1.0.0";
+  version = "1.1.0";
 
   src = fetchFromGitHub {
     owner = "isri-aist";
     repo = "mc_h1";
-    rev = "e9e5c4b1220d68229600824ad8a34f32b2f76dc0";
-    hash = "sha256-dUf7TLxwJEWsumJrWz497AYfu3WI2zIyN27OvWLE2IQ=";
+    tag = "v1.1.0";
+    hash = "sha256-19AAvMG2QTXRhKS+C6KiOWuABrPQ6HKx5ik8V432+xg=";
   };
 
   nativeBuildInputs = [ cmake ];
