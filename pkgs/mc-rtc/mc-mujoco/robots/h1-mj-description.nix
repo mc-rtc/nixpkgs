@@ -13,8 +13,9 @@ import ./mj-description-base.nix {
     cmake
     ;
   pname = "h1-mj-description";
+  version = "1.1.0";
   repo = "h1_mj_description";
-  hash = "sha256-lplu1x/q/hYHL+Gfz0XdJxBweFBYfmfmZPv9NdlU3VE=";
+  hash = "sha256-HmK5B4OmR+Eeyilq6yN4FakIIQXPucC12UACFQMPEoU=";
 }
 // {
   passthru = {
