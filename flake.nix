@@ -3,8 +3,9 @@
 
   inputs = {
     gepetto.url = "github:gepetto/nix";
-    flake-parts.follows = "gepetto/flake-parts";
+    gepetto.inputs.systems.url = "github:nix-systems/default";
     flakoboros.follows = "gepetto/flakoboros";
+    flake-parts.follows = "gepetto/flake-parts";
     nixpkgs.follows = "gepetto/nixpkgs";
     systems.follows = "gepetto/systems";
     jrl-cmakemodulesv2 = {
