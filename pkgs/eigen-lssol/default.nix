@@ -15,7 +15,7 @@ stdenv.mkDerivation (_finalAttrs: {
   version = "0.0.0";
 
   src = fetchGit {
-    url = "git@gite.lirmm.fr:multi-contact/eigen-lssol.git";
+    url = "ssh://git@gite.lirmm.fr/multi-contact/eigen-lssol.git";
     # Master
     rev = "af9c2cf289935da022d405b8247616b70a717e6e";
   };

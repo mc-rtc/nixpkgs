@@ -13,7 +13,7 @@ stdenv.mkDerivation (_finalAttrs: {
     # I don't remember what hugo changes were
     # TODO release
     builtins.fetchGit {
-      url = "git@gite.lirmm.fr:hlefevre/hrp4_mj_description";
+      url = "ssh://git@gite.lirmm.fr/hlefevre/hrp4_mj_description.git";
       rev = "5f8df7e6eeb5153ee381394312f5700f36bda1e2";
     };
 

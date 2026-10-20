@@ -3,12 +3,12 @@
 }:
 
 let
-  version = "2.15.0";
+  version = "2.16.0";
   src = fetchFromGitHub {
     owner = "jrl-umi3218";
     repo = "mc_rtc";
-    tag = "v2.15.0";
-    hash = "sha256-YwE3HGdjX8scGIrS7F/zOy0KaNLQB9M1ANpwgNZNjS8=";
+    tag = "v2.16.0";
+    hash = "sha256-/2wPV6jnn94shUUFpIiDv6cazA0duPSF3WKduzEU39E=";
   };
 in
 {
