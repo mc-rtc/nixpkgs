@@ -451,6 +451,8 @@ in
                 inherit (pkgs.python3Packages)
                   mc-rtc
                   mc-log-ui
+                  mc-rtc-new-controller
+                  mc-rtc-new-fsm-controller
                   ;
               })
             ]

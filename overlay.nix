@@ -135,8 +135,6 @@
     mc-rtc = callWithRos ./pkgs/mc-rtc/mc-rtc.nix {
       inherit with-ros;
       with-python-bindings = with-python;
-      with-python-tools = true;
-      inherit qt;
     };
     mc-rtc-ros-compat = final.callPackage ./pkgs/mc-rtc/mc-rtc-ros-compat.nix {
       jrl-cmakemodules = final.jrl-cmakemodulesv2;

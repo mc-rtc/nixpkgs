@@ -1,21 +1,17 @@
 {
-  lib,
   buildPythonPackage,
-  fetchFromGitHub,
   python,
   setuptools,
+  build,
   pyqt5,
   numpy,
   matplotlib,
   qt5,
   mc-rtc,
   with-mc-rtc ? true,
+  fetchFromGitHub,
+  lib,
 }:
-let
-  common = import ../mc-rtc-common.nix {
-    inherit fetchFromGitHub;
-  };
-in
 buildPythonPackage {
   pname = "mc_log_ui";
   version = "1.0.0";
@@ -23,9 +19,17 @@ buildPythonPackage {
   # without this it tries to use cmake when including mc-rtc, why?
   dontConfigure = true;
 
-  src = "${common.src}/utils/python/mc_log_ui";
+  src = fetchFromGitHub {
+    owner = "mc-rtc";
+    repo = "mc_log_ui";
+    rev = "3675017b00650f0eb03ffcc8dc938a43a8ab2670";
+    hash = "sha256-A+eHuliV2O5YUEOV4UbSbzuPUKDdu10qvX4w036FSWY=";
+  };
 
-  build-system = [ setuptools ];
+  build-system = [
+    setuptools
+    build
+  ];
   propagatedBuildInputs = [
     pyqt5
     numpy
