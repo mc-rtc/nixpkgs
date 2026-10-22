@@ -191,6 +191,9 @@ in
             };
           };
 
+          # TODO: automatically generate based on a list of robots
+          # This list could be automatically constructed from all packages by adding a passthru.mc-rtc.isRobotModule flag
+          # to each robot module
           default-all-robots = {
             extends = [ "default" ];
             runtime = with pkgs; {
@@ -200,6 +203,7 @@ in
                 mc-human
                 mc-robogami
                 mc-pepper
+                mc-openarm
               ]
               ++ lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [
                 mc-panda
@@ -216,6 +220,16 @@ in
               ];
               controllers = [ robogami-controller ];
             };
+          };
+
+          mc-openarm = {
+            extends = [ "default" ];
+            runtime = with pkgs; {
+              robots = [
+                mc-openarm
+              ];
+            };
+            mainRobot = "OpenArmV2";
           };
 
           full = {
@@ -358,6 +372,7 @@ in
                   mc-human
                   mc-robogami
                   mc-pepper
+                  mc-openarm
                   ;
 
                 # Robot description
@@ -368,6 +383,7 @@ in
                   h1-description
                   ur5e-description
                   human-description
+                  openarm-description
                   robogami-description
                   pepper-description
                   ;
