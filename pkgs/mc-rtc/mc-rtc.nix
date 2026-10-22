@@ -25,13 +25,11 @@
   boost,
   mesh-sampling,
   python3Packages,
-  qt,
   doxygen,
   bundler, # Ruby for bundle dependencies
   with-ros ? false,
   mc-rtc-ros-compat, # for both ros-free and ros version
   with-python-bindings ? true,
-  with-python-tools ? true,
   rclcpp ? null,
   nav-msgs ? null,
   sensor-msgs ? null,
@@ -46,50 +44,55 @@ let
     inherit fetchFromGitHub;
   };
   use-python-bindings = with-python-bindings && !stdenv.hostPlatform.isDarwin;
-  use-python-tools =
-    with-python-tools
-    && (
-      if lib.hasInfix "qtbase-5" qt.qtbase.name then
-        true
-      else
-        builtins.trace "warning: mc-rtc is requesting with-python-tools but it is not compatible with qt6, will build without it." false
-    );
   # for python utils (mc_rtc_new_fsm_controller, mc_log_ui, etc)
   pythonEnv = python3Packages.python.withPackages (ps: [
     ps.gitpython
-    ps.pyqt5
-    ps.matplotlib
   ]);
+
+  fullSrc = fetchFromGitHub {
+    owner = "arntanguy";
+    repo = "mc_rtc";
+    rev = "36dede60306676d92dcee9ee0b338236f730c612";
+    hash = "sha256-HcnIQBZy7SsV5VD+zi+1LX/MGk9xfeR3E7voTKBsegw=";
+  };
+  # # For local Tests
+  # fullSrc = builtins.path { path = /home/arnaud/devel/mc-rtc-nix/workspace/mc_rtc; name = "mc_rtc"; };
+
+  # Exclude python utils
+  filteredSrc = lib.cleanSourceWith {
+    filter =
+      name: _type:
+      let
+        relPath = lib.removePrefix (toString common.src + "/") (toString name);
+      in
+      !(lib.hasPrefix "utils/python" relPath);
+    src = fullSrc;
+  };
 in
 
 (if with-ros then buildRosPackage else stdenv.mkDerivation) {
   pname = "mc-rtc";
-  inherit (common) version src;
+  inherit (common) version;
 
-  postPatch =
-    (lib.optionalString with-ros ''
+  src = builtins.trace (builtins.toJSON filteredSrc) filteredSrc;
+
+  postPatch = (
+    lib.optionalString with-ros ''
       sed -i 's@set(''${PACKAGE_PATH_VAR} "''${''${PACKAGE}_INSTALL_PREFIX}@\0/share/''${PACKAGE}@' CMakeLists.txt
-    '')
-    + (lib.optionalString with-python-tools ''
-      substituteInPlace utils/mc_rtc_new_fsm_controller.in.py \
-        --replace '"mc_rtc_new_controller", os.path.dirname(__file__) + "/mc_rtc_new_controller"' \
-                  '"mc_rtc_new_controller", os.path.dirname(__file__) + "/mc_rtc_new_controller.py"'
-    '');
+    ''
+  );
 
-  dontWrapQtApps = true; # we wrap mc_log_ui manually in postInstall
   buildInputs = [
     jrl-cmakemodules
-    qt.qtbase
-  ]
-  ++ lib.optional use-python-tools qt.wrapQtAppsHook;
+  ];
   nativeBuildInputs = [
     cmake
     # for documentation
     doxygen
     bundler
   ]
-  ++ lib.optional (use-python-bindings || use-python-tools) pythonEnv
   ++ lib.optionals use-python-bindings [
+    pythonEnv
     python3Packages.distutils
     python3Packages.pytest
     python3Packages.cython
@@ -134,7 +137,7 @@ in
 
   cmakeFlags = [
     (lib.cmakeBool "PYTHON_BINDING" use-python-bindings)
-    (lib.cmakeBool "BUILD_MC_RTC_PYTHON_UTILS" use-python-tools) # does not need bindings
+    (lib.cmakeBool "BUILD_MC_RTC_PYTHON_UTILS" false)
     "-DBUILD_TESTING=OFF" # FIXME
     "-DINSTALL_DOCUMENTATION=ON" # Use a different output
   ];
@@ -143,8 +146,8 @@ in
 
   passthru = {
     inherit with-ros;
-    with-python-tools = use-python-tools;
     with-python-bindings = use-python-bindings;
+    fullSrc = fullSrc;
   };
 
   # XXX: Without this fixupPhase fails due to RPATHS references to /build/
@@ -153,24 +156,6 @@ in
       echo "Shrinking RPATH for $binary"
       patchelf --shrink-rpath --allowed-rpath-prefixes "$NIX_STORE" "$binary"
     done
-  '';
-
-  postInstall = ''
-    # Wrap mc_log_ui with PYTHONPATH and QT_PLUGIN_PATH
-    # TODO make it a proper python project with pyproject.toml
-    wrapProgram $out/bin/mc_log_ui \
-      --set PYTHONPATH "$out/${python3Packages.python.sitePackages}:${pythonEnv}/${python3Packages.python.sitePackages}:$out/bin:$PYTHONPATH" \
-      --set QT_PLUGIN_PATH "${qt.qtbase}/${qt.qtbase.qtPluginPrefix}"
-
-    # TODO make it proper python projects
-    mv $out/bin/mc_rtc_new_controller $out/bin/mc_rtc_new_controller.py
-    makeWrapper ${python3Packages.python.interpreter} $out/bin/mc_rtc_new_controller \
-      --add-flags $out/bin/mc_rtc_new_controller.py \
-      --set PYTHONPATH "$out/${python3Packages.python.sitePackages}:${pythonEnv}/${python3Packages.python.sitePackages}:$out/bin:$PYTHONPATH"
-
-    wrapProgram $out/bin/mc_rtc_new_fsm_controller \
-      --set PYTHONPATH "$out/${python3Packages.python.sitePackages}:${pythonEnv}/${python3Packages.python.sitePackages}:$out/bin:$PYTHONPATH"
-
   '';
 
   meta = with lib; {
