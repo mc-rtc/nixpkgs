@@ -23,6 +23,7 @@
     inherit (prev.rosPackages.${rosDistro})
       buildRosPackage
       ament-cmake
+      ament-lint-auto
       rclcpp
       ros2cli
       ros2run
@@ -110,6 +111,7 @@
     ur-description = final.callPackage ./pkgs/mc-rtc/robots/descriptions/ur-description.nix { };
     ur5e-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/ur5e-description.nix { };
     human-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/human-description.nix { };
+    openarm-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/openarm-description.nix { };
     jvrc-description = callWithRos ./pkgs/mc-rtc-data/jvrc-description.nix { };
     mc-env-description = callWithRos ./pkgs/mc-rtc-data/mc-env-description.nix { };
     mc-int-obj-description = callWithRos ./pkgs/mc-rtc-data/mc-int-obj-description.nix { };
@@ -125,6 +127,7 @@
     mc-panda-lirmm = final.callPackage ./pkgs/mc-rtc/robots/mc-panda/mc-panda-lirmm.nix { };
     mc-robogami = final.callPackage ./pkgs/mc-rtc/robots/modules/mc-robogami.nix { };
     mc-pepper = final.callPackage ./pkgs/mc-rtc/robots/mc-pepper/mc-pepper.nix { };
+    mc-openarm = final.callPackage ./pkgs/mc-rtc/robots/modules/mc-openarm.nix { };
 
     libfranka_0_9_2 = final.callPackage ./pkgs/mc-rtc/robots/mc-panda/libfranka.nix { };
     # mc-franka = final.callPackage ./pkgs/mc-rtc/robots/mc-panda/mc-franka.nix {};
