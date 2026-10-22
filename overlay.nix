@@ -111,7 +111,9 @@
     ur-description = final.callPackage ./pkgs/mc-rtc/robots/descriptions/ur-description.nix { };
     ur5e-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/ur5e-description.nix { };
     human-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/human-description.nix { };
-    openarm-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/openarm-description.nix { };
+    openarm-description =
+      final.callPackage ./pkgs/mc-rtc/robots/descriptions/openarm-description.nix
+        { };
     jvrc-description = callWithRos ./pkgs/mc-rtc-data/jvrc-description.nix { };
     mc-env-description = callWithRos ./pkgs/mc-rtc-data/mc-env-description.nix { };
     mc-int-obj-description = callWithRos ./pkgs/mc-rtc-data/mc-int-obj-description.nix { };

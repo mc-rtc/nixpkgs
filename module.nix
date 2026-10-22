@@ -203,7 +203,6 @@ in
                 mc-human
                 mc-robogami
                 mc-pepper
-                mc-openarm
               ]
               ++ lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [
                 mc-panda
@@ -211,6 +210,7 @@ in
               ]
               ++ lib.optionals (cfg.with-ros || superbuildCfg.withRos) [
                 mc-ur5e
+                mc-openarm
               ]
               ++ lib.optionals cfg.overlays.private [
                 mc-hrp2
@@ -372,7 +372,6 @@ in
                   mc-human
                   mc-robogami
                   mc-pepper
-                  mc-openarm
                   ;
 
                 # Robot description
@@ -418,7 +417,10 @@ in
               }
 
               (lib.optionalAttrs (cfg.with-ros || superbuildCfg.withRos) {
-                inherit (pkgs) mc-rtc-rviz;
+                inherit (pkgs)
+                  mc-rtc-rviz
+                  mc-openarm
+                  ;
               })
               (lib.optionalAttrs (!pkgs.stdenv.hostPlatform.isDarwin) {
                 inherit (pkgs) mc-udp mc-mujoco mc-mujoco-full;
