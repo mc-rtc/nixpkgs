@@ -16,14 +16,13 @@
 
 stdenv.mkDerivation {
   pname = if (with-lssol && eigen-lssol != null) then "tvm-lssol" else "tvm-qld";
-  version = "0.9.8";
+  version = "0.10.0";
 
-  # master
   src = fetchFromGitHub {
     owner = "jrl-umi3218";
     repo = "tvm";
-    tag = "v0.9.8";
-    hash = "sha256-1JgwB5je5qLVuSJJ7pn9iOe9TGKZSlWofulRl+SAHsE=";
+    tag = "v0.10.0";
+    hash = "sha256-/Ops3mTyxtvtJ4jZTO700TNhvgIfKtLKBn8rOmmx1Mo=";
   };
 
   buildInputs = [
