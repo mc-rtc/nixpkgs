@@ -14,13 +14,13 @@
 
 stdenv.mkDerivation rec {
   pname = "mesh-sampling";
-  version = "1.2.0";
+  version = "1.3.1";
 
   src = fetchFromGitHub {
     owner = "jrl-umi3218";
     repo = "mesh_sampling";
-    tag = "v${version}";
-    hash = "sha256-M0YRXR4a4jhP074n7PMWUhUqLpU/P4jDuTH4G76YQdo=";
+    tag = "v1.3.1";
+    hash = "sha256-4/RD8uKGouyU6hI5bHQ3eJwAjS2j6QxOPtiAomXZkyg=";
   };
 
   buildInputs = [
