@@ -175,82 +175,89 @@ in
 
         maybe-mc-mujoco = mujoco-pkg: lib.optional (!pkgs.stdenv.hostPlatform.isDarwin) mujoco-pkg;
 
-        builtInConfigurations = {
-          minimal = {
-            runtime = { };
-          };
-
-          default = {
-            extends = [ "minimal" ];
-            runtime = {
-              observers = [ pkgs.mc-state-observation ];
-              apps = [
-                pkgs.mc-rtc-magnum
-              ]
-              ++ lib.optionals (cfg.with-ros || superbuildCfg.withRos) [ pkgs.mc-rtc-rviz ];
+        builtInConfigurations =
+          let
+            genRobotSuperbuild = mcRobotPkgName: mainRobotName: controllerName: {
+              extends = [ "default" ];
+              enabled = controllerName;
+              runtime = {
+                robots = [
+                  pkgs.${mcRobotPkgName}
+                ];
+              };
+              mainRobot = mainRobotName;
             };
-          };
-
-          # TODO: automatically generate based on a list of robots
-          # This list could be automatically constructed from all packages by adding a passthru.mc-rtc.isRobotModule flag
-          # to each robot module
-          default-all-robots = {
-            extends = [ "default" ];
-            runtime = with pkgs; {
-              robots = [
-                mc-g1
-                mc-h1
-                mc-human
-                mc-robogami
-                mc-pepper
-              ]
-              ++ lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [
-                mc-panda
-                mc-panda-lirmm
-              ]
-              ++ lib.optionals (cfg.with-ros || superbuildCfg.withRos) [
-                mc-ur5e
-                mc-openarm
-              ]
-              ++ lib.optionals cfg.overlays.private [
-                mc-hrp2
-                mc-hrp4
-                mc-hrp5-p
-                mc-miroki
-              ];
-              controllers = [ robogami-controller ];
+          in
+          {
+            minimal = {
+              runtime = { };
             };
-          };
 
-          mc-openarm = {
-            extends = [ "default" ];
-            runtime = with pkgs; {
-              robots = [
-                mc-openarm
-              ];
+            default = {
+              extends = [ "minimal" ];
+              runtime = {
+                observers = [ pkgs.mc-state-observation ];
+                apps = [
+                  pkgs.mc-rtc-magnum
+                ]
+                ++ lib.optionals (cfg.with-ros || superbuildCfg.withRos) [ pkgs.mc-rtc-rviz ];
+              };
             };
-            mainRobot = "OpenArmV2";
-          };
 
-          full = {
-            extends = [ "default-all-robots" ];
-            runtime = {
-              plugins = [
-                pkgs.mc-robot-model-update
-              ]
-              ++ lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [
-                pkgs.mc-force-shoe-plugin
-              ];
-              apps = maybe-mc-mujoco pkgs.mc-mujoco-full;
+            # TODO: automatically generate based on a list of robots
+            # This list could be automatically constructed from all packages by adding a passthru.mc-rtc.isRobotModule flag
+            # to each robot module
+            default-all-robots = {
+              extends = [ "default" ];
+              runtime = with pkgs; {
+                robots = [
+                  mc-g1
+                  mc-h1
+                  mc-human
+                  mc-robogami
+                  mc-triorb
+                  mc-pepper
+                ]
+                ++ lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [
+                  mc-panda
+                  mc-panda-lirmm
+                ]
+                ++ lib.optionals (cfg.with-ros || superbuildCfg.withRos) [
+                  mc-ur5e
+                  mc-openarm
+                ]
+                ++ lib.optionals cfg.overlays.private [
+                  mc-hrp2
+                  mc-hrp4
+                  mc-hrp5-p
+                  mc-miroki
+                ];
+                controllers = [ robogami-controller ];
+              };
             };
-          };
 
-          # auto-generated configs from controller's passthru.mc-rtc
-          ismpc-walking = mc-rtc-lib.mkControllerSuperbuild pkgs pkgs.ismpc-walking-controller { };
-          lipm-walking = mc-rtc-lib.mkControllerSuperbuild pkgs pkgs.lipm-walking-controller { };
-          robogami = mc-rtc-lib.mkControllerSuperbuild pkgs pkgs.robogami-controller { };
-          panda-prosthesis = mc-rtc-lib.mkControllerSuperbuild pkgs pkgs.panda-prosthesis { };
-        };
+            mc-openarm = genRobotSuperbuild "mc-openarm" "OpenArmV2" "Posture";
+            mc-triorb = genRobotSuperbuild "mc-triorb" "TriOrb" "Posture";
+
+            full = {
+              extends = [ "default-all-robots" ];
+              runtime = {
+                plugins = [
+                  pkgs.mc-robot-model-update
+                ]
+                ++ lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [
+                  pkgs.mc-force-shoe-plugin
+                ];
+                apps = maybe-mc-mujoco pkgs.mc-mujoco-full;
+              };
+            };
+
+            # auto-generated configs from controller's passthru.mc-rtc
+            ismpc-walking = mc-rtc-lib.mkControllerSuperbuild pkgs pkgs.ismpc-walking-controller { };
+            lipm-walking = mc-rtc-lib.mkControllerSuperbuild pkgs pkgs.lipm-walking-controller { };
+            robogami = mc-rtc-lib.mkControllerSuperbuild pkgs pkgs.robogami-controller { };
+            panda-prosthesis = mc-rtc-lib.mkControllerSuperbuild pkgs pkgs.panda-prosthesis { };
+          };
 
         configurations = builtInConfigurations // superbuildCfg.configurations;
 
@@ -371,6 +378,7 @@ in
                   mc-ur5e
                   mc-human
                   mc-robogami
+                  mc-triorb
                   mc-pepper
                   ;
 
@@ -384,6 +392,7 @@ in
                   human-description
                   openarm-description
                   robogami-description
+                  triorb-description
                   pepper-description
                   ;
 
