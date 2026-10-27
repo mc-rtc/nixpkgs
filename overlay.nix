@@ -118,6 +118,7 @@
     mc-env-description = callWithRos ./pkgs/mc-rtc-data/mc-env-description.nix { };
     mc-int-obj-description = callWithRos ./pkgs/mc-rtc-data/mc-int-obj-description.nix { };
     robogami-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/robogami-description.nix { };
+    triorb-description = callWithRos ./pkgs/mc-rtc/robots/descriptions/triorb-description.nix { };
     pepper-description = callWithRos ./pkgs/mc-rtc/robots/mc-pepper/pepper-description.nix { };
 
     # Robot modules
@@ -128,6 +129,7 @@
     mc-panda = final.callPackage ./pkgs/mc-rtc/robots/mc-panda { };
     mc-panda-lirmm = final.callPackage ./pkgs/mc-rtc/robots/mc-panda/mc-panda-lirmm.nix { };
     mc-robogami = final.callPackage ./pkgs/mc-rtc/robots/modules/mc-robogami.nix { };
+    mc-triorb = final.callPackage ./pkgs/mc-rtc/robots/modules/mc-triorb.nix { };
     mc-pepper = final.callPackage ./pkgs/mc-rtc/robots/mc-pepper/mc-pepper.nix { };
     mc-openarm = final.callPackage ./pkgs/mc-rtc/robots/modules/mc-openarm.nix { };
 
@@ -220,10 +222,6 @@
     #############
     # 3rd-party #
     #############
-    eigen-fmt = final.callPackage ./pkgs/3rd-party/eigen-fmt {
-      fmt = prev.fmt_10;
-    };
-
     imguizmo = final.callPackage ./pkgs/3rd-party/imguizmo.nix {
       jrl-cmakemodules = final.jrl-cmakemodulesv2;
     };

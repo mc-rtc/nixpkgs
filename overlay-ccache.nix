@@ -104,7 +104,6 @@ let
     "mc-mujoco-full"
     "mc-force-shoe-plugin"
     "mc-robot-model-update"
-    "eigen-fmt"
     "imguizmo"
     "corrade"
     "magnum"
