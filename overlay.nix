@@ -222,10 +222,6 @@
     #############
     # 3rd-party #
     #############
-    eigen-fmt = final.callPackage ./pkgs/3rd-party/eigen-fmt {
-      fmt = prev.fmt_10;
-    };
-
     imguizmo = final.callPackage ./pkgs/3rd-party/imguizmo.nix {
       jrl-cmakemodules = final.jrl-cmakemodulesv2;
     };

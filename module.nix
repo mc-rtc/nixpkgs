@@ -350,7 +350,6 @@ in
                   eigen-qld
                   state-observation
                   mesh-sampling
-                  eigen-fmt
                   copra
                   ;
 
