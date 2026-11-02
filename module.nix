@@ -362,6 +362,13 @@ in
                   mc-rtc-ros-compat-ros
                   ;
 
+                # magnum
+                inherit (pkgs)
+                  corrade
+                  magnum
+                  magnum-with-plugins
+                  ;
+
                 # Main GUIs and applications
                 inherit (pkgs)
                   mc-rtc-ticker
