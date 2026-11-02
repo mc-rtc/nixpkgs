@@ -225,16 +225,21 @@
     imguizmo = final.callPackage ./pkgs/3rd-party/imguizmo.nix {
       jrl-cmakemodules = final.jrl-cmakemodulesv2;
     };
-    corrade = final.callPackage ./pkgs/3rd-party/magnum/corrade.nix { };
-    magnum = final.callPackage ./pkgs/3rd-party/magnum/magnum.nix { };
-    magnum-integration = final.callPackage ./pkgs/3rd-party/magnum/magnum-integration.nix {
-      with-imguiintegration = true;
+    corrade = final.callPackage ./pkgs/3rd-party/magnum-nixpkgs/corrade/package.nix { };
+    magnum = final.callPackage ./pkgs/3rd-party/magnum-nixpkgs/magnum/package.nix { };
+    magnum-integration =
+      final.callPackage ./pkgs/3rd-party/magnum-nixpkgs/magnum-integration/package.nix
+        {
+          withImguiIntegration = true;
+        };
+    magnum-plugins = final.callPackage ./pkgs/3rd-party/magnum-nixpkgs/magnum-plugins/package.nix {
+      withAssimpImporter = true;
+      withStbImageImporter = true;
     };
-    magnum-plugins = final.callPackage ./pkgs/3rd-party/magnum/magnum-plugins.nix {
-      magnumPluginsWithAssimpImporter = true;
-      magnumPluginsWithStbImageImporter = true;
-    };
-    magnum-with-plugins = final.callPackage ./pkgs/3rd-party/magnum/magnum-with-plugins.nix { };
+    magnum-with-plugins = final.magnum.withPlugins [
+      final.magnum-integration
+      final.magnum-plugins
+    ];
     mc-rtc-imgui = final.callPackage ./pkgs/mc-rtc-imgui {
       jrl-cmakemodules = final.jrl-cmakemodulesv2;
     };
@@ -243,6 +248,8 @@
     mc-rtc-magnum = final.callPackage ./pkgs/mc-rtc-magnum/standalone.nix { };
 
     sphinx-cmake = final.callPackage ./pkgs/sphinx-cmake.nix { };
+
+    # test magnum nixpkgs
 
     ##########
     # TOOLS  #
