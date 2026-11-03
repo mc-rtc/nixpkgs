@@ -18,10 +18,9 @@
 }:
 let
   cfg = config.mc-rtc-nix;
-  flakoboros-cfg = config.flakoboros;
   rosDistro =
     let
-      distro = flakoboros-cfg.rosShellDistro;
+      distro = "rolling"; # flakoboros-cfg.rosShellDistro;
     in
     builtins.trace "rosDistro evaluated to: ${distro}" distro;
 
