@@ -3,6 +3,7 @@
 
 {
   lib,
+  makeWrapper,
   buildRosPackage,
   stdenv,
   fetchFromGitHub,
@@ -79,6 +80,7 @@ in
   dontWrapQtApps = true; # we wrap mc_log_ui manually in postInstall
   buildInputs = [
     jrl-cmakemodules
+    makeWrapper
     qt.qtbase
   ]
   ++ lib.optional use-python-tools qt.wrapQtAppsHook;
@@ -155,7 +157,7 @@ in
     done
   '';
 
-  postInstall = ''
+  postInstall = lib.optionalString use-python-tools ''
     # Wrap mc_log_ui with PYTHONPATH and QT_PLUGIN_PATH
     # TODO make it a proper python project with pyproject.toml
     wrapProgram $out/bin/mc_log_ui \
