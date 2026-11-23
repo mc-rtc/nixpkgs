@@ -23,6 +23,7 @@
     inherit (prev.rosPackages.${rosDistro})
       buildRosPackage
       ament-cmake
+      ament-index-cpp
       ament-lint-auto
       rclcpp
       ros2cli

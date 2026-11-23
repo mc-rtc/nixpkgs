@@ -8,7 +8,7 @@
   with-ros ? true,
   buildRosPackage,
   rclcpp,
-  ament-cmake, # for ament-index-cpp
+  ament-index-cpp,
   human-description ? null, # for tests
 }:
 
@@ -16,13 +16,13 @@ builtins.trace "Building mc-rtc-ros-compat (with-ros: ${lib.boolToString with-ro
   (if with-ros then buildRosPackage else stdenv.mkDerivation)
   {
     pname = "mc-rtc-ros-compat";
-    version = "1.1.0";
+    version = "1.1.1";
 
     src = fetchFromGitHub {
       owner = "jrl-umi3218";
       repo = "mc_rtc_ros_compat";
-      tag = "v1.1.0";
-      hash = "sha256-UW3QxN86nd0072cvAl8dxkoyS9EDEHxMEBK/mWtLvek=";
+      tag = "v1.1.1";
+      hash = "sha256-ii8t2Ul6I1Rz3CUiFCQhehxjfmuP64SfHNBwrcVi0Ew=";
     };
 
     dontWrapQtApps = true;
@@ -37,7 +37,7 @@ builtins.trace "Building mc-rtc-ros-compat (with-ros: ${lib.boolToString with-ro
     ++ lib.optional (human-description != null) human-description;
     propagatedBuildInputs = lib.optionals with-ros [
       rclcpp
-      ament-cmake
+      ament-index-cpp
     ];
 
     cmakeFlags = [
