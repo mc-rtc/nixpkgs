@@ -4,8 +4,7 @@
   ament-cmake,
   fetchFromGitHub,
   mc-rtc,
-  qt, # either qt5 or qt6
-  qwt,
+  qt6Packages,
   libGL,
   libGLU,
   rviz2,
@@ -19,19 +18,13 @@
 
 let
   pname = "mc-rtc-rviz-panel";
-  version = "1.7.0";
+  version = "1.8.2";
   fetched = fetchFromGitHub {
     owner = "jrl-umi3218";
     repo = "mc_rtc_ros";
-    rev = "f08a371289c49e677cd5107c581569811b03117f";
-    hash = "sha256-/hWW4ETOUEGo8wFOBA97dt0ZmOB0AI7mfs35/cfIDJE=";
+    tag = "v1.8.2";
+    hash = "sha256-UrxFFZZyqTKdOakCs4ZCf38+CF9ZUq/IYB+ZVEYfFTg=";
   };
-  # fetchFromGitHub {
-  #   owner = "arntanguy";
-  #   repo = "mc_rtc_ros";
-  #   rev = "topic/nix";
-  #   hash = "sha256-Gmxv/nYKGcK9G1r0i08kLzTc2Dj8qCAQA/S0bic1LKA=";
-  # };
 in
 buildRosPackage {
   pname = "${pname}";
@@ -48,8 +41,8 @@ buildRosPackage {
     rviz2
     visualization-msgs
     tf2-ros
-    qt.qtbase
-    qwt
+    qt6Packages.qtbase
+    qt6Packages.qwt
     libGL
     libGLU
     ros2cli

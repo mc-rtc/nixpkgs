@@ -47,14 +47,7 @@ let
     inherit fetchFromGitHub;
   };
   use-python-bindings = with-python-bindings && !stdenv.hostPlatform.isDarwin;
-  use-python-tools =
-    with-python-tools
-    && (
-      if lib.hasInfix "qtbase-5" qt.qtbase.name then
-        true
-      else
-        builtins.trace "warning: mc-rtc is requesting with-python-tools but it is not compatible with qt6, will build without it." false
-    );
+  use-python-tools = with-python-tools;
   # for python utils (mc_rtc_new_fsm_controller, mc_log_ui, etc)
   pythonEnv = python3Packages.python.withPackages (ps: [
     ps.gitpython

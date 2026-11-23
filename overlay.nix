@@ -159,9 +159,8 @@
       with-ros = true;
     };
     mc-rtc-python-utils = final.callPackage ./pkgs/mc-rtc/mc-rtc-python-utils.nix { };
-    mc-rtc-rviz-panel = prev.libsForQt5.callPackage ./pkgs/mc-rtc/ros/mc-rtc-rviz-panel.nix {
-      inherit qt;
-    };
+    # uses qt6
+    mc-rtc-rviz-panel = final.callPackage ./pkgs/mc-rtc/ros/mc-rtc-rviz-panel.nix { };
     mc-rtc-rviz = final.callPackage ./pkgs/mc-rtc/ros/mc-rtc-rviz.nix { };
     mc-rtc-ticker = final.callPackage ./pkgs/mc-rtc/mc-rtc-ticker.nix { inherit rosDistro; };
     gram-savitzky-golay = final.callPackage ./pkgs/gram-savitzky-golay { };

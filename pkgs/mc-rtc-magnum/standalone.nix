@@ -10,17 +10,16 @@
   imguizmo,
 }:
 
-# TODO: modularize the build of mc_rtc-magnum instead of using submodules
 stdenv.mkDerivation {
-  pname = "mc-rtc-magnum";
-  version = "main";
+  pname = "mc-rtc-magnum-standalone";
+  version = "1.7.0-unstable-2026-11-23";
 
   # nix branch on official remote
   src = fetchFromGitHub {
     owner = "mc-rtc";
     repo = "mc_rtc-magnum";
-    rev = "ede3e81fc2eafce633821718ed52b386cdd7671b";
-    hash = "sha256-tZN1qwxHYfJb9jEWwv6PWxO+LTVkoGBZLkjdDhFDS+I=";
+    rev = "f0b651aae21a85f02a959d114e179aff51fbf743";
+    hash = "sha256-Bn918sARWRzJzuwjklgORA0dOApBw9fCeOgu+HbfVtI=";
   };
 
   nativeBuildInputs = [
