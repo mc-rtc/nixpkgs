@@ -23,6 +23,7 @@
     inherit (prev.rosPackages.${rosDistro})
       buildRosPackage
       ament-cmake
+      ament-index-cpp
       ament-lint-auto
       rclcpp
       ros2cli
@@ -158,7 +159,8 @@
       with-ros = true;
     };
     mc-rtc-python-utils = final.callPackage ./pkgs/mc-rtc/mc-rtc-python-utils.nix { };
-    mc-rtc-rviz-panel = prev.libsForQt5.callPackage ./pkgs/mc-rtc/ros/mc-rtc-rviz-panel.nix {
+    # uses qt6
+    mc-rtc-rviz-panel = final.callPackage ./pkgs/mc-rtc/ros/mc-rtc-rviz-panel.nix {
       inherit qt;
     };
     mc-rtc-rviz = final.callPackage ./pkgs/mc-rtc/ros/mc-rtc-rviz.nix { };

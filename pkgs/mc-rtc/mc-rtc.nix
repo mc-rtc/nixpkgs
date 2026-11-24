@@ -3,6 +3,7 @@
 
 {
   lib,
+  makeWrapper,
   buildRosPackage,
   stdenv,
   fetchFromGitHub,
@@ -46,14 +47,7 @@ let
     inherit fetchFromGitHub;
   };
   use-python-bindings = with-python-bindings && !stdenv.hostPlatform.isDarwin;
-  use-python-tools =
-    with-python-tools
-    && (
-      if lib.hasInfix "qtbase-5" qt.qtbase.name then
-        true
-      else
-        builtins.trace "warning: mc-rtc is requesting with-python-tools but it is not compatible with qt6, will build without it." false
-    );
+  use-python-tools = with-python-tools;
   # for python utils (mc_rtc_new_fsm_controller, mc_log_ui, etc)
   pythonEnv = python3Packages.python.withPackages (ps: [
     ps.gitpython
@@ -79,6 +73,7 @@ in
   dontWrapQtApps = true; # we wrap mc_log_ui manually in postInstall
   buildInputs = [
     jrl-cmakemodules
+    makeWrapper
     qt.qtbase
   ]
   ++ lib.optional use-python-tools qt.wrapQtAppsHook;
@@ -155,7 +150,7 @@ in
     done
   '';
 
-  postInstall = ''
+  postInstall = lib.optionalString use-python-tools ''
     # Wrap mc_log_ui with PYTHONPATH and QT_PLUGIN_PATH
     # TODO make it a proper python project with pyproject.toml
     wrapProgram $out/bin/mc_log_ui \
