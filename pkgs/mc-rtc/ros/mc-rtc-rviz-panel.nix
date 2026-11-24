@@ -4,7 +4,7 @@
   ament-cmake,
   fetchFromGitHub,
   mc-rtc,
-  qt6Packages,
+  qt, # qt5 or qt6
   libGL,
   libGLU,
   rviz2,
@@ -41,8 +41,8 @@ buildRosPackage {
     rviz2
     visualization-msgs
     tf2-ros
-    qt6Packages.qtbase
-    qt6Packages.qwt
+    qt.qtbase
+    qt.qwt
     libGL
     libGLU
     ros2cli

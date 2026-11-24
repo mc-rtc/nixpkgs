@@ -20,7 +20,9 @@ let
   cfg = config.mc-rtc-nix;
   rosDistro =
     let
-      distro = "rolling"; # flakoboros-cfg.rosShellDistro;
+      # See flakoboros module configuration below.
+      flakoboros-cfg = config.flakoboros;
+      distro = flakoboros-cfg.rosShellDistro;
     in
     builtins.trace "rosDistro evaluated to: ${distro}" distro;
 
@@ -34,7 +36,7 @@ let
   mcRtcPkgsOverlay =
     final: prev:
     let
-      qt = if (qtVersion == "5") then final.qt5 else final.qt6;
+      qt = if (qtVersion == "5") then final.libsForQt5 else final.qt6Packages;
     in
     (import ./overlay.nix {
       inherit lib;
@@ -143,7 +145,8 @@ in
     flakoboros = {
       # FIXME: Flakoboros pulls in qtwayland that does not exist on macos
       enableQt = false;
-      rosShellDistro = "kilted";
+      # Do not explicitely set it to use flakoboros' module's defaults
+      # rosShellDistro = "kilted";
       extraPackages = [ "ninja" ];
       overlays = [
         (builtins.trace "using overlay mc-rtc-pkgs (public)" mcRtcPkgsOverlay)
