@@ -130,11 +130,12 @@ in
   cmakeFlags = [
     (lib.cmakeBool "PYTHON_BINDING" use-python-bindings)
     (lib.cmakeBool "BUILD_MC_RTC_PYTHON_UTILS" use-python-tools) # does not need bindings
-    "-DBUILD_TESTING=OFF" # FIXME
+    (lib.cmakeBool "BUILD_TESTING" true) # FIXME: We build testing but do not run it in the sandbox for now
     "-DINSTALL_DOCUMENTATION=ON" # Use a different output
+    (lib.cmakeBool "DMC_RTC_DEVELOPPER_MODE" true) # Disable exact version embedding to speed up recompilations
   ];
 
-  doCheck = true;
+  doCheck = false; # FIXME
 
   passthru = {
     inherit with-ros;
