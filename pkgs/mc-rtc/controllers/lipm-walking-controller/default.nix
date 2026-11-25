@@ -3,6 +3,7 @@
   mkMcRtcController,
   lib,
   fetchFromGitHub,
+  jrl-cmakemodules,
   cmake,
   mc-rtc,
   copra,
@@ -20,6 +21,7 @@ mkMcRtcController rec {
   };
 
   nativeBuildInputs = [ cmake ];
+  buildInputs = [ jrl-cmakemodules ];
   propagatedBuildInputs = [
     mc-rtc
     copra
