@@ -4,6 +4,7 @@
   makeWrapper,
   fetchFromGitHub,
   cmake,
+  fetchpatch,
   pkg-config,
   mc-rtc-imgui,
   magnum-with-plugins,
@@ -21,6 +22,14 @@ stdenv.mkDerivation {
     rev = "f0b651aae21a85f02a959d114e179aff51fbf743";
     hash = "sha256-Bn918sARWRzJzuwjklgORA0dOApBw9fCeOgu+HbfVtI=";
   };
+
+  patches = [
+    (fetchpatch {
+      name = "update-magnum-pr";
+      url = "https://patch-diff.githubusercontent.com/raw/mc-rtc/mc_rtc-magnum/pull/19.patch";
+      hash = "sha256-pCNEgA2ubajY9/N9CZ5qD2zOQVlxAdfiXui6Gq06siI=";
+    })
+  ];
 
   nativeBuildInputs = [
     cmake
@@ -58,6 +67,11 @@ stdenv.mkDerivation {
       --replace "Magnum::AnySceneImporter" "" \
       --replace "MagnumPlugins::AssimpImporter" "" \
       --replace "MagnumPlugins::StbImageImporter" ""
+  ''
+  + ''
+    substituteInPlace src/McRtcGui.h \
+      --replace '#include "MagnumClient.h"' \
+                $'#include "MagnumClient.h"\n#include <Magnum/Shaders/PhongGL.h>'
   '';
 
   cmakeFlags = [
