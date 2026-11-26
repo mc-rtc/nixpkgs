@@ -55,7 +55,10 @@
     });
 
     eigen3-to-python = final.callPackage ./pkgs/eigen3-to-python { };
-    spacevecalg = final.callPackage ./pkgs/spacevecalg { inherit with-python; };
+    spacevecalg = final.callPackage ./pkgs/spacevecalg {
+      inherit with-python;
+      jrl-cmakemodules = final.jrl-cmakemodulesv2;
+    };
     rbdyn = final.callPackage ./pkgs/rbdyn { inherit with-python; };
     eigen-qld = final.callPackage ./pkgs/eigen-qld { };
     eigen-quadprog = final.callPackage ./pkgs/eigen-quadprog { };

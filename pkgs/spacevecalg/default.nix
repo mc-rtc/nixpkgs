@@ -2,64 +2,62 @@
   stdenv,
   lib,
   cmake,
-  pkg-config,
   jrl-cmakemodules,
   doxygen,
   eigen,
   boost,
   fetchFromGitHub,
   python3Packages,
-  with-python ? true,
+  graphviz,
+  sphinx,
+  sphinx-cmake,
 }:
 
-let
-  use-python = with-python && !stdenv.hostPlatform.isDarwin;
-in
 stdenv.mkDerivation {
   pname = "spacevecalg";
   version = "1.2.10";
-
+  dontWrapQtApps = true; # XXX: why is this needed?
+  # pull 74
   src = fetchFromGitHub {
     owner = "jrl-umi3218";
-    repo = "SpaceVecAlg";
-    tag = "v1.2.10";
-    hash = "sha256-fTKKj3m8cO4F46LlO7r8JeuWLhlyRcX7EblHroDYFkQ=";
+    repo = "spacevecalg";
+    rev = "6d720a1c14168759874c9016a6bda7125d956c9e";
+    hash = "sha256-6zMUa6iuDgEV4ArzfvKtP3dZ82niBOzXfmvtUTyFoN4=";
   };
-
-  buildInputs = [
-    jrl-cmakemodules
+  outputs = [
+    "out"
+    "doc"
+  ];
+  cmakeFlags = [
+    (lib.cmakeBool "PYTHON_BINDINGS" false)
+    (lib.cmakeBool "BUILD_DOCUMENTATION" true)
+    (lib.cmakeBool "INSTALL_DOCUMENTATION" true)
+    (lib.cmakeBool "NANOBIND_BINDINGS" true)
+    (lib.cmakeBool "NANOBIND_DOCUMENTATION" true)
+    (lib.cmakeBool "BUILD_TESTING" false)
   ];
   nativeBuildInputs = [
     cmake
-    pkg-config
+    jrl-cmakemodules
     doxygen
-  ]
-  ++ lib.optionals use-python [
-    python3Packages.cython
     python3Packages.python
-    python3Packages.distutils
-    python3Packages.pytest
+    python3Packages.pythonImportsCheckHook
+    python3Packages.pytestCheckHook
+    # nanobind documentation
+    graphviz
+    sphinx
+    sphinx-cmake
+    python3Packages.sphinx-autodoc2
+    python3Packages.sphinx-book-theme
   ];
-
   propagatedBuildInputs = [
     eigen
     boost
-  ]
-  ++ lib.optionals use-python [
-    python3Packages.numpy
-    python3Packages.eigen3-to-python
+    python3Packages.nanoeigenpy
+    python3Packages.nanobind
   ];
 
-  cmakeFlags = [
-    (lib.cmakeBool "PYTHON_BINDING" use-python)
-  ];
-
-  doCheck = true;
-
-  meta = with lib; {
-    description = "Spatial Vector Algebra with the Eigen library";
-    homepage = "https://github.com/jrl-umi3218/SpaceVecAlg";
-    license = licenses.bsd2;
-    platforms = platforms.all;
-  };
+  # pytest
+  pythonImportsCheck = [ "sva" ];
+  pytestFlagsArray = [ "$src/binding/nanobind/tests" ];
 }
