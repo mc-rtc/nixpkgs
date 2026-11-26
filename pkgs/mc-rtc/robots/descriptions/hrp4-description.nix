@@ -12,8 +12,8 @@
   version = "1.0.0";
   separateDebugInfo = false;
 
-  src = builtins.fetchGit {
-    url = "git@github.com:isri-aist/hrp4_description";
+  src = fetchGit {
+    url = "ssh://git@github.com/isri-aist/hrp4_description";
     # Release v1.0.0
     rev = "7fcf6c471eaca5a5018b917560b9a62e4e4aa069";
   };

@@ -13,8 +13,8 @@
   separateDebugInfo = false;
 
   # TODO: release hrp2_drc_descriptioin
-  src = builtins.fetchGit {
-    url = "git@github.com:isri-aist/hrp2_drc_description.git";
+  src = fetchGit {
+    url = "ssh://git@github.com/isri-aist/hrp2_drc_description.git";
     # Commit for v1.0.0 release
     rev = "d0b4648965622e9546fbff620ece09be7e6dee8a";
   };
@@ -36,7 +36,7 @@
 
   meta = with lib; {
     description = "HRP2 urdf and data";
-    homepage = "https://gite.lirmm.fr/mc-hrp2/hrp2_drc";
+    homepage = "https://github.com/isri-aist/hrp2_drc_description";
     license = licenses.bsd2;
     platforms = platforms.all;
   };

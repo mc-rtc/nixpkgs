@@ -19,7 +19,7 @@ stdenv.mkDerivation {
   version = "1.0.0";
 
   src = builtins.fetchGit {
-    url = "git@github.com:isri-aist/mc_hrp5_p";
+    url = "ssh://git@github.com/isri-aist/mc_hrp5_p";
     rev = "3b5341abaeefde63981372183bd4fada4848b201";
   };
 
@@ -43,7 +43,7 @@ stdenv.mkDerivation {
 
   meta = with lib; {
     description = "HRP5-P RobotModule for mc-rtc";
-    homepage = "https://gite.lirmm.fr/mc-hrp5/mc-hrp5_p";
+    homepage = "https://github.com/isri-aist/mc-hrp5_p";
     license = licenses.bsd2;
     platforms = platforms.all;
   };

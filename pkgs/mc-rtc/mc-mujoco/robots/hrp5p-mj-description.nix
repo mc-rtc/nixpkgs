@@ -31,7 +31,7 @@ stdenv.mkDerivation (_finalAttrs: {
 
   meta = with lib; {
     description = "hrp5p simulation robot model mc_mujoco";
-    homepage = "https://github.com/jrl-umi3218/hrp5p_env_description";
+    homepage = "https://github.com/isri-aist/hrp5p_mj_description";
     license = licenses.bsd2;
     platforms = platforms.all;
   };

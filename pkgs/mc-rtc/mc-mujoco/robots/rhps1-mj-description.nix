@@ -8,8 +8,8 @@ stdenv.mkDerivation (_finalAttrs: {
   version = "1.0.0";
   pname = "rhps1-mj-description";
 
-  src = builtins.fetchGit {
-    url = "git@github.com:isri-aist/rhps1_mj_description";
+  src = fetchGit {
+    url = "ssh://git@github.com/isri-aist/rhps1_mj_description";
     # Release v1.0.0
     rev = "ac2d198b21b6f431fffc2c93ad03b04f98c4135a";
   };

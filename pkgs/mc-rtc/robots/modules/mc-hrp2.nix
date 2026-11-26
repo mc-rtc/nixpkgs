@@ -25,8 +25,8 @@ stdenv.mkDerivation {
   # };
 
   # PR https://github.com/isri-aist/mc-hrp2/pull/8
-  src = builtins.fetchGit {
-    url = "git@github.com:arntanguy/mc-hrp2";
+  src = fetchGit {
+    url = "ssh://git@github.com/arntanguy/mc-hrp2";
     rev = "2d72cd24eda07c2cd131e53a26e20643a522261e";
   };
 
@@ -52,7 +52,7 @@ stdenv.mkDerivation {
 
   meta = with lib; {
     description = "HRP2DRC RobotModule for mc-rtc";
-    homepage = "https://gite.lirmm.fr/mc-hrp2/mc-hrp2";
+    homepage = "https://github.com/isri-aist/mc-hrp2/mc-hrp2";
     license = licenses.bsd2;
     platforms = platforms.all;
   };

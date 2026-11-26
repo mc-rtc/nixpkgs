@@ -13,7 +13,7 @@
   separateDebugInfo = false;
 
   src = fetchGit {
-    url = "git@github.com:isri-aist/miroki_description";
+    url = "ssh://git@github.com/isri-aist/miroki_description";
     rev = "294ccaceb61f331902c5117558ddb4af82836074";
   };
 

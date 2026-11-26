@@ -12,12 +12,10 @@ stdenv.mkDerivation (_finalAttrs: {
   # XXX: this is built from a private github repository
   src =
     builtins.trace "politopix is currently a private repository, ask I2S Bordeaux to make it public"
-      (
-        builtins.fetchGit {
-          url = "git@github.com:Hugo-L3174/politopix";
-          rev = "f625b42de4404eea16aabcf720f2cee19dfdc406";
-        }
-      );
+      (fetchGit {
+        url = "ssh://git@github.com/Hugo-L3174/politopix";
+        rev = "f625b42de4404eea16aabcf720f2cee19dfdc406";
+      });
 
   nativeBuildInputs = [ cmake ];
   propagatedBuildInputs = [ boost ];
