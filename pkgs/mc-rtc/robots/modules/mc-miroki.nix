@@ -10,7 +10,7 @@ stdenv.mkDerivation {
   version = "0.0.0";
 
   src = fetchGit {
-    url = "git@github.com:isri-aist/mc_miroki";
+    url = "ssh://git@github.com/isri-aist/mc_miroki";
     rev = "f783343513a9beab86c33ce286e49f7291ed963e";
   };
 

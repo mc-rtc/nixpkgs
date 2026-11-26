@@ -12,8 +12,8 @@
   version = "1.0.0";
   separateDebugInfo = false;
 
-  src = builtins.fetchGit {
-    url = "git@github.com:isri-aist/rhps1_description";
+  src = fetchGit {
+    url = "ssh://git@github.com/isri-aist/rhps1_description";
     # Release v1.0.0
     rev = "fd50b0d3424a926b8ad78b983389573b0453c88a";
   };
